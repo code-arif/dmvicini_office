@@ -33,3 +33,6 @@ Route::group(['middleware' => 'guest:api'], function () {
     //pinned education
     Route::get('/pinned/education', [EducationPageController::class,'pinnedEducation']);
 });
+
+
+

@@ -37,6 +37,30 @@
                     </a>
                 </li>
 
+                {{-- manage investment --}}
+                <li class="slide">
+                    <a class="side-menu__item" data-bs-toggle="slide" href="#">
+                        <i class="fa-solid fa-seedling"
+                            style="font-size:24px; width:24px; height:24px; margin-right: 5px;"></i>
+                        <span class="side-menu__label">Manage Investment</span>
+                        <i class="angle fa fa-angle-right"></i>
+                    </a>
+
+
+                    <ul class="slide-menu">
+                        <li><a href="{{ route('show.category.list') }}" class="slide-item">Assets Classes</a>
+                        </li>
+                        <li><a href="{{ route('show.education.list') }}" class="slide-item">Investment Types</a>
+                        </li>
+                        <li><a href="{{ route('show.education.list') }}" class="slide-item">Strategies</a>
+                        </li>
+                        <li><a href="{{ route('show.education.list') }}" class="slide-item">Locations</a>
+                        </li>
+                        <li><a href="{{ route('show.education.list') }}" class="slide-item">Investments</a>
+                        </li>
+                    </ul>
+                </li>
+
                 {{-- blog/education --}}
                 <li class="slide">
                     <a class="side-menu__item" data-bs-toggle="slide" href="#">
@@ -84,24 +108,11 @@
                         <span class="side-menu__label">Settings</span><i class="angle fa fa-angle-right"></i>
                     </a>
 
-                    {{-- <ul class="slide-menu">
-                        <li><a href="{{ route('setting.general.index') }}" class="slide-item">Privacy Policy</a>
-                        </li>
-                        <li><a href="{{ route('setting.general.index') }}" class="slide-item">Terms or Services</a>
-                        </li>
-                        <li><a href="{{ route('setting.general.index') }}" class="slide-item">General Settings</a>
-                        </li>
-                        <li><a href="{{ route('setting.profile.index') }}" class="slide-item">Profile Settings</a>
-                        </li>
+                    <ul class="slide-menu">
+                        <li><a href="{{ route('setting.general.index') }}" class="slide-item">General Settings</a></li>
+                        <li><a href="{{ route('setting.profile.index') }}" class="slide-item">Profile Settings</a></li>
 
-                        <li><a href="{{ route('setting.mail.index') }}" class="slide-item">Mail Settings</a></li>
-                        <li><a href="{{ route('setting.stripe.index') }}" class="slide-item">Stripe Settings</a></li>
-                        <li><a href="{{ route('admin.testimonial.index') }}" class="slide-item">Testimonials</a></li>
-
-                        <li><a href="{{ route('admin.social_media.index') }}" class="slide-item">Social Media</a>
-                        </li>
-                        <li><a href="{{ route('setting.social.index') }}" class="slide-item">Google Settings</a></li>
-                    </ul> --}}
+                    </ul>
                 </li>
             </ul>
             <div class="slide-right" id="slide-right"><svg xmlns="http://www.w3.org/2000/svg" fill="#7b8191"
