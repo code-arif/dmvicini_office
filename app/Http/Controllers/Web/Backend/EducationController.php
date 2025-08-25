@@ -32,9 +32,10 @@ class EducationController extends Controller
 
                 // Description (truncate to 50 chars)
                 ->addColumn('description', function ($item) {
-                    return strlen($item->description) > 50
-                        ? substr($item->description, 0, 50) . '...'
-                        : $item->description ?? '-';
+                    $text = strip_tags($item->description); // remove HTML tags
+                    return strlen($text) > 50
+                        ? substr($text, 0, 50) . '...'
+                        : $text;
                 })
 
                 // Category
@@ -63,6 +64,7 @@ class EducationController extends Controller
                 // Action buttons
                 ->addColumn('action', function ($item) {
                     return '
+                    <div class="d-flex justify-content-start gap-2">
                         <button type="button" class="btn btn-sm btn-primary editBtn"
                             data-id="' . $item->id . '"
                             data-title="' . e($item->title) . '"
@@ -75,6 +77,7 @@ class EducationController extends Controller
                         <button type="button" class="btn btn-sm btn-danger deleteBtn" onclick="showDeleteConfirm(' . $item->id . ')">
                             <i class="fas fa-trash"></i> Delete
                         </button>
+                    </div>
                         ';
                 })
                 // status (Pin/Unpin toggle)

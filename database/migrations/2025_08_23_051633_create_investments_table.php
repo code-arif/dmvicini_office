@@ -14,15 +14,25 @@ return new class extends Migration
         Schema::create('investments', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->foreignId('asset_class_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('investment_type_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('asset_class_id')->nullable()->constrained()->cascadeOnDelete();
+            $table->foreignId('investment_type_id')->nullable()->constrained()->cascadeOnDelete();
             $table->foreignId('investments_strategy_id')->nullable()->constrained('investment_strategies')->nullOnDelete();
-            $table->foreignId('location_id')->nullable()->constrained()->nullOnDelete();
+
             $table->string('term')->nullable();
             $table->string('min_investment')->nullable();
             $table->string('targeted_irr')->nullable();
             $table->string('thumbnail')->nullable();
             $table->longText('summary')->nullable();
+
+            //location
+            $table->string('country')->nullable();
+            $table->string('city')->nullable();
+            $table->string('state')->nullable();
+            $table->string('address')->nullable();
+            $table->text('map_url')->nullable();
+            $table->decimal('latitude', 10, 7)->nullable();
+            $table->decimal('longitude', 10, 7)->nullable();
+
             $table->string('banker_phone')->nullable();
             $table->string('banker_email')->nullable();
             $table->enum('status', ['draft', 'active', 'closed'])->default('draft');

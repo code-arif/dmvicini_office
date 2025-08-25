@@ -8,6 +8,10 @@ use App\Http\Controllers\Web\Backend\DashboardController;
 use App\Http\Controllers\Web\Backend\EducationController;
 use App\Http\Controllers\Web\Backend\CMS\AuthPageController;
 use App\Http\Controllers\Web\Backend\CMS\HelpCenterController;
+use App\Http\Controllers\Web\Backend\Investment\AssetClassController;
+use App\Http\Controllers\Web\Backend\Investment\InvestmentController;
+use App\Http\Controllers\Web\Backend\Investment\InvestmentStrategyController;
+use App\Http\Controllers\Web\Backend\Investment\InvestmentTypeController;
 use App\Http\Controllers\Web\Backend\Settings\ProfileController;
 use App\Http\Controllers\Web\Backend\Settings\SettingController;
 use App\Http\Controllers\Web\Backend\Settings\DynamicPageController;
@@ -43,6 +47,34 @@ Route::middleware(['auth', 'admin'])->group(function () {
 
         //pinned and unpinned education
         Route::post('/pin/{edu_id}', [EducationController::class, 'togglePinned'])->name('pinned.education');
+    });
+
+    //investment manage
+    Route::group(['prefix' => 'investment'], function () {
+        //asset class
+        Route::get('/asset-class', [AssetClassController::class, 'index'])->name('show.asset.class.list');
+        Route::post('/asset-class/store', [AssetClassController::class, 'store'])->name('asset.class.store');
+        Route::post('/asset-class/update/{id}', [AssetClassController::class, 'update'])->name('asset.class.update');
+        Route::delete('/asset-class/delete/{id}', [AssetClassController::class, 'destroy'])->name('asset.class.delete');
+
+        //inventment type
+        Route::get('/type', [InvestmentTypeController::class, 'index'])->name('show.investment.type.list');
+        Route::post('/type/store', [InvestmentTypeController::class, 'store'])->name('investment.type.store');
+        Route::post('/type/update/{id}', [InvestmentTypeController::class, 'update'])->name('investment.type.update');
+        Route::delete('/type/delete/{id}', [InvestmentTypeController::class, 'destroy'])->name('investment.type.delete');
+
+        //investment strategy
+        Route::get('/strategy', [InvestmentStrategyController::class, 'index'])->name('show.investment.strategy.list');
+        Route::post('/strategy/store', [InvestmentStrategyController::class, 'store'])->name('investment.strategy.store');
+        Route::post('/strategy/update/{id}', [InvestmentStrategyController::class, 'update'])->name('investment.strategy.update');
+        Route::delete('/strategy/delete/{id}', [InvestmentStrategyController::class, 'destroy'])->name('investment.strategy.delete');
+
+        //investment
+        Route::get('/', [InvestmentController::class,'index'])->name('get.investments');
+        Route::get('/create', [InvestmentController::class,'create'])->name('create.investment');
+        Route::post('/store', [InvestmentController::class,'store'])->name('store.investment');
+        Route::get('/edit/{id}', [InvestmentController::class,'edit'])->name('edit.investment');
+        Route::get('/update/{id}', [InvestmentController::class,'update'])->name('update.investment');
     });
 });
 

@@ -1,5 +1,5 @@
 @extends('backend.app')
-@section('title', 'Categories')
+@section('title', 'Asset Classes')
 
 @push('styles')
     <link href="{{ asset('default/datatable.css') }}" rel="stylesheet" />
@@ -16,11 +16,11 @@
                 <!-- PAGE-HEADER -->
                 <div class="page-header">
                     <div>
-                        <h1 class="page-title">Categories</h1>
+                        <h1 class="page-title">Asset Classes</h1>
                     </div>
                     <div class="ms-auto pageheader-btn">
                         <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="javascript:void(0);">Categories</a></li>
+                            <li class="breadcrumb-item"><a href="javascript:void(0);">Asset Classes</a></li>
                             <li class="breadcrumb-item active" aria-current="page">Index</li>
                         </ol>
                     </div>
@@ -32,10 +32,10 @@
                     <div class="col-12 col-sm-12">
                         <div class="card product-sales-main">
                             <div class="card-header border-bottom">
-                                <h3 class="card-title mb-0">Category List</h3>
+                                <h3 class="card-title mb-0">Asset Classes List</h3>
                                 <div class="card-options ms-auto">
                                     <button class="btn btn-primary btn-sm" data-bs-toggle="modal"
-                                        data-bs-target="#createCategoryModal">Add Category</button>
+                                        data-bs-target="#createClassModal">Add Class</button>
                                 </div>
                             </div>
                             <div class="card-body">
@@ -44,7 +44,7 @@
                                         <thead>
                                             <tr>
                                                 <th class="bg-transparent border-bottom-0">#</th>
-                                                <th class="bg-transparent border-bottom-0">Title</th>
+                                                <th class="bg-transparent border-bottom-0">Name</th>
                                                 <th class="bg-transparent border-bottom-0">Description</th>
                                                 <th class="bg-transparent border-bottom-0">Created</th>
                                                 <th class="bg-transparent border-bottom-0">Action</th>
@@ -65,23 +65,23 @@
     </div>
     <!-- CONTAINER CLOSED -->
 
-    <!-- Create Category Modal -->
-    <div class="modal fade" id="createCategoryModal" tabindex="-1" aria-labelledby="createCategoryModalLabel"
+    <!-- Create Class Modal -->
+    <div class="modal fade" id="createClassModal" tabindex="-1" aria-labelledby="createClassModalLabel"
         aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <form id="createCategoryForm" method="post">
+                <form id="createClassForm" method="post">
                     @csrf
                     <div class="modal-header">
-                        <h5 class="modal-title" id="createCategoryModalLabel">Create Category</h5>
+                        <h5 class="modal-title" id="createClassModalLabel">Create Class</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <div class="form-group mb-2">
-                            <label for="createTitle" class="form-label">Title</label>
-                            <input type="text" class="form-control" name="title" id="createTitle"
-                                placeholder="Enter title">
-                            <span class="text-danger error-text title_error"></span>
+                            <label for="createName" class="form-label">Name</label>
+                            <input type="text" class="form-control" name="name" id="createName"
+                                placeholder="Enter Class Name">
+                            <span class="text-danger error-text name_error"></span>
                         </div>
 
                         <div class="form-group mb-2">
@@ -100,23 +100,23 @@
     </div>
 
     <!-- Edit Category Modal -->
-    <div class="modal fade" id="editCategoryModal" tabindex="-1" aria-labelledby="editCategoryModalLabel"
+    <div class="modal fade" id="editClassModal" tabindex="-1" aria-labelledby="editClassModalLabel"
         aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <form id="editCategoryForm" method="post">
+                <form id="editClassForm" method="post">
                     @csrf
                     @method('POST')
                     <input type="hidden" name="id" id="editID">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="editCategoryModalLabel">Edit Category</h5>
+                        <h5 class="modal-title" id="editClassModalLabel">Edit Class</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <div class="form-group mb-2">
-                            <label for="editTitle" class="form-label">Title</label>
-                            <input type="text" class="form-control" name="title" id="editTitle">
-                            <span class="text-danger error-text title_error"></span>
+                            <label for="editName" class="form-label">Name</label>
+                            <input type="text" class="form-control" name="name" id="editName">
+                            <span class="text-danger error-text name_error"></span>
                         </div>
 
                         <div class="form-group mb-2">
@@ -149,7 +149,7 @@
                 processing: true,
                 serverSide: true,
                 ajax: {
-                    url: "{{ route('show.category.list') }}",
+                    url: "{{ route('show.asset.class.list') }}",
                     type: "GET",
                 },
                 columns: [{
@@ -159,8 +159,8 @@
                         searchable: false
                     },
                     {
-                        data: 'title',
-                        name: 'title'
+                        data: 'name',
+                        name: 'name'
                     },
                     {
                         data: 'description',
@@ -180,11 +180,11 @@
             });
 
             // CREATE
-            $('#createCategoryForm').on('submit', function(e) {
+            $('#createClassForm').on('submit', function(e) {
                 e.preventDefault();
                 let formData = new FormData(this);
                 $.ajax({
-                    url: "{{ route('category.store') }}",
+                    url: "{{ route('asset.class.store') }}",
                     method: "POST",
                     data: formData,
                     processData: false,
@@ -194,8 +194,8 @@
                     },
                     success: function(res) {
                         if (res.success) {
-                            $('#createCategoryModal').modal('hide');
-                            $('#createCategoryForm')[0].reset();
+                            $('#createClassModal').modal('hide');
+                            $('#createClassForm')[0].reset();
                             dTable.ajax.reload();
                             toastr.success(res.message);
                         } else {
@@ -213,22 +213,22 @@
             // OPEN EDIT MODAL
             $(document).on('click', '.editBtn', function() {
                 let id = $(this).data('id');
-                let title = $(this).data('title');
+                let name = $(this).data('name');
                 let description = $(this).data('description');
 
                 $('#editID').val(id);
-                $('#editTitle').val(title);
+                $('#editName').val(name);
                 $('#editDescription').val(description);
-                $('#editCategoryModal').modal('show');
+                $('#editClassModal').modal('show');
             });
 
             // UPDATE
-            $('#editCategoryForm').on('submit', function(e) {
+            $('#editClassForm').on('submit', function(e) {
                 e.preventDefault();
                 let id = $('#editID').val();
                 let formData = new FormData(this);
                 $.ajax({
-                    url: "{{ route('category.update', ':id') }}".replace(':id', id),
+                    url: "{{ route('asset.class.update', ':id') }}".replace(':id', id),
                     method: "POST",
                     data: formData,
                     processData: false,
@@ -238,7 +238,7 @@
                     },
                     success: function(res) {
                         if (res.success) {
-                            $('#editCategoryModal').modal('hide');
+                            $('#editClassModal').modal('hide');
                             dTable.ajax.reload();
                             toastr.success(res.message);
                         } else {
@@ -259,7 +259,7 @@
         function showDeleteConfirm(id) {
             event.preventDefault();
             Swal.fire({
-                title: 'Are you sure you want to delete this category?',
+                title: 'Are you sure you want to delete this class?',
                 text: 'If you delete this, it will be gone forever.',
                 icon: 'warning',
                 showCancelButton: true,
@@ -276,7 +276,7 @@
         // Delete Button
         function deleteItem(id) {
             NProgress.start();
-            let url = "{{ route('category.delete', ':id') }}";
+            let url = "{{ route('asset.class.delete', ':id') }}";
             let csrfToken = '{{ csrf_token() }}';
             $.ajax({
                 type: "DELETE",

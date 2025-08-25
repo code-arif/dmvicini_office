@@ -1,5 +1,5 @@
 @extends('backend.app')
-@section('title', 'Categories')
+@section('title', 'Investment Strategy')
 
 @push('styles')
     <link href="{{ asset('default/datatable.css') }}" rel="stylesheet" />
@@ -16,11 +16,11 @@
                 <!-- PAGE-HEADER -->
                 <div class="page-header">
                     <div>
-                        <h1 class="page-title">Categories</h1>
+                        <h1 class="page-title">Investment Strategy</h1>
                     </div>
                     <div class="ms-auto pageheader-btn">
                         <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="javascript:void(0);">Categories</a></li>
+                            <li class="breadcrumb-item"><a href="javascript:void(0);">Investment Strategy</a></li>
                             <li class="breadcrumb-item active" aria-current="page">Index</li>
                         </ol>
                     </div>
@@ -32,10 +32,10 @@
                     <div class="col-12 col-sm-12">
                         <div class="card product-sales-main">
                             <div class="card-header border-bottom">
-                                <h3 class="card-title mb-0">Category List</h3>
+                                <h3 class="card-title mb-0">Investment Strategy List</h3>
                                 <div class="card-options ms-auto">
                                     <button class="btn btn-primary btn-sm" data-bs-toggle="modal"
-                                        data-bs-target="#createCategoryModal">Add Category</button>
+                                        data-bs-target="#createStrategyModal">Add Strategy</button>
                                 </div>
                             </div>
                             <div class="card-body">
@@ -44,7 +44,7 @@
                                         <thead>
                                             <tr>
                                                 <th class="bg-transparent border-bottom-0">#</th>
-                                                <th class="bg-transparent border-bottom-0">Title</th>
+                                                <th class="bg-transparent border-bottom-0">Name</th>
                                                 <th class="bg-transparent border-bottom-0">Description</th>
                                                 <th class="bg-transparent border-bottom-0">Created</th>
                                                 <th class="bg-transparent border-bottom-0">Action</th>
@@ -65,28 +65,29 @@
     </div>
     <!-- CONTAINER CLOSED -->
 
-    <!-- Create Category Modal -->
-    <div class="modal fade" id="createCategoryModal" tabindex="-1" aria-labelledby="createCategoryModalLabel"
+    <!-- Create Strategy Modal -->
+    <div class="modal fade" id="createStrategyModal" tabindex="-1" aria-labelledby="createStrategyModalLabel"
         aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <form id="createCategoryForm" method="post">
+                <form id="createStrategyForm" method="post">
                     @csrf
                     <div class="modal-header">
-                        <h5 class="modal-title" id="createCategoryModalLabel">Create Category</h5>
+                        <h5 class="modal-title" id="createStrategyModalLabel">Create Strategy</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <div class="form-group mb-2">
-                            <label for="createTitle" class="form-label">Title</label>
-                            <input type="text" class="form-control" name="title" id="createTitle"
-                                placeholder="Enter title">
-                            <span class="text-danger error-text title_error"></span>
+                            <label for="createName" class="form-label">Name</label>
+                            <input type="text" class="form-control" name="name" id="createName"
+                                placeholder="Enter Class Name">
+                            <span class="text-danger error-text name_error"></span>
                         </div>
 
                         <div class="form-group mb-2">
                             <label for="createDescription" class="form-label">Description</label>
-                            <textarea class="form-control" name="description" id="createDescription" rows="3" placeholder="Enter description"></textarea>
+                            <textarea class="form-control" name="description" id="createDescription" rows="3"
+                                placeholder="Enter description"></textarea>
                             <span class="text-danger error-text description_error"></span>
                         </div>
                     </div>
@@ -100,23 +101,23 @@
     </div>
 
     <!-- Edit Category Modal -->
-    <div class="modal fade" id="editCategoryModal" tabindex="-1" aria-labelledby="editCategoryModalLabel"
+    <div class="modal fade" id="editStrategyModal" tabindex="-1" aria-labelledby="editStrategyModalLabel"
         aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <form id="editCategoryForm" method="post">
+                <form id="editStrategyForm" method="post">
                     @csrf
                     @method('POST')
                     <input type="hidden" name="id" id="editID">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="editCategoryModalLabel">Edit Category</h5>
+                        <h5 class="modal-title" id="editStrategyModalLabel">Edit Strategy</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <div class="form-group mb-2">
-                            <label for="editTitle" class="form-label">Title</label>
-                            <input type="text" class="form-control" name="title" id="editTitle">
-                            <span class="text-danger error-text title_error"></span>
+                            <label for="editName" class="form-label">Name</label>
+                            <input type="text" class="form-control" name="name" id="editName">
+                            <span class="text-danger error-text name_error"></span>
                         </div>
 
                         <div class="form-group mb-2">
@@ -138,6 +139,16 @@
 @push('scripts')
     <script>
         $(document).ready(function() {
+            // Initialize Summernote once for create and edit
+            $('#createDescription, #editDescription').summernote({
+                height: 200,
+                toolbar: [
+                    ['style', ['bold', 'italic', 'underline', 'clear']],
+                    ['para', ['ul', 'ol', 'paragraph']],
+                    ['insert', ['link', 'picture']],
+                ]
+            });
+
             $.ajaxSetup({
                 headers: {
                     "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
@@ -149,7 +160,7 @@
                 processing: true,
                 serverSide: true,
                 ajax: {
-                    url: "{{ route('show.category.list') }}",
+                    url: "{{ route('show.investment.strategy.list') }}",
                     type: "GET",
                 },
                 columns: [{
@@ -159,8 +170,8 @@
                         searchable: false
                     },
                     {
-                        data: 'title',
-                        name: 'title'
+                        data: 'name',
+                        name: 'name'
                     },
                     {
                         data: 'description',
@@ -180,11 +191,11 @@
             });
 
             // CREATE
-            $('#createCategoryForm').on('submit', function(e) {
+            $('#createStrategyForm').on('submit', function(e) {
                 e.preventDefault();
                 let formData = new FormData(this);
                 $.ajax({
-                    url: "{{ route('category.store') }}",
+                    url: "{{ route('investment.strategy.store') }}",
                     method: "POST",
                     data: formData,
                     processData: false,
@@ -194,8 +205,10 @@
                     },
                     success: function(res) {
                         if (res.success) {
-                            $('#createCategoryModal').modal('hide');
-                            $('#createCategoryForm')[0].reset();
+                            $('#createStrategyModal').modal('hide');
+                            // reset form + summernote
+                            $('#createStrategyForm')[0].reset();
+                            $('#createDescription').summernote('reset');
                             dTable.ajax.reload();
                             toastr.success(res.message);
                         } else {
@@ -212,23 +225,20 @@
 
             // OPEN EDIT MODAL
             $(document).on('click', '.editBtn', function() {
-                let id = $(this).data('id');
-                let title = $(this).data('title');
-                let description = $(this).data('description');
-
-                $('#editID').val(id);
-                $('#editTitle').val(title);
-                $('#editDescription').val(description);
-                $('#editCategoryModal').modal('show');
+                let e = $(this);
+                $('#editID').val(e.data('id'));
+                $('#editName').val(e.data('name'));
+                $('#editDescription').summernote('code', e.data('description'));
+                $('#editStrategyModal').modal('show');
             });
 
             // UPDATE
-            $('#editCategoryForm').on('submit', function(e) {
+            $('#editStrategyForm').on('submit', function(e) {
                 e.preventDefault();
                 let id = $('#editID').val();
                 let formData = new FormData(this);
                 $.ajax({
-                    url: "{{ route('category.update', ':id') }}".replace(':id', id),
+                    url: "{{ route('investment.strategy.update', ':id') }}".replace(':id', id),
                     method: "POST",
                     data: formData,
                     processData: false,
@@ -238,7 +248,10 @@
                     },
                     success: function(res) {
                         if (res.success) {
-                            $('#editCategoryModal').modal('hide');
+                            $('#editStrategyModal').modal('hide');
+                            // reset form + summernote
+                            $('#editStrategyForm')[0].reset();
+                            $('#editDescription').summernote('reset');
                             dTable.ajax.reload();
                             toastr.success(res.message);
                         } else {
@@ -252,6 +265,12 @@
                     }
                 });
             });
+
+            // When modal hide -> reset form automatically
+            $('#createStrategyModal, #editStrategyModal').on('hidden.bs.modal', function() {
+                $(this).find('form')[0].reset();
+                $(this).find('.summernote').summernote('reset');
+            });
         });
 
 
@@ -259,7 +278,7 @@
         function showDeleteConfirm(id) {
             event.preventDefault();
             Swal.fire({
-                title: 'Are you sure you want to delete this category?',
+                title: 'Are you sure you want to delete this strategy?',
                 text: 'If you delete this, it will be gone forever.',
                 icon: 'warning',
                 showCancelButton: true,
@@ -276,7 +295,7 @@
         // Delete Button
         function deleteItem(id) {
             NProgress.start();
-            let url = "{{ route('category.delete', ':id') }}";
+            let url = "{{ route('investment.strategy.delete', ':id') }}";
             let csrfToken = '{{ csrf_token() }}';
             $.ajax({
                 type: "DELETE",

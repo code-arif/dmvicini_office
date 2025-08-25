@@ -37,30 +37,6 @@
                     </a>
                 </li>
 
-                {{-- manage investment --}}
-                <li class="slide">
-                    <a class="side-menu__item" data-bs-toggle="slide" href="#">
-                        <i class="fa-solid fa-seedling"
-                            style="font-size:24px; width:24px; height:24px; margin-right: 5px;"></i>
-                        <span class="side-menu__label">Manage Investment</span>
-                        <i class="angle fa fa-angle-right"></i>
-                    </a>
-
-
-                    <ul class="slide-menu">
-                        <li><a href="{{ route('show.category.list') }}" class="slide-item">Assets Classes</a>
-                        </li>
-                        <li><a href="{{ route('show.education.list') }}" class="slide-item">Investment Types</a>
-                        </li>
-                        <li><a href="{{ route('show.education.list') }}" class="slide-item">Strategies</a>
-                        </li>
-                        <li><a href="{{ route('show.education.list') }}" class="slide-item">Locations</a>
-                        </li>
-                        <li><a href="{{ route('show.education.list') }}" class="slide-item">Investments</a>
-                        </li>
-                    </ul>
-                </li>
-
                 {{-- blog/education --}}
                 <li class="slide">
                     <a class="side-menu__item" data-bs-toggle="slide" href="#">
@@ -86,6 +62,28 @@
                         <i class="fa-solid fa-clipboard-question side-menu__icon"></i>
                         <span class="side-menu__label">FAQ</span>
                     </a>
+                </li>
+
+                {{-- manage investment --}}
+                <li class="slide">
+                    <a class="side-menu__item" data-bs-toggle="slide" href="#">
+                        <i class="fa-solid fa-seedling"
+                            style="font-size:24px; width:24px; height:24px; margin-right: 5px;"></i>
+                        <span class="side-menu__label">Manage Investment</span>
+                        <i class="angle fa fa-angle-right"></i>
+                    </a>
+
+
+                    <ul class="slide-menu">
+                        <li><a href="{{ route('show.asset.class.list') }}" class="slide-item">Assets Classes</a>
+                        </li>
+                        <li><a href="{{ route('show.investment.type.list') }}" class="slide-item">Investment Types</a>
+                        </li>
+                        <li><a href="{{ route('show.investment.strategy.list') }}" class="slide-item">Strategies</a>
+                        </li>
+                        <li><a href="{{ route('get.investments') }}" class="slide-item">Investments</a>
+                        </li>
+                    </ul>
                 </li>
 
                 <h3>CMS</h3>
