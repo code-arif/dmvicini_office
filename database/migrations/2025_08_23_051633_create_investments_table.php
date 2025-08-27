@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('term')->nullable();
             $table->string('min_investment')->nullable();
             $table->string('targeted_irr')->nullable();
+            $table->string('targeted_eps')->nullable();
             $table->string('thumbnail')->nullable();
             $table->longText('summary')->nullable();
 

@@ -6,5 +6,5 @@ use Illuminate\Database\Eloquent\Model;
 
 class InvestmentRisk extends Model
 {
-    //
+    protected $guarded = [];
 }

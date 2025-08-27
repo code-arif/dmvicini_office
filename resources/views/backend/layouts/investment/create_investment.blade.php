@@ -102,19 +102,24 @@
 
                                     <div class="row">
                                         <!-- Term -->
-                                        <div class="col-md-4 mb-3">
+                                        <div class="col-md-3 mb-3">
                                             <label class="form-label">Term</label>
                                             <input type="text" name="term" class="form-control">
                                         </div>
                                         <!-- Min Investment -->
-                                        <div class="col-md-4 mb-3">
+                                        <div class="col-md-3 mb-3">
                                             <label class="form-label">Min Investment</label>
                                             <input type="text" name="min_investment" class="form-control">
                                         </div>
                                         <!-- Targeted IRR -->
-                                        <div class="col-md-4 mb-3">
+                                        <div class="col-md-3 mb-3">
                                             <label class="form-label">Targeted IRR</label>
                                             <input type="text" name="targeted_irr" class="form-control">
+                                        </div>
+                                        <!-- Targeted ESP -->
+                                        <div class="col-md-3 mb-3">
+                                            <label class="form-label">Targeted ESP</label>
+                                            <input type="text" name="targeted_eps" class="form-control">
                                         </div>
                                     </div>
 

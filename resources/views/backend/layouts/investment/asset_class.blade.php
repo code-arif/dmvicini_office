@@ -68,7 +68,7 @@
     <!-- Create Class Modal -->
     <div class="modal fade" id="createClassModal" tabindex="-1" aria-labelledby="createClassModalLabel"
         aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <form id="createClassForm" method="post">
                     @csrf
@@ -86,7 +86,7 @@
 
                         <div class="form-group mb-2">
                             <label for="createDescription" class="form-label">Description</label>
-                            <textarea class="form-control" name="description" id="createDescription" rows="3" placeholder="Enter description"></textarea>
+                            <textarea class="form-control" name="description" id="createDescription" rows="8" placeholder="Enter description"></textarea>
                             <span class="text-danger error-text description_error"></span>
                         </div>
                     </div>
@@ -102,7 +102,7 @@
     <!-- Edit Category Modal -->
     <div class="modal fade" id="editClassModal" tabindex="-1" aria-labelledby="editClassModalLabel"
         aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <form id="editClassForm" method="post">
                     @csrf
@@ -121,7 +121,7 @@
 
                         <div class="form-group mb-2">
                             <label for="editDescription" class="form-label">Description</label>
-                            <textarea class="form-control" name="description" id="editDescription" rows="3"></textarea>
+                            <textarea class="form-control" name="description" id="editDescription" rows="8"></textarea>
                             <span class="text-danger error-text description_error"></span>
                         </div>
                     </div>

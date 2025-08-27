@@ -65,6 +65,11 @@
         </div>
     </div>
     <!-- CONTAINER CLOSED -->
+
+    {{-- add/edit/heilight modal --}}
+    @include('backend.layouts.investment.highlight')
+    @include('backend.layouts.investment.document')
+    @include('backend.layouts.investment.risk')
 @endsection
 
 @push('scripts')
@@ -126,13 +131,88 @@
                 ]
             });
         });
+    </script>
 
+    {{-- update status --}}
+    <script>
+        async function abc(){
+            await axios.post()
+        }
+    </script>
+    <script>
+        $(document).on('click', '.changeStatus', function() {
+            let id = $(this).data('id');
+            let status = $(this).data('status');
 
+            $.ajax({
+                url: "{{ route('investment.status.update') }}",
+                type: "POST",
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    id: id,
+                    status: status
+                },
+                success: function(res) {
+                    if (res.success) {
+                        toastr.success(res.message);
+                        $('#datatable').DataTable().ajax.reload(null,
+                        false);
+                    } else {
+                        toastr.error("Failed to update status");
+                    }
+                },
+                error: function(xhr) {
+                    toastr.error("Something went wrong");
+                }
+            });
+        });
+    </script>
+
+    {{-- highlight modal --}}
+    <script>
+        $(document).ready(function() {
+            $(document).on('click', '.highlightBtn', function() {
+                let investmentId = $(this).data('id');
+                $('#investment_id').val(investmentId);
+                let modal = new bootstrap.Modal(document.getElementById('investmentHighlightsModal'));
+                modal.show();
+            });
+        });
+    </script>
+
+    {{-- inventment document modal --}}
+    <script>
+        $(document).on('click', '.docBtn', function() {
+            let investmentId = $(this).data('id');
+
+            // Target the input inside the modal only
+            $('#investmentMediaModal').find('input[name="investment_id"]').val(investmentId);
+
+            let modal = new bootstrap.Modal(document.getElementById('investmentMediaModal'));
+            modal.show();
+        });
+    </script>
+
+    {{-- inventment risk modal --}}
+    <script>
+        $(document).on('click', '.riskBtn', function() {
+            let investmentId = $(this).data('id');
+
+            // Target the input inside the modal only
+            $('#investment_id').val(investmentId);
+
+            let modal = new bootstrap.Modal(document.getElementById('riskModal'));
+            modal.show();
+        });
+    </script>
+
+    {{-- inventment delete --}}
+    <script>
         // delete Confirm
         function showDeleteConfirm(id) {
             event.preventDefault();
             Swal.fire({
-                title: 'Are you sure you want to delete this strategy?',
+                title: 'Are you sure you want to delete this item?',
                 text: 'If you delete this, it will be gone forever.',
                 icon: 'warning',
                 showCancelButton: true,
@@ -149,7 +229,7 @@
         // Delete Button
         function deleteItem(id) {
             NProgress.start();
-            let url = "{{ route('investment.strategy.delete', ':id') }}";
+            let url = "{{ route('destroy.investment', ':id') }}";
             let csrfToken = '{{ csrf_token() }}';
             $.ajax({
                 type: "DELETE",
@@ -168,61 +248,5 @@
                 }
             });
         }
-    </script>
-@endpush
-
-
-@push('scripts')
-    <script>
-        $(document).ready(function() {
-            // Initialize Summernote once for create and edit
-            $('#createDescription, #editDescription').summernote({
-                height: 200,
-                toolbar: [
-                    ['style', ['bold', 'italic', 'underline', 'clear']],
-                    ['para', ['ul', 'ol', 'paragraph']],
-                    ['insert', ['link', 'picture']],
-                ]
-            });
-
-            $.ajaxSetup({
-                headers: {
-                    "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content"),
-                }
-            });
-
-            // CREATE
-            $('#createStrategyForm').on('submit', function(e) {
-                e.preventDefault();
-                let formData = new FormData(this);
-                $.ajax({
-                    url: "{{ route('investment.strategy.store') }}",
-                    method: "POST",
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    beforeSend: function() {
-                        $('#createSubmitBtn').prop('disabled', true).text('Saving...');
-                    },
-                    success: function(res) {
-                        if (res.success) {
-                            $('#createStrategyModal').modal('hide');
-                            // reset form + summernote
-                            $('#createStrategyForm')[0].reset();
-                            $('#createDescription').summernote('reset');
-                            dTable.ajax.reload();
-                            toastr.success(res.message);
-                        } else {
-                            toastr.error(res.message);
-                        }
-                        $('#createSubmitBtn').prop('disabled', false).text('Save');
-                    },
-                    error: function() {
-                        toastr.error("Something went wrong!");
-                        $('#createSubmitBtn').prop('disabled', false).text('Save');
-                    }
-                });
-            });
-        });
     </script>
 @endpush

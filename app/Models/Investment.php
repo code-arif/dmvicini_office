@@ -14,6 +14,7 @@ class Investment extends Model
         'term',
         'min_investment',
         'targeted_irr',
+        'targeted_eps',
         'thumbnail',
         'summary',
         'country',
@@ -39,5 +40,20 @@ class Investment extends Model
     public function strategy()
     {
         return $this->belongsTo(InvestmentStrategy::class, 'investments_strategy_id');
+    }
+
+    public function highlight()
+    {
+        return $this->hasOne(InvestmentHighlight::class);
+    }
+
+    public function documents()
+    {
+        return $this->hasMany(InvestmentDocument::class);
+    }
+
+    public function images()
+    {
+        return $this->hasMany(InvestmentImage::class);
     }
 }

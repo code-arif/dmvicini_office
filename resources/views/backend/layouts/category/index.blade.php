@@ -85,8 +85,11 @@
                         </div>
 
                         <div class="form-group mb-2">
-                            <label for="createDescription" class="form-label">Description</label>
-                            <textarea class="form-control" name="description" id="createDescription" rows="3" placeholder="Enter description"></textarea>
+                            <label for="createDescription" class="form-label">
+                                Description <small class="text-muted">(max 250 characters)</small>
+                            </label>
+                            <textarea class="form-control" name="description" id="createDescription" rows="3" maxlength="250"
+                                placeholder="Enter description (max 250 characters)"></textarea>
                             <span class="text-danger error-text description_error"></span>
                         </div>
                     </div>

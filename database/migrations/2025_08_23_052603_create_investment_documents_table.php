@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('investment_documents', function (Blueprint $table) {
             $table->id();
             $table->foreignId('investment_id')->constrained()->cascadeOnDelete();
-            $table->string('name');
-            $table->string('file_path');
+            $table->string('name')->nullable();
+            $table->string('file_path')->nullable();
             $table->timestamps();
         });
     }

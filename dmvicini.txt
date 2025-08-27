@@ -1,8 +1,8 @@
 FTP account creadencials:
 
 FTP server   : ftp.softvencefsd.xyz
-FTP username : app@collegepark.softvencefsd.xyz
-FTP password : aTQZ72O#5l]Gu2Z{
+FTP username : app@dmvicini.softvencefsd.xyz
+FTP password : (ph7V94O!UgK%0RS
 FTP & explicit FTPS port:  21
 
 
@@ -11,4 +11,10 @@ Database password : aTQZ72O#5l]Gu2Z{
 
 
 Database Credencials :  sdf
+
+-create a subdomain
+-create a ftp account
+-create a Database
+-create a user
+-assing the user on this Database
 

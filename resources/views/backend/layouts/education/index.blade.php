@@ -96,7 +96,7 @@
                             </div>
                         </div>
 
-                        <div class="mb-2">
+                        <div class="mb-2 p-2 rounded-2 bg-light">
                             <label class="form-label">Category</label>
                             <select name="category_id" class="form-control">
                                 <option value="">-- Select Category --</option>
@@ -157,7 +157,7 @@
                             </div>
                         </div>
 
-                        <div class="mb-2">
+                        <div class="mb-2 p-3 rounded-2 bg-light">
                             <label class="form-label">Category</label>
                             <select name="category_id" id="editCategoryId" class="form-control">
                                 <option value="">-- Select Category --</option>
@@ -169,6 +169,7 @@
                             <input type="text" name="category_name" id="editManualCategory" class="form-control mt-1"
                                 placeholder="New Category">
                         </div>
+
 
                         <div class="mb-2">
                             <label class="form-label">Description</label>

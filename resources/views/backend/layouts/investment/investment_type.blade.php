@@ -68,25 +68,25 @@
     <!-- Create Class Modal -->
     <div class="modal fade" id="createTypeModal" tabindex="-1" aria-labelledby="createTypeModalLabel"
         aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <form id="createClassForm" method="post">
                     @csrf
                     <div class="modal-header">
-                        <h5 class="modal-title" id="createTypeModalLabel">Create Class</h5>
+                        <h5 class="modal-title" id="createTypeModalLabel">Create Type</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <div class="form-group mb-2">
                             <label for="createName" class="form-label">Name</label>
                             <input type="text" class="form-control" name="name" id="createName"
-                                placeholder="Enter Class Name">
+                                placeholder="Enter Type Name">
                             <span class="text-danger error-text name_error"></span>
                         </div>
 
                         <div class="form-group mb-2">
                             <label for="createDescription" class="form-label">Description</label>
-                            <textarea class="form-control" name="description" id="createDescription" rows="3" placeholder="Enter description"></textarea>
+                            <textarea class="form-control" name="description" id="createDescription" rows="8" placeholder="Enter description"></textarea>
                             <span class="text-danger error-text description_error"></span>
                         </div>
                     </div>
@@ -102,7 +102,7 @@
     <!-- Edit Category Modal -->
     <div class="modal fade" id="editTypeModal" tabindex="-1" aria-labelledby="editTypeModalLabel"
         aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <form id="editTypeForm" method="post">
                     @csrf
@@ -121,7 +121,7 @@
 
                         <div class="form-group mb-2">
                             <label for="editDescription" class="form-label">Description</label>
-                            <textarea class="form-control" name="description" id="editDescription" rows="3"></textarea>
+                            <textarea class="form-control" name="description" id="editDescription" rows="8"></textarea>
                             <span class="text-danger error-text description_error"></span>
                         </div>
                     </div>

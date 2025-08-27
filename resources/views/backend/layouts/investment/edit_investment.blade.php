@@ -33,7 +33,7 @@
                             <div class="card-body">
                                 <form id="editInvestmentForm" method="post" enctype="multipart/form-data">
                                     @csrf
-                                    @method('PUT')
+                                    @method('POST')
 
                                     <div class="row">
                                         <!-- Title -->
@@ -51,7 +51,7 @@
                                             <div class="mt-2">
                                                 @if ($investment->thumbnail)
                                                     <img id="thumbnailPreview"
-                                                        src="{{ asset('storage/' . $investment->thumbnail) }}"
+                                                        src="{{ asset('/' . $investment->thumbnail) }}"
                                                         alt="Current thumbnail"
                                                         style="max-height:100px; border:1px solid #ddd; padding:5px;">
                                                 @else
@@ -111,22 +111,28 @@
 
                                     <div class="row">
                                         <!-- Term -->
-                                        <div class="col-md-4 mb-3">
+                                        <div class="col-md-3 mb-3">
                                             <label class="form-label">Term</label>
                                             <input type="text" name="term" class="form-control"
                                                 value="{{ $investment->term }}">
                                         </div>
                                         <!-- Min Investment -->
-                                        <div class="col-md-4 mb-3">
+                                        <div class="col-md-3 mb-3">
                                             <label class="form-label">Min Investment</label>
                                             <input type="text" name="min_investment" class="form-control"
                                                 value="{{ $investment->min_investment }}">
                                         </div>
                                         <!-- Targeted IRR -->
-                                        <div class="col-md-4 mb-3">
+                                        <div class="col-md-3 mb-3">
                                             <label class="form-label">Targeted IRR</label>
                                             <input type="text" name="targeted_irr" class="form-control"
                                                 value="{{ $investment->targeted_irr }}">
+                                        </div>
+                                        <!-- Targeted EPS -->
+                                        <div class="col-md-3 mb-3">
+                                            <label class="form-label">Targeted EPS</label>
+                                            <input type="text" name="targeted_eps" class="form-control"
+                                                value="{{ $investment->targeted_eps }}">
                                         </div>
                                     </div>
 
