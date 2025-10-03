@@ -135,11 +135,6 @@
 
     {{-- update status --}}
     <script>
-        async function abc(){
-            await axios.post()
-        }
-    </script>
-    <script>
         $(document).on('click', '.changeStatus', function() {
             let id = $(this).data('id');
             let status = $(this).data('status');

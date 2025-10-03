@@ -6,8 +6,8 @@ FTP password : (ph7V94O!UgK%0RS
 FTP & explicit FTPS port:  21
 
 
-Database User : softvencefsd_collegepark
-Database password : aTQZ72O#5l]Gu2Z{
+Database User : softvence_dmvicini
+Database password : (ph7V94O!UgK%0RS
 
 
 Database Credencials :  sdf
