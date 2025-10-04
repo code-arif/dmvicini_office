@@ -1,7 +1,7 @@
 <?php
 
 
-namespace App\Http\Controllers\Api\React\User\Auth;
+namespace App\Http\Controllers\Api\Auth;
 
 use App\Models\User;
 use App\Traits\ApiResponse;

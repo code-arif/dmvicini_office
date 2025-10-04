@@ -1,16 +1,14 @@
 <?php
 
-namespace App\Http\Controllers\Api\React\User\Auth;
+namespace App\Http\Controllers\Api\Auth;
 
 use Exception;
-use App\Models\User;
 use App\Helper\Helper;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\UserResource;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Pagination\LengthAwarePaginator;

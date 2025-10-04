@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\React\User\Auth;
+namespace App\Http\Controllers\Api\Auth;
 
 use Exception;
 use Carbon\Carbon;
@@ -8,7 +8,6 @@ use App\Models\User;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use App\Mail\RegisterOtpMail;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
@@ -16,7 +15,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Http\Requests\Auth\LoginRequest;
 use Illuminate\Support\Facades\Cache;
 
-use Illuminate\Support\Facades\Validator;
+
 use App\Http\Requests\Auth\OtpVerifyRequest;
 use App\Http\Requests\Auth\UserRegisterRequest;
 
@@ -116,11 +115,10 @@ class AuthenticationController extends Controller
     }
 
 
-
     /*
     ** Verify Register Otp
     */
-    public function RegistrationVerifyOtp(OtpVerifyRequest $request)
+    public function verifyEmail(OtpVerifyRequest $request)
     {
         try {
             $validatedData = $request->validated();

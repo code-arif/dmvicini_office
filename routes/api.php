@@ -3,21 +3,23 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\EducationPageController;
 use App\Http\Controllers\Api\HelpcenterPageController;
-use App\Http\Controllers\Api\React\User\Auth\UserProfileController;
-use App\Http\Controllers\Api\React\User\Auth\ResetPasswordController;
-use App\Http\Controllers\Api\React\User\Auth\AuthenticationController;
+use App\Http\Controllers\Api\Auth\UserProfileController;
+use App\Http\Controllers\Api\Auth\ResetPasswordController;
+use App\Http\Controllers\Api\Auth\AuthenticationController;
 
 //health-check
-// Route::get("/check", function () {
-//     return "All right!... 👍";
-// });
+Route::get("/check", function () {
+    return "All right!... 👍";
+});
 
 //Guest user routes
 Route::group(['middleware' => 'guest:api'], function () {
 
     // Login & Register
-    Route::post('/login', [AuthenticationController::class, 'login']);
-    Route::post('/register', [AuthenticationController::class, 'register']);
+    Route::post('/login', [AuthenticationController::class, 'login']); // working
+    Route::post('/register', [AuthenticationController::class, 'register']); // working
+    Route::post('/verify-email', [AuthenticationController::class, 'verifyEmail']); // working
+    Route::post('/resend-register-otp', [AuthenticationController::class, 'resendRegisterOtp']); // working
 
     // Password Reset
     Route::post('/forgot-password', [ResetPasswordController::class, 'forgotPassword']);
@@ -46,6 +48,4 @@ Route::group(['middleware' => 'auth:api'], function () {
 
     // upload signature
     Route::post('/update-signature', [UserProfileController::class, 'updateSignature']);
-
-
 });
