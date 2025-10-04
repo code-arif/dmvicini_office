@@ -13,18 +13,17 @@ class RegisterOtpMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $otp , $fullName, $otpExpiresAt;
+    public $otp , $otpExpiresAt;
 
-    public function __construct($otp , $fullName)
+    public function __construct($otp )
     {
        $this->otp = $otp;
-       $this->fullName = $fullName;
     }
 
     public function build()
     {
         return $this->subject('Your OTP for Email Verification')
                     ->view('mail.verifyEmail')
-                    ->with(['otp' => $this->otp , 'fullName' => $this->fullName]);
+                    ->with(['otp' => $this->otp]);
     }
 }

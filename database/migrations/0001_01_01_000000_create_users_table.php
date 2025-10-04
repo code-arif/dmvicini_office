@@ -13,12 +13,8 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('f_name', 50);
-            $table->string('l_name', 50)->nullable();
             $table->string('email')->unique();
             $table->string('password');
-            $table->string('avatar')->nullable();
-            $table->timestamp('last_activity_at')->nullable();
 
             $table->string('otp')->nullable();
             $table->boolean('is_otp_verified')->default(false);
@@ -28,21 +24,7 @@ return new class extends Migration
             $table->string('reset_password_token')->nullable();
             $table->timestamp('reset_password_token_expire_at')->nullable();
 
-            $table->enum('role', ['user', 'dj', 'promoter', 'artist', 'venue', 'admin'])->nullable();
-
-            $table->string('profession', 255)->nullable();
-            $table->string('gender', 50)->nullable();
-            $table->string('age', 50)->nullable();
-
-            $table->string('address')->nullable();
-            $table->string('country', 100)->nullable();
-            $table->string('city', 100)->nullable();
-            $table->string('state', 100)->nullable();
-            $table->string('zip_code', 20)->nullable();
-            $table->string('latitude', 200)->nullable();
-            $table->string('longitude', 200)->nullable();
-
-            $table->boolean('get_notification')->default(value: false);
+            $table->enum('role', ['user', 'admin'])->nullable();
 
             $table->rememberToken();
             $table->timestamps();

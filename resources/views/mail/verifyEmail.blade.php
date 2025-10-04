@@ -159,7 +159,6 @@
             <h1>Verify your OTP</h1>
 
             <div class="verification-box">
-                <p>Dear, {{ $fullName }}</p> </br>
                 <div class="code-label">Your OTP code</div>
                 <div class="verification-code">{{ $otp }}</div>
                 <div class="verification-note">This code will expire in 5 minutes</div>

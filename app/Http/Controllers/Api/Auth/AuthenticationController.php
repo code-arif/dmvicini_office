@@ -36,8 +36,6 @@ class AuthenticationController extends Controller
             $otpExpiresAt = Carbon::now()->addMinutes(5);
 
             $email = $validatedData['email'];
-            $f_name = $validatedData['f_name'];
-            $l_name = $validatedData['l_name'];
 
             // Add OTP + expiry to the cached data
             $cacheData = array_merge($validatedData, [
@@ -51,13 +49,11 @@ class AuthenticationController extends Controller
 
             // Send mail
             // $fullName = $f_name . ' ' . $l_name;
-            // Mail::to($email)->send(new RegisterOtpMail($otp, $fullName));
+            Mail::to($email)->send(new RegisterOtpMail($otp));
 
             return $this->success(
                 [
                     'message' => 'OTP has been sent to your email. Please verify to complete registration.',
-                    'f_name' => $f_name,
-                    'l_name' => $l_name,
                     'email' => $email,
                     'otp' => $otp,
                 ],
@@ -102,8 +98,7 @@ class AuthenticationController extends Controller
             Cache::put("register_data_{$email}", $cachedData, 300);
 
             // Send mail
-            // $fullName = $cachedData['f_name'] . ' ' . $cachedData['l_name'];
-            // Mail::to($email)->send(new RegisterOtpMail($otp, $fullName));
+            Mail::to($email)->send(new RegisterOtpMail($otp));
 
             return $this->success(
                 [
@@ -154,8 +149,6 @@ class AuthenticationController extends Controller
 
             // Save user to database
             $user = User::create([
-                'f_name' => $cachedData['f_name'],
-                'l_name' => $cachedData['l_name'],
                 'email' => $cachedData['email'],
                 'password' => Hash::make($cachedData['password']),
                 'is_otp_verified' => true,
@@ -170,8 +163,6 @@ class AuthenticationController extends Controller
 
             $userData = [
                 'id' => $user->id,
-                'f_name' => $user->f_name,
-                'l_name' => $user->l_name,
                 'email' => $user->email,
                 'role' => $user->role,
                 'is_otp_verified' => $user->is_otp_verified,
@@ -213,8 +204,6 @@ class AuthenticationController extends Controller
 
             $userData = [
                 'id' => $user->id,
-                'f_name' => $user->f_name,
-                'l_name' => $user->l_name,
                 'email' => $user->email,
                 'role' => $user->role,
                 'token' => $token,
@@ -225,51 +214,6 @@ class AuthenticationController extends Controller
 
             Log::error($e->getMessage());
             return $this->error([], $e->getMessage(), 500);
-        }
-    }
-
-
-    /*
-    ** Update user role
-    */
-    public function updateRole(Request $request)
-    {
-
-        try {
-
-            $user = auth('api')->user();
-
-            // dd($user);
-
-            if (!$user) {
-                return $this->error([], 'User not found.', 404);
-            }
-
-            $validator = Validator::make($request->all(), [
-                'role' => 'required|in:user,dj,promoter,artist,venue,admin',
-            ]);
-
-            if ($validator->fails()) {
-                return $this->error([], $validator->errors()->first(), 422);
-            }
-
-            if (!empty($user->role) && $user->role !== 'user') {
-                return $this->error([], 'You have already updated your role. It cannot be changed again.', 400);
-            }
-
-
-            $user->update(['role' => $request->role]);
-
-            $userData = [
-                'id' => $user->id,
-                'role' => $user->role,
-            ];
-
-            return $this->success($userData, 'User role updated successfully.', 200);
-        } catch (Exception $e) {
-
-            Log::info($e->getMessage());
-            return $this->error([], 'An error occurred while updating the role.', 500);
         }
     }
 
