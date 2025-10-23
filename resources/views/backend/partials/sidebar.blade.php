@@ -86,6 +86,15 @@
                     </ul>
                 </li>
 
+                {{-- excel/csv upload --}}
+                <li class="slide">
+                    <a class="side-menu__item {{ request()->routeIs('faq') ? 'has-link' : '' }}"
+                        href="{{ route('investments.import.form') }}">
+                        <i class="fa-solid fa-file-excel side-menu__icon"></i>
+                        <span class="side-menu__label">Import CSV/Excel</span>
+                    </a>
+                </li>
+
                 <h3>CMS</h3>
 
                 <li class="slide">

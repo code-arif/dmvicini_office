@@ -8,19 +8,23 @@ use App\Http\Controllers\Web\Backend\DashboardController;
 use App\Http\Controllers\Web\Backend\EducationController;
 use App\Http\Controllers\Web\Backend\CMS\AuthPageController;
 use App\Http\Controllers\Web\Backend\CMS\HelpCenterController;
-use App\Http\Controllers\Web\Backend\Investment\AssetClassController;
-use App\Http\Controllers\Web\Backend\Investment\InvestmentController;
-use App\Http\Controllers\Web\Backend\Investment\InvestmentDocController;
-use App\Http\Controllers\Web\Backend\Investment\InvestmentHightlightController;
-use App\Http\Controllers\Web\Backend\Investment\InvestmentStrategyController;
-use App\Http\Controllers\Web\Backend\Investment\InvestmentTypeController;
 use App\Http\Controllers\Web\Backend\Investment\RiskController;
+use App\Http\Controllers\Web\Backend\InvestmentImportController;
 use App\Http\Controllers\Web\Backend\Settings\ProfileController;
 use App\Http\Controllers\Web\Backend\Settings\SettingController;
 use App\Http\Controllers\Web\Backend\Settings\DynamicPageController;
+use App\Http\Controllers\Web\Backend\Investment\AssetClassController;
+use App\Http\Controllers\Web\Backend\Investment\InvestmentController;
+use App\Http\Controllers\Web\Backend\Investment\InvestmentDocController;
+use App\Http\Controllers\Web\Backend\Investment\InvestmentTypeController;
+use App\Http\Controllers\Web\Backend\Investment\InvestmentStrategyController;
+use App\Http\Controllers\Web\Backend\Investment\InvestmentHightlightController;
 
 Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard/stats', [DashboardController::class, 'getStats'])->name('dashboard.stats');
+    Route::get('/investments/{id}/details', [DashboardController::class, 'getInvestmentDetails']);
+    Route::get('/dashboard/chart-data', [DashboardController::class, 'getChartData'])->name('dashboard.chart');
 
     // Dashboard data for charts
     Route::get('dashboard/data', [DashboardController::class, 'getDashboardData'])->name('dashboard.data');
@@ -92,6 +96,15 @@ Route::middleware(['auth', 'admin'])->group(function () {
         Route::get('/risk/{investment_id}', [RiskController::class, 'edit'])->name('get.risk');
         Route::post('/risk/store', [RiskController::class, 'store'])->name('investment.risk.store');
     });
+
+
+    // Import routes
+    Route::get('/investments/import', [InvestmentImportController::class, 'showImportForm'])
+        ->name('investments.import.form');
+    Route::post('/investments/import', [InvestmentImportController::class, 'import'])
+        ->name('investments.import');
+    Route::get('/investments/download-template', [InvestmentImportController::class, 'downloadTemplate'])
+        ->name('investments.download-template');
 });
 
 

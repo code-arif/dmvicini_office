@@ -38,14 +38,7 @@ class UserProfileController extends Controller
     {
         try {
             $validator = Validator::make($request->all(), [
-                'f_name'       => ['nullable', 'string', 'max:50'],
-                'l_name'       => ['nullable', 'string', 'max:50'],
-                'avatar'       => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,svg', 'max:5120'],
-                'profession'   => ['nullable', 'string', 'max:100'],
-                'gender'       => ['nullable', 'string', 'in:male,female,Other'],
-                'country'      => ['nullable', 'string', 'max:255'],
-                'age'          => ['nullable', 'integer', 'min:0'],
-                'address'      => ['nullable', 'string', 'max:255'],
+                'avatar'       => ['nullable', 'image'],
             ]);
 
             if ($validator->fails()) {
@@ -66,82 +59,11 @@ class UserProfileController extends Controller
 
             $user->update($data);
 
-
             return $this->success(new UserResource($user), 'Profile updated successfully.', 200);
         } catch (Exception $e) {
 
             Log::error('Profile Update Error: ' . $e->getMessage());
             return $this->error([], 'Failed to update profile.', 500);
-        }
-    }
-
-    //update location
-    public function updateLocation(Request $request)
-    {
-        try {
-            $validator = Validator::make($request->all(), [
-                'address'       => ['nullable', 'string', 'max:50'],
-                'city'       => ['nullable', 'string', 'max:50'],
-                'state'       => ['nullable', 'string', 'max:255'],
-                'zip_code'   => ['nullable', 'string', 'max:100'],
-                'latitude'       => ['nullable', 'string', 'max:255'],
-                'longitude'      => ['nullable', 'string', 'max:255'],
-            ]);
-
-            if ($validator->fails()) {
-                return $this->error([], $validator->errors()->first(), 422);
-            }
-
-            $user = auth('api')->user();
-
-            $data = $validator->validated();
-
-            $user->update($data);
-
-            $userData = [
-                'address' => $user->address,
-                'city' => $user->city,
-                'state' => $user->state,
-                'zip_code' => $user->zip_code,
-                'latitude' => $user->latitude,
-                'longitude' => $user->longitude,
-            ];
-
-
-            return $this->success($userData, 'Profile updated successfully.', 200);
-        } catch (Exception $e) {
-
-            Log::error('Profile Update Error: ' . $e->getMessage());
-            return $this->error([], 'Failed to update profile.', 500);
-        }
-    }
-
-    // update avatar
-    public function updateAvatar(Request $request)
-    {
-        try {
-            $validator = Validator::make($request->all(), [
-                'avatar' => ['required', 'image', 'mimes:jpeg,png,jpg,gif,svg', 'max:5120'],
-            ]);
-
-            if ($validator->fails()) {
-                return $this->error([], $validator->errors()->first(), 422);
-            }
-
-            $user = auth('api')->user();
-
-            if ($user->avatar) {
-                Helper::deleteImage($user->avatar);
-            }
-
-            $avatarPath = Helper::uploadImage($request->file('avatar'), 'profile');
-
-            $user->update(['avatar' => $avatarPath]);
-
-            return $this->success(['avatar' => url($avatarPath)], 'Avatar updated successfully.', 200);
-        } catch (Exception $e) {
-            Log::error('Avatar Update Error: ' . $e->getMessage());
-            return $this->error([], $e->getMessage(), 500);
         }
     }
 
@@ -170,84 +92,5 @@ class UserProfileController extends Controller
         } catch (Exception $e) {
             return $this->error([], $e->getMessage(), 500);
         }
-    }
-
-    //delete profile
-    public function deleteProfile()
-    {
-        try {
-            $user = auth('api')->user();
-
-            if ($user->avatar) {
-                Helper::deleteImage($user->avatar);
-            }
-
-            $user->delete();
-
-            return $this->success([], 'Profile deleted successfully.', 200);
-        } catch (Exception $e) {
-
-            Log::info($e->getMessage());
-            return $this->error([], $e->getMessage(), 500);
-        }
-    }
-
-    //user profile gallery
-    public function gallery(Request $request)
-    {
-        $user = auth('api')->user();
-        if (!$user) {
-            return $this->error([], 'User not found.', 404);
-        }
-
-        $perPage = $request->input('per_page', 10);
-        $page = $request->input('page', 1);
-
-        // User post images
-        $postImages = $user->postImages()
-            ->select('post_images.id', 'post_images.post_id', 'post_images.image_path')
-            ->get()
-            ->map(function ($img) {
-                return [
-                    'id'         => $img->id,
-                    'post_id'    => $img->post_id,
-                    'image_path' => url($img->image_path), // full URL
-                    'type'       => 'post_image',
-                ];
-            });
-
-        // User event banners
-        $eventBanners = $user->events()
-            ->select('id', 'banner')
-            ->get()
-            ->map(function ($event) {
-                return [
-                    'id'         => $event->id,
-                    'post_id'    => null,
-                    'image_path' => url($event->banner),
-                    'type'       => 'event_banner',
-                ];
-            });
-
-        // Merge all images
-        $allImages = $postImages->merge($eventBanners)->values();
-
-        // Manual pagination
-        $total = $allImages->count();
-        $results = $allImages->forPage($page, $perPage);
-        $paginator = new LengthAwarePaginator($results, $total, $perPage, $page, [
-            'path' => $request->url(),
-            'query' => $request->query(),
-        ]);
-
-        return $this->success([
-            'images'     => $paginator->items(),
-            'pagination' => [
-                'total'        => $paginator->total(),
-                'current_page' => $paginator->currentPage(),
-                'last_page'    => $paginator->lastPage(),
-                'per_page'     => $paginator->perPage(),
-            ],
-        ], 'Images retrieved successfully.');
     }
 }

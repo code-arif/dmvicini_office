@@ -37,6 +37,18 @@ return new class extends Migration
             $table->string('banker_phone')->nullable();
             $table->string('banker_email')->nullable();
             $table->enum('status', ['draft', 'active', 'closed'])->default('draft');
+
+            // spreadsheet file upload
+            $table->string('sponsor')->nullable();
+            $table->string('fund_name')->nullable();
+            $table->decimal('target_equity', 20, 2)->nullable();
+            $table->decimal('target_raise', 20, 2)->nullable();
+            $table->date('launch_date')->nullable();
+            $table->date('close_date')->nullable();
+            $table->string('property_type')->nullable();
+            $table->integer('unit_count')->nullable();
+            $table->text('market_overview')->nullable();
+
             $table->timestamps();
         });
     }

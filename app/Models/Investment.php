@@ -52,6 +52,11 @@ class Investment extends Model
         return $this->hasMany(InvestmentDocument::class);
     }
 
+    public function risks()
+    {
+        return $this->hasOne(InvestmentRisk::class);
+    }
+
     public function images()
     {
         return $this->hasMany(InvestmentImage::class);

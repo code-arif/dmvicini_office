@@ -11,4 +11,8 @@ class InvestmentDocument extends Model
         'name',
         'file_path'
     ];
+
+    public function investment(){
+        return $this->belongsTo(Investment::class);
+    }
 }

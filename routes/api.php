@@ -6,6 +6,9 @@ use App\Http\Controllers\Api\HelpcenterPageController;
 use App\Http\Controllers\Api\Auth\UserProfileController;
 use App\Http\Controllers\Api\Auth\ResetPasswordController;
 use App\Http\Controllers\Api\Auth\AuthenticationController;
+use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\Api\InvestmentController;
+use Illuminate\Contracts\Auth\UserProvider;
 
 //health-check
 Route::get("/check", function () {
@@ -34,18 +37,33 @@ Route::group(['middleware' => 'guest:api'], function () {
     Route::get('/hero', [HelpcenterPageController::class, 'helpCenterHero']);
 
     //eudcation routes
-    Route::get('/education/list', [EducationPageController::class, 'getEducationlist']);
-    Route::get('/education/{id}', [EducationPageController::class, 'show']);
+    Route::get('/education/list', [EducationPageController::class, 'getEducationlist']); // working
 
     //pinned education
-    Route::get('/pinned/education', [EducationPageController::class, 'pinnedEducation']);
-});
+    Route::get('/pinned/education', [EducationPageController::class, 'pinnedEducation']); // working
 
+    // investment list
+    Route::get('/investment-list', [InvestmentController::class, 'index']); // working
+
+    // filtering item
+    Route::get('/investment-strategy', [InvestmentController::class, 'investmentStrategy']); // get asset class
+    Route::get('/filter-data', [InvestmentController::class,'filterData']); // get country list
+});
 
 Route::group(['middleware' => 'auth:api'], function () {
     //User logout
     Route::post('/logout', [AuthenticationController::class, 'logout']);
 
-    // upload signature
-    Route::post('/update-signature', [UserProfileController::class, 'updateSignature']);
+    // user profile
+    Route::get('/profile', [UserProfileController::class, 'profile']);
+    Route::post('/update-profile', [UserProfileController::class, 'updateProfile']);
+    Route::post('/update-password', [UserProfileController::class, 'updatePassword']);
+
+
+    Route::get('/education/{id}', [EducationPageController::class, 'show']); // education details
+    Route::get('/investment/{id}', [InvestmentController::class, 'show']); // investment details
+
+
+    // dashboard stats
+    Route::get('/dashboard/stats', [DashboardController::class, 'index']);
 });
