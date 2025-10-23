@@ -13,7 +13,7 @@ class SettingSeeder extends Seeder
     public function run(): void
     {
         DB::table('settings')->insert([
-            'title'         => '',
+            'title'         => 'Pinnacle Capital Group',
             'phone'         => '1234567890',
             'email'         => 'support@pinnaclealts.com',
             'name'          => 'David Vicini',
