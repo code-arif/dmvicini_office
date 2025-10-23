@@ -13,17 +13,17 @@ class SettingSeeder extends Seeder
     public function run(): void
     {
         DB::table('settings')->insert([
-            'title'         => 'Whatsdamove',
-            'phone'         => '123456789',
-            'email'         => 'info@Whatsdamove.com',
-            'name'          => 'Isak202',
-            'copyright'     => 'Copyright © 2025 Whatsdamove. All rights reserved.',
-            'description'   => "Whatsdamove is a digital agency that creates and shares innovative digital product experiences tailored for startups and small businesses.
+            'title'         => '',
+            'phone'         => '1234567890',
+            'email'         => 'support@pinnaclealts.com',
+            'name'          => 'David Vicini',
+            'copyright'     => 'Copyright © 2025 Pinnacle Capital Group. All rights reserved.',
+            'description'   => "Pinnacle Capital Group is a digital agency that creates and shares innovative digital product experiences tailored for startups and small businesses.
                                 Through this platform, our team showcases project updates, creative work, and industry insights—giving users a behind-the-scenes look at
                                 how we bring digital ideas to life.",
             'address'       => 'Cairo, Australia',
-            'keywords'      => 'Whatsdamove',
-            'author'        => 'College Park',
+            'keywords'      => 'Pinnacle Capital Group',
+            'author'        => 'David Vicini',
             'created_at'    => now(),
             'updated_at'    => now(),
         ]);
