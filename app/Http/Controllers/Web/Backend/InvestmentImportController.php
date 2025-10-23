@@ -29,7 +29,7 @@ class InvestmentImportController extends Controller
     public function import(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'file' => 'required|mimes:csv,xlsx,xls|max:102400', // 100MB max
+            'file' => 'required|max:102400', // 100MB max
         ]);
 
         if ($validator->fails()) {
