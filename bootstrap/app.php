@@ -42,8 +42,7 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
         $middleware->validateCsrfTokens(except: [
             'payment/stripe-webhook',
-            'api/*',
-            'https://dmvicini.softvencefsd.xyz/'
+            'api/*'
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
