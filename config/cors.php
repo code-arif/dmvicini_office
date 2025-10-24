@@ -40,7 +40,9 @@ return [
         'http://localhost:5173',
         'https://dmvicini.softvencefsd.xyz/',
         'https://dmvicini.softvencefsd.xyz/api/',
-        'https://dmvicini.softvencefsd.xyz/api/*'
+        'https://dmvicini.softvencefsd.xyz/api/*',
+        'http://localhost:5173/investment',
+        'http://localhost:5173/*'
 
     ],
 
