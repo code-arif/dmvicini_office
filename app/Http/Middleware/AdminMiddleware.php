@@ -12,8 +12,15 @@ class AdminMiddleware
 
     public function handle(Request $request, Closure $next): Response
     {
+
+        if (Auth::guard('api')->check()) {
+            return "wrong";
+        }
+
+        dd('wrokksfsf');
+
         $user = auth()->user();
-        
+
         if ($user && $user->role === 'admin') {
             return $next($request);
         }
