@@ -1,0 +1,127 @@
+<?php
+
+namespace Database\Seeders;
+
+use App\Models\AssetClass;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+
+class AssetClassSeeder extends Seeder
+{
+    /**
+     * Run the database seeds.
+     */
+    public function run(): void
+    {
+        $assetClasses = [
+            ['name' => 'Equities', 'description' => 'Shares of publicly traded companies representing ownership in a corporation.'],
+            ['name' => 'Bonds', 'description' => 'Debt instruments issued by governments or corporations to raise capital with fixed income returns.'],
+            ['name' => 'Mutual Funds', 'description' => 'Pooled investment vehicles that invest in diversified portfolios managed by professionals.'],
+            ['name' => 'Exchange-Traded Funds (ETFs)', 'description' => 'Funds traded on stock exchanges tracking indices, commodities, or sectors.'],
+            ['name' => 'Real Estate', 'description' => 'Investment in land, buildings, and property development for rental or capital appreciation.'],
+            ['name' => 'Commodities', 'description' => 'Physical goods such as gold, oil, or agricultural products traded in markets.'],
+            ['name' => 'Private Equity', 'description' => 'Investments in privately held companies not listed on public exchanges.'],
+            ['name' => 'Venture Capital', 'description' => 'Equity investments in startups and early-stage businesses with high growth potential.'],
+            ['name' => 'Hedge Funds', 'description' => 'Pooled funds using advanced strategies to achieve absolute returns regardless of market direction.'],
+            ['name' => 'Cryptocurrencies', 'description' => 'Digital currencies like Bitcoin or Ethereum operating on decentralized blockchain networks.'],
+            ['name' => 'Real Estate Investment Trusts (REITs)', 'description' => 'Companies owning or financing income-producing real estate.'],
+            ['name' => 'Treasury Bills', 'description' => 'Short-term government securities issued at a discount with maturities under one year.'],
+            ['name' => 'Corporate Bonds', 'description' => 'Debt issued by corporations to finance operations, paying fixed or floating interest.'],
+            ['name' => 'Government Bonds', 'description' => 'Long-term debt securities issued by national governments.'],
+            ['name' => 'Municipal Bonds', 'description' => 'Debt securities issued by local governments or agencies to fund public projects.'],
+            ['name' => 'Savings Accounts', 'description' => 'Bank deposits offering modest interest with high liquidity.'],
+            ['name' => 'Certificates of Deposit (CDs)', 'description' => 'Time deposits earning fixed interest for a specified duration.'],
+            ['name' => 'Money Market Funds', 'description' => 'Funds investing in short-term, low-risk instruments for capital preservation.'],
+            ['name' => 'Foreign Exchange (Forex)', 'description' => 'Currency trading in global foreign exchange markets.'],
+            ['name' => 'Derivatives', 'description' => 'Financial contracts whose value derives from underlying assets like stocks or commodities.'],
+            ['name' => 'Options', 'description' => 'Contracts giving the right but not obligation to buy or sell an asset at a set price.'],
+            ['name' => 'Futures', 'description' => 'Agreements to buy or sell assets at predetermined prices on future dates.'],
+            ['name' => 'Index Funds', 'description' => 'Passive investment funds tracking specific market indices like the S&P 500.'],
+            ['name' => 'Preferred Stocks', 'description' => 'Equity shares with fixed dividends and priority over common stockholders.'],
+            ['name' => 'Convertible Bonds', 'description' => 'Bonds that can be converted into a predetermined number of equity shares.'],
+            ['name' => 'Art Investments', 'description' => 'Investing in collectible art pieces appreciating in cultural and monetary value.'],
+            ['name' => 'Fine Wine', 'description' => 'Investment in rare wines that appreciate in value over time.'],
+            ['name' => 'Gold', 'description' => 'Precious metal investment used as a hedge against inflation and currency fluctuation.'],
+            ['name' => 'Silver', 'description' => 'Industrial and precious metal used for diversification.'],
+            ['name' => 'Oil & Gas', 'description' => 'Investments in exploration, extraction, and production of energy resources.'],
+            ['name' => 'Renewable Energy Assets', 'description' => 'Investments in solar, wind, and clean energy projects.'],
+            ['name' => 'Infrastructure Funds', 'description' => 'Funds investing in public infrastructure such as roads, airports, and utilities.'],
+            ['name' => 'Peer-to-Peer Lending', 'description' => 'Online platforms allowing individuals to lend money directly to borrowers.'],
+            ['name' => 'Crowdfunding Investments', 'description' => 'Equity or reward-based participation in startup or project funding.'],
+            ['name' => 'Agricultural Land', 'description' => 'Farmland investments generating income through crop production.'],
+            ['name' => 'Timberland', 'description' => 'Forest land investments producing timber and other forest products.'],
+            ['name' => 'Collectibles', 'description' => 'Items such as coins, stamps, or memorabilia with appreciating market value.'],
+            ['name' => 'Luxury Watches', 'description' => 'High-end timepieces with collectible and resale value.'],
+            ['name' => 'Private Debt', 'description' => 'Loans made to private companies not available on public markets.'],
+            ['name' => 'Structured Products', 'description' => 'Pre-packaged investments combining derivatives and traditional assets.'],
+            ['name' => 'Insurance-Linked Securities', 'description' => 'Investments tied to insurance risks such as catastrophe bonds.'],
+            ['name' => 'Emerging Market Stocks', 'description' => 'Equities from developing countries with high growth potential.'],
+            ['name' => 'Developed Market Stocks', 'description' => 'Shares of companies based in economically mature countries.'],
+            ['name' => 'High-Yield Bonds', 'description' => 'Corporate bonds with lower credit ratings but higher interest rates.'],
+            ['name' => 'Sovereign Wealth Funds', 'description' => 'State-owned investment funds managing national reserves.'],
+            ['name' => 'Annuities', 'description' => 'Insurance contracts providing fixed income streams for retirees.'],
+            ['name' => 'Pension Funds', 'description' => 'Investment pools that pay retirement benefits to members.'],
+            ['name' => 'Endowment Funds', 'description' => 'Investment funds supporting institutions such as universities or charities.'],
+            ['name' => 'Stablecoins', 'description' => 'Cryptocurrencies pegged to stable assets like the US dollar.'],
+            ['name' => 'Non-Fungible Tokens (NFTs)', 'description' => 'Unique digital assets representing ownership of digital art or media.'],
+            ['name' => 'Metaverse Real Estate', 'description' => 'Virtual land ownership within online metaverse platforms.'],
+            ['name' => 'Venture Debt', 'description' => 'Loans to early-stage companies backed by venture capital.'],
+            ['name' => 'Microfinance', 'description' => 'Small loans and financial services to low-income entrepreneurs.'],
+            ['name' => 'SPACs (Special Purpose Acquisition Companies)', 'description' => 'Blank-check companies created to merge with private firms.'],
+            ['name' => 'Carbon Credits', 'description' => 'Tradable certificates representing emission reductions.'],
+            ['name' => 'Water Rights', 'description' => 'Legal entitlements to use water resources for industrial or agricultural purposes.'],
+            ['name' => 'Green Bonds', 'description' => 'Debt instruments funding environmentally sustainable projects.'],
+            ['name' => 'Blue Bonds', 'description' => 'Bonds financing marine and ocean-based sustainability initiatives.'],
+            ['name' => 'Impact Investing', 'description' => 'Investments made to generate social or environmental impact alongside returns.'],
+            ['name' => 'Social Bonds', 'description' => 'Debt used to finance socially beneficial projects.'],
+            ['name' => 'Infrastructure Debt', 'description' => 'Loans made to infrastructure projects like energy or transport.'],
+            ['name' => 'Shipping Assets', 'description' => 'Investments in vessels and maritime logistics.'],
+            ['name' => 'Aircraft Leasing', 'description' => 'Ownership or leasing of aircraft for airline operations.'],
+            ['name' => 'Data Centers', 'description' => 'Investment in digital infrastructure supporting cloud and IT services.'],
+            ['name' => 'Healthcare Real Estate', 'description' => 'Properties leased to hospitals, clinics, and medical offices.'],
+            ['name' => 'Student Housing', 'description' => 'Real estate investments targeting university accommodation.'],
+            ['name' => 'Logistics Warehouses', 'description' => 'Industrial properties supporting e-commerce and supply chains.'],
+            ['name' => 'Hospitality Assets', 'description' => 'Hotels and resorts generating income through tourism.'],
+            ['name' => 'Retail Real Estate', 'description' => 'Shopping centers and retail properties with rental income.'],
+            ['name' => 'Farmland REITs', 'description' => 'REITs specializing in agricultural properties.'],
+            ['name' => 'Infrastructure REITs', 'description' => 'REITs focused on energy, transport, and utility infrastructure.'],
+            ['name' => 'Digital Assets', 'description' => 'Blockchain-based financial assets beyond cryptocurrencies.'],
+            ['name' => 'DeFi Protocols', 'description' => 'Decentralized finance applications offering peer-to-peer lending and trading.'],
+            ['name' => 'Index-Linked Bonds', 'description' => 'Bonds with returns tied to inflation or market indices.'],
+            ['name' => 'Inflation-Protected Securities', 'description' => 'Government bonds safeguarding against inflation, like TIPS.'],
+            ['name' => 'Private Real Estate Funds', 'description' => 'Closed-end funds investing in commercial and residential properties.'],
+            ['name' => 'Crowdfunded Real Estate', 'description' => 'Online investment in fractional property ownership.'],
+            ['name' => 'Royalty Trusts', 'description' => 'Entities collecting royalties from natural resource extraction.'],
+            ['name' => 'Film Finance', 'description' => 'Investment in movie production and distribution rights.'],
+            ['name' => 'Music Royalties', 'description' => 'Ownership in revenue streams from song publishing or performances.'],
+            ['name' => 'Litigation Finance', 'description' => 'Funding legal cases in exchange for a share of settlements.'],
+            ['name' => 'Patent Royalties', 'description' => 'Income from licensing patented technologies or inventions.'],
+            ['name' => 'Franchise Ownership', 'description' => 'Owning rights to operate a branded business franchise.'],
+            ['name' => 'Venture Funds of Funds', 'description' => 'Funds investing in multiple venture capital funds.'],
+            ['name' => 'Private Equity Funds of Funds', 'description' => 'Funds allocating capital across various private equity funds.'],
+            ['name' => 'Infrastructure Equity', 'description' => 'Ownership stakes in large-scale infrastructure projects.'],
+            ['name' => 'Renewable Energy Yieldcos', 'description' => 'Companies holding operating renewable energy assets for steady income.'],
+            ['name' => 'Biotechnology Funds', 'description' => 'Funds investing in innovative biotech and pharmaceutical firms.'],
+            ['name' => 'Telecom Infrastructure', 'description' => 'Investment in cell towers, fiber networks, and related assets.'],
+            ['name' => 'Space Technology', 'description' => 'Investments in satellite and aerospace ventures.'],
+            ['name' => 'Artificial Intelligence Funds', 'description' => 'Funds focusing on AI-driven companies and technologies.'],
+            ['name' => 'Quantum Computing Ventures', 'description' => 'Investments in emerging quantum computing firms.'],
+            ['name' => 'Cybersecurity Funds', 'description' => 'Funds investing in companies securing digital infrastructure.'],
+            ['name' => 'E-commerce Stocks', 'description' => 'Equities of companies operating online retail platforms.'],
+            ['name' => 'Fintech Startups', 'description' => 'Early-stage companies developing innovative financial technologies.'],
+            ['name' => 'Education Technology', 'description' => 'Investments in platforms delivering online and digital education.'],
+            ['name' => 'Healthcare Technology', 'description' => 'Firms combining medical and digital innovation to improve health systems.'],
+            ['name' => 'AI Infrastructure', 'description' => 'Data processing and computational assets supporting AI development.'],
+            ['name' => 'Cloud Computing Stocks', 'description' => 'Companies offering cloud storage and computing services.'],
+            ['name' => 'Semiconductor Stocks', 'description' => 'Equities of chip manufacturers driving global tech industries.'],
+            ['name' => 'Robotics Funds', 'description' => 'Investments in automation and robotics companies.'],
+            ['name' => 'Autonomous Vehicle Tech', 'description' => 'Investments in self-driving car technologies.'],
+            ['name' => '3D Printing Companies', 'description' => 'Investments in additive manufacturing and prototyping technologies.'],
+        ];
+
+        foreach ($assetClasses as $assetClass) {
+            AssetClass::create($assetClass);
+        }
+    }
+}

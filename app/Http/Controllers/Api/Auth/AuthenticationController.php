@@ -65,7 +65,6 @@ class AuthenticationController extends Controller
         }
     }
 
-
     /*
     ** Resend otp for registration
     */
@@ -113,7 +112,6 @@ class AuthenticationController extends Controller
             return $this->error([], 'Something went wrong: ' . $e->getMessage(), 500);
         }
     }
-
 
     /*
     ** Verify Register Otp
@@ -174,8 +172,6 @@ class AuthenticationController extends Controller
         }
     }
 
-
-
     /*
     ** User login
     */
@@ -214,7 +210,6 @@ class AuthenticationController extends Controller
             return $this->error([], $e->getMessage(), 500);
         }
     }
-
 
     /*
     ** User logout

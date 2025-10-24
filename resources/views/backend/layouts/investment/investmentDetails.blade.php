@@ -255,11 +255,11 @@
                                         <div class="stat-label">Term</div>
                                     </div>
                                     <div class="col-md-3 col-6 text-center">
-                                        <div class="stat-value">${{ $investment->min_investment ?? '-' }}</div>
+                                        <div class="stat-value">{{ $investment->min_investment ?? '-' }}</div>
                                         <div class="stat-label">Minimum Investment</div>
                                     </div>
                                     <div class="col-md-3 col-6 text-center">
-                                        <div class="stat-value">{{ $investment->targeted_irr ?? '-' }}%</div>
+                                        <div class="stat-value">{{ $investment->targeted_irr ?? '-' }}</div>
                                         <div class="stat-label">Targeted Returns</div>
                                     </div>
                                     <div class="col-md-3 col-6 text-center">

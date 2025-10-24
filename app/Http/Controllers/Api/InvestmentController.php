@@ -17,79 +17,11 @@ class InvestmentController extends Controller
     use ApiResponse;
 
     //investment list
-    // public function index(Request $request)
-    // {
-    //     $perPage = $request->input('per_page', 10);
-
-    //     $query = Investment::with(['assetClass', 'investmentType', 'strategy'])->where('status', 'active');
-
-    //     // Search by title
-    //     if ($request->filled('title')) {
-    //         $query->where('title', 'like', '%' . $request->title . '%');
-    //     }
-
-    //     // Filter by asset class
-    //     if ($request->filled('asset_class_id')) {
-    //         $query->where('asset_class_id', $request->asset_class_id);
-    //     }
-
-    //     // Filter by investment type
-    //     if ($request->filled('investment_type_id')) {
-    //         $query->where('investment_type_id', $request->investment_type_id);
-    //     }
-
-    //     // Filter by strategy
-    //     if ($request->filled('strategy_id')) {
-    //         $query->where('investments_strategy_id', $request->strategy_id);
-    //     }
-
-    //     // Location-based filters
-    //     if ($request->filled('country')) {
-    //         $query->where('country', 'like', '%' . $request->country . '%');
-    //     }
-
-    //     if ($request->filled('city')) {
-    //         $query->where('city', 'like', '%' . $request->city . '%');
-    //     }
-
-    //     // Date filters
-    //     if ($request->filled('start_date') && $request->filled('end_date')) {
-    //         $query->whereBetween('created_at', [$request->start_date, $request->end_date]);
-    //     }
-
-    //     $investments = $query->latest()->paginate($perPage);
-
-    //     $data = $investments->map(function ($item) {
-    //         return [
-    //             'id'              => $item->id,
-    //             'title'           => $item->title,
-    //             'term'            => $item->term,
-    //             'min_investment'  => $item->min_investment,
-    //             'targeted_irr'    => $item->targeted_irr,
-    //             'p_strategy'      => optional($item->strategy)->name,
-    //             'asset_class'     => optional($item->assetClass)->name,
-    //             'investment_type' => optional($item->investmentType)->name,
-    //             'location'        => trim("{$item->city}, {$item->country}", ', '),
-    //             'thumbnail'       => $item->thumbnail ? url($item->thumbnail) : null,
-    //         ];
-    //     });
-
-    //     return $this->success([
-    //         'investments' => $data,
-    //         'pagination' => [
-    //             'total' => $investments->total(),
-    //             'current_page' => $investments->currentPage(),
-    //             'last_page' => $investments->lastPage(),
-    //             'per_page' => $investments->perPage(),
-    //         ],
-    //     ], 'Investments retrieved successfully');
-    // }
-
     public function index(Request $request)
     {
         $perPage = $request->input('per_page', 10);
 
-        $query = Investment::with(['assetClass', 'investmentType', 'strategy'])->where('status', 'active');
+        $query = Investment::with(['assetClass', 'investmentType', 'strategy'])->where('status', 'active')->latest('id');
 
         // Search by title
         if ($request->filled('title')) {
@@ -304,13 +236,15 @@ class InvestmentController extends Controller
         $cities = DB::table('investments')->select('city')->get();
         $class = AssetClass::select('id', 'name')->get();
         $types = InvestmentTypes::select('id', 'name')->get();
+        $strategy = InvestmentStrategy::select('id', 'name')->get();
 
         return $this->success(
             [
                 'countries' => $countries,
                 'cities' => $cities,
                 'asset_classes' => $class,
-                'types' => $types
+                'types' => $types,
+                'strategy' => $strategy
             ],
             'Country City list retrieved successfully'
         );

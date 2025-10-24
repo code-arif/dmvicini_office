@@ -25,7 +25,7 @@ return new class extends Migration
             $table->timestamp('reset_password_token_expire_at')->nullable();
 
             $table->enum('role', ['user', 'admin'])->nullable();
-
+            $table->tinyInteger('accept')->default(0);
             $table->rememberToken();
             $table->timestamps();
         });
