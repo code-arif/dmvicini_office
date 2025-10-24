@@ -183,19 +183,19 @@ class AuthenticationController extends Controller
             $user = User::where('email', $validatedData['email'])->first();
 
             if (!$user) {
-                return $this->error([], 'Invalid email or password.', 401);
+                return $this->error([], 'Invalid email or password.', 422);
             }
 
             if (!$user->is_otp_verified) {
-                return $this->error([], 'Please verify your email with the OTP before logging in.', 401);
+                return $this->error([], 'Please verify your email with the OTP before logging in.', 422);
             }
 
             if (!$user->accept) {
-                return $this->error([], 'Your account has not been approved yet.', 401);
+                return $this->error([], 'Your account has not been approved yet.', 422);
             }
 
             if (!($token = auth('api')->attempt($validatedData))) {
-                return $this->error([], 'Invalid email or password.', 401);
+                return $this->error([], 'Invalid email or password.', 422);
             }
 
             $userData = [

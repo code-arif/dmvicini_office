@@ -34,6 +34,7 @@ class User extends Authenticatable implements JWTSubject
         'reset_password_token',
         'reset_password_token_expire_at',
         'role',
+        'avatar'
     ];
 
     protected $hidden = [
