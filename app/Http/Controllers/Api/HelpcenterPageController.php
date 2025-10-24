@@ -14,7 +14,7 @@ class HelpcenterPageController extends Controller
     //get faqs
     public function getFaqs()
     {
-        $faqs = Faq::latest()->get();
+        $faqs = Faq::get();
 
         if (!$faqs) {
             return $this->error([], 'Faq not found.', 404);
