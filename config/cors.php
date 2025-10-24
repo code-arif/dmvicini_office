@@ -15,20 +15,35 @@ return [
     |
     */
 
-    'paths' => ['api/*', 'sanctum/csrf-cookie'],
+    // 'paths' => ['api/*', 'sanctum/csrf-cookie'],
 
-    'allowed_methods' => ['*'],
+    // 'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['*'],
+    // 'allowed_origins' => ['*'],
 
-    'allowed_origins_patterns' => [],
+    // 'allowed_origins_patterns' => [],
 
-    'allowed_headers' => ['*'],
+    // 'allowed_headers' => ['*'],
 
-    'exposed_headers' => [],
+    // 'exposed_headers' => [],
 
-    'max_age' => 0,
+    // 'max_age' => 0,
 
-    'supports_credentials' => false,
+    // 'supports_credentials' => false,
+
+
+    'supports_credentials' => true,
+    'allowed_origins' => [
+        'http://localhost:3000',
+        'https://tutawasi-dev.netlify.app/',
+        'https://aichique.com',
+        'http://localhost:5173',
+        'https://dmvicini.softvencefsd.xyz/',
+        'https://dmvicini.softvencefsd.xyz/api/',
+        'https://dmvicini.softvencefsd.xyz/api/*'
+
+    ],
+
+
 
 ];
