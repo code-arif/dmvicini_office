@@ -17,7 +17,7 @@ class InvestmentController extends Controller
     use ApiResponse;
 
     //investment list
-    public function index(Request $request)
+    public function investmentList(Request $request)
     {
         $perPage = $request->input('per_page', 10);
 

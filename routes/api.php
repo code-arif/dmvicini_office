@@ -43,12 +43,14 @@ Route::group(['middleware' => 'guest:api'], function () {
     Route::get('/pinned/education', [EducationPageController::class, 'pinnedEducation']); // working
 
     // investment list
-    Route::get('/investment-list', [InvestmentController::class, 'index']); // working
+   // working
 
     // filtering item
     Route::get('/investment-strategy', [InvestmentController::class, 'investmentStrategy']); // get asset class
     Route::get('/filter-data', [InvestmentController::class,'filterData']); // get country list
 });
+
+  Route::get('/investment-list', [InvestmentController::class, 'investmentList']);
 
 Route::group(['middleware' => 'auth:api'], function () {
     //User logout
