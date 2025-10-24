@@ -76,26 +76,6 @@ class InvestmentController extends Controller
             });
         }
 
-        // Alternative: Predefined ranges (optional, use one of the approaches)
-        if ($request->filled('investment_range')) {
-            $ranges = [
-                'under_50k' => [0, 50000],
-                '50k_100k' => [50000, 100000],
-                '100k_250k' => [100000, 250000],
-                '250k_500k' => [250000, 500000],
-                '500k_1m' => [500000, 1000000],
-                'over_1m' => [1000000, PHP_INT_MAX],
-            ];
-
-            if (isset($ranges[$request->investment_range])) {
-                [$min, $max] = $ranges[$request->investment_range];
-
-                $query->whereRaw(
-                    "CAST(REPLACE(REPLACE(REPLACE(min_investment, '$', ''), ',', ''), ' ', '') AS DECIMAL(20,2)) BETWEEN ? AND ?",
-                    [$min, $max]
-                );
-            }
-        }
 
         // ============================================
         // NEW: Year-based Filter (Dynamic)

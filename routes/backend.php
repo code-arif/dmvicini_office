@@ -4,6 +4,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Web\Backend\FaqController;
 use App\Http\Controllers\Web\Backend\CategoryController;
+use App\Http\Controllers\Web\Backend\UserListController;
 use App\Http\Controllers\Web\Backend\DashboardController;
 use App\Http\Controllers\Web\Backend\EducationController;
 use App\Http\Controllers\Web\Backend\CMS\AuthPageController;
@@ -28,6 +29,11 @@ Route::middleware(['auth', 'admin'])->group(function () {
 
     // Dashboard data for charts
     Route::get('dashboard/data', [DashboardController::class, 'getDashboardData'])->name('dashboard.data');
+
+    // investor manage
+    Route::get('/investor-list', [UserListController::class, 'index'])->name('investor.lsit');
+    Route::post('/investors/change-status', [UserListController::class, 'changeAcceptStatus'])->name('investor.changeStatus');
+
 
     // cms management
     Route::prefix('cms')->name('cms.')->group(function () {

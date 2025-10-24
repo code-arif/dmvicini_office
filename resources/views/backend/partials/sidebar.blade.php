@@ -37,6 +37,16 @@
                     </a>
                 </li>
 
+                {{-- users --}}
+                <li class="slide">
+                    <a class="side-menu__item {{ request()->routeIs('investor.lsit') ? 'has-link' : '' }}"
+                        href="{{ route('investor.lsit') }}">
+                        <i class="fa-solid fa-users side-menu__icon"
+                            style="font-size:24px; width:24px; height:24px;"></i>
+                        <span class="side-menu__label">Investor Manage</span>
+                    </a>
+                </li>
+
                 {{-- blog/education --}}
                 <li class="slide">
                     <a class="side-menu__item" data-bs-toggle="slide" href="#">
@@ -117,7 +127,8 @@
 
                     <ul class="slide-menu">
                         <li><a href="{{ route('setting.general.index') }}" class="slide-item">General Settings</a></li>
-                        <li><a href="{{ route('setting.profile.index') }}" class="slide-item">Profile Settings</a></li>
+                        <li><a href="{{ route('setting.profile.index') }}" class="slide-item">Profile Settings</a>
+                        </li>
 
                     </ul>
                 </li>

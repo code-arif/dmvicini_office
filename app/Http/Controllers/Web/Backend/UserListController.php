@@ -3,10 +3,8 @@
 namespace App\Http\Controllers\Web\Backend;
 
 use App\Models\User;
-use App\Helper\Helper;
 use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
-use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
 
 class UserListController extends Controller
@@ -16,41 +14,67 @@ class UserListController extends Controller
         if ($request->ajax()) {
             $query = User::where('role', '!=', 'admin');
 
-            // Apply filter BEFORE ->get()
             if ($request->has('role') && $request->role !== 'all') {
                 $query->where('role', $request->role);
             }
 
-            $users = $query->get(); // now run the query
+            $users = $query->get();
 
             return DataTables::of($users)
                 ->addIndexColumn()
-                ->addColumn('name', fn($row) => $row->f_name . ' ' . $row->l_name)
-                ->addColumn('email', fn($row) => $row->email ?? '---')
-                ->addColumn('profession', fn($row) => $row->profession ?? '---')
-                ->addColumn('address', function ($item) {
-                    return strlen($item->address) > 20 ? substr($item->address, 0, 20) . '...' : $item->address;
+                ->addColumn('name', function ($user) {
+                    $avatar = asset('default/default_image.jpg');
+                    $email = $user->email;
+                    $acceptStatus = $user->accept ? 'Accepted' : 'Declined';
+                    $dropdownOptions = $user->accept
+                        ? '<li><a class="dropdown-item decline-user" data-id="' . $user->id . '" data-action="decline" href="#">Decline</a></li>'
+                        : '<li><a class="dropdown-item accept-user" data-id="' . $user->id . '" data-action="accept" href="#">Accept</a></li>';
+
+                    return '
+                        <div class="d-flex align-items-center">
+                            <img src="' . $avatar . '" alt="avatar" class="rounded-circle me-2" width="35" height="35">
+                            <div>
+                                <div class="fw-bold">' . $email . '</div>
+                                <div class="dropdown mt-1">
+                                    <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                        ' . $acceptStatus . '
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        ' . $dropdownOptions . '
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    ';
                 })
-                ->addColumn('country', fn($item) => $item->country ?? '---')
-                ->addColumn('city', fn($row) => $row->city ?? '---')
-                ->addColumn('created_at', fn($row) => optional($row->created_at)->format('Y-m-d'))
-                ->addColumn('role', function ($item) {
-                    $role = $item->role;
-                    $colors = [
-                        'user' => 'success',
-                        'dj' => 'warning',
-                        'promoter' => 'info',
-                        'artist' => 'danger',
-                        'venue' => 'primary',
-                    ];
-                    $label = ucfirst(str_replace('_', ' ', $role));
-                    $badgeClass = $colors[$role] ?? 'secondary';
-                    return '<span class="badge bg-' . $badgeClass . '">' . $label . '</span>';
+                ->addColumn('action', function ($user) {
+                    return '
+                        <button class="btn btn-sm btn-danger delete-user" data-id="' . $user->id . '">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    ';
                 })
-                ->rawColumns(['role'])
-                ->make();
+                ->rawColumns(['name', 'action'])
+                ->make(true);
         }
 
-        return view("backend.layouts.user.index");
+        return view('backend.layouts.investors.index');
+    }
+
+    public function changeAcceptStatus(Request $request)
+    {
+        $request->validate([
+            'id' => 'required|exists:users,id',
+            'action' => 'required|in:accept,decline',
+        ]);
+
+        $user = User::findOrFail($request->id);
+        $user->accept = $request->action === 'accept' ? 1 : 0;
+        $user->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'User ' . $request->action . 'ed successfully!',
+        ]);
     }
 }

@@ -149,9 +149,10 @@ class AuthenticationController extends Controller
                 'password' => Hash::make($cachedData['password']),
                 'is_otp_verified' => true,
                 'email_verified_at' => Carbon::now(),
+                'accept' => false,
+                'role' => 'user',
+                'otp' => ''
             ]);
-
-            $token = auth('api')->login($user);
 
             // Clear cache after successful registration
             Cache::forget("register_otp_{$email}");
@@ -162,7 +163,6 @@ class AuthenticationController extends Controller
                 'email' => $user->email,
                 'role' => $user->role,
                 'is_otp_verified' => $user->is_otp_verified,
-                'token' => $token,
             ];
 
             return $this->success($userData, 'Otp verified successfully. You are now registered.', 200);
@@ -178,7 +178,6 @@ class AuthenticationController extends Controller
     public function login(LoginRequest $request)
     {
         try {
-
             $validatedData = $request->validated();
 
             $user = User::where('email', $validatedData['email'])->first();
@@ -191,6 +190,9 @@ class AuthenticationController extends Controller
                 return $this->error([], 'Please verify your email with the OTP before logging in.', 401);
             }
 
+            if (!$user->accept) {
+                return $this->error([], 'Your account has not been approved yet.', 401);
+            }
 
             if (!($token = auth('api')->attempt($validatedData))) {
                 return $this->error([], 'Invalid email or password.', 401);
@@ -203,11 +205,10 @@ class AuthenticationController extends Controller
                 'token' => $token,
             ];
 
-            return $this->success($userData, 'Successfully logged in!.', 200);
+            return $this->success($userData, 'Successfully logged in!', 200);
         } catch (Exception $e) {
-
             Log::error($e->getMessage());
-            return $this->error([], $e->getMessage(), 500);
+            return $this->error([], 'An error occurred during login.', 500);
         }
     }
 
