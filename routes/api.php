@@ -52,7 +52,7 @@ Route::group(['middleware' => 'guest:api'], function () {
 
   Route::get('/investment-list', [InvestmentController::class, 'investmentList']);
 
-Route::group(['middleware' => 'auth:api'], function () {
+Route::group(['middleware' => 'auth:jwt'], function () {
     //User logout
     Route::post('/logout', [AuthenticationController::class, 'logout']);
 

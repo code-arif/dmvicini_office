@@ -32,19 +32,14 @@ return [
     // 'supports_credentials' => false,
 
 
-    'supports_credentials' => true,
+   'paths' => ['api/*', 'sanctum/csrf-cookie'],
+    'allowed_methods' => ['*'],
     'allowed_origins' => [
-        'http://localhost:3000',
-        'https://tutawasi-dev.netlify.app/',
-        'https://aichique.com',
         'http://localhost:5173',
-        'https://dmvicini.softvencefsd.xyz/',
-        'https://dmvicini.softvencefsd.xyz/api/',
-        'https://dmvicini.softvencefsd.xyz/api/*',
-        'http://localhost:5173/investment',
-        'http://localhost:5173/*'
-
+        'https://dmvicini.softvencefsd.xyz',
     ],
+    'allowed_headers' => ['*'],
+    'supports_credentials' => true,
 
 
 
