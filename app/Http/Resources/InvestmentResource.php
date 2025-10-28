@@ -24,9 +24,6 @@ class InvestmentResource extends JsonResource
             'summary'         => $this->summary,
             'status'          => $this->status,
             'thumbnail'       => $this->thumbnail ? url($this->thumbnail) : null,
-            'p_strategy'      => optional($this->strategy)->name,
-            'asset_class'     => optional($this->assetClass)->name,
-            'investment_type' => optional($this->investmentType)->name,
             'location'        => [
                 'address'  => $this->address,
                 'city'     => $this->city,
@@ -40,13 +37,23 @@ class InvestmentResource extends JsonResource
                 'phone' => $this->banker_phone,
                 'email' => $this->banker_email,
             ],
-            'highlights' => $this->whenLoaded('highlights', function () {
-                return $this->highlights->map(fn($h) => [
-                    'overview'        => $h->overview,
-                    'targeted_returns' => $h->targeted_returns,
-                    'fees'            => $h->fees,
-                ]);
+            'highlight' => $this->whenLoaded('highlight', function () {
+                $targetedReturns = json_decode($this->highlight->targeted_returns, true);
+                $fees = json_decode($this->highlight->fees, true);
+
+                return [
+                    'overview' => $this->highlight->overview,
+
+                    'targeted_returns' => collect($targetedReturns)->map(function ($value, $key) {
+                        return ['key' => $key, 'value' => $value];
+                    })->values()->all(),
+
+                    'fees' => collect($fees)->map(function ($value, $key) {
+                        return ['key' => $key, 'value' => $value];
+                    })->values()->all(),
+                ];
             }),
+
             'documents' => $this->whenLoaded('documents', function () {
                 return $this->documents->map(fn($doc) => [
                     'name' => $doc->name,
@@ -57,6 +64,24 @@ class InvestmentResource extends JsonResource
                 return [
                     'title'       => $this->risks->title,
                     'description' => $this->risks->description,
+                ];
+            }),
+            'asset_class' => $this->whenLoaded('assetClass', function () {
+                return [
+                    'name' => $this->assetClass->name,
+                    'description' => $this->assetClass->description,
+                ];
+            }),
+            'investment_type' => $this->whenLoaded('investmentType', function () {
+                return [
+                    'name' => $this->investmentType->name,
+                    'description' => $this->investmentType->description,
+                ];
+            }),
+            'investment_strategies' => $this->whenLoaded('strategy', function () {
+                return [
+                    'name' => $this->strategy->name,
+                    'description' => $this->strategy->description,
                 ];
             }),
 

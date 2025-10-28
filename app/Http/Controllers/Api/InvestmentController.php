@@ -195,6 +195,8 @@ class InvestmentController extends Controller
             'risks',
         ])->find($id);
 
+        // return $investment;exit();
+
         if (!$investment) {
             return $this->error('Investment not found', 404);
         }
