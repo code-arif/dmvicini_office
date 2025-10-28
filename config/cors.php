@@ -34,18 +34,10 @@ return [
 
     'supports_credentials' => true,
     'allowed_origins' => [
-        'http://localhost:3000',
-        'https://tutawasi-dev.netlify.app/',
-        'https://aichique.com',
+        'https://pinnacle-capital-group.netlify.app',
         'http://localhost:5173',
         'https://dmvicini.softvencefsd.xyz/',
         'https://dmvicini.softvencefsd.xyz/api/',
         'https://dmvicini.softvencefsd.xyz/api/*',
-        'http://localhost:5173/investment',
-        'http://localhost:5173/*'
-
     ],
-
-
-
 ];
