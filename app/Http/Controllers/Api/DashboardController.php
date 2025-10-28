@@ -116,4 +116,60 @@ class DashboardController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * apprived deals
+     */
+    public function approvedDeals(Request $request)
+    {
+        $perPage = $request->input('per_page', 10);
+
+        try {
+            // Approved Deals (active and completed)
+            $investments = Investment::with(['assetClass', 'investmentType', 'strategy'])
+                ->whereIn('status', ['active', 'closed'])
+                ->orderBy('created_at', 'desc')
+                ->paginate($perPage);
+
+            // Transform each investment
+            $approvedDeals = $investments->getCollection()->map(function ($investment) {
+                $minInvestment = (float) str_replace([',', '$'], '', $investment->min_investment ?? 0);
+                $irrPercent = (float) str_replace(['%', ' '], '', $investment->targeted_irr ?? 0);
+
+                return [
+                    'id'            => $investment->id,
+                    'name'          => $investment->title,
+                    'type'          => $investment->assetClass->name ?? 'N/A',
+                    'investment'    => '$' . number_format($minInvestment, 0),
+                    'roi'           => ($irrPercent >= 0 ? '+' : '') . number_format($irrPercent, 1) . '%',
+                    'roi_raw'       => $irrPercent,
+                    'status'        => ucfirst($investment->status),
+                    'thumbnail'     => $investment->thumbnail ? asset($investment->thumbnail) : null,
+                    'asset_class'   => $investment->assetClass->name ?? 'Real Estate',
+                    'fund_name'     => $investment->fund_name,
+                    'sponsor'       => $investment->sponsor,
+                ];
+            });
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'approved_deals' => $approvedDeals,
+                    'pagination' => [
+                        'total'         => $investments->total(),
+                        'current_page'  => $investments->currentPage(),
+                        'last_page'     => $investments->lastPage(),
+                        'per_page'      => $investments->perPage(),
+                    ],
+                ],
+                'message' => 'Approved deals retrieved successfully'
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to load deals',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
 }

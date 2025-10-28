@@ -69,4 +69,5 @@ Route::group(['middleware' => 'auth:api'], function () {
 
     // dashboard stats
     Route::get('/dashboard/stats', [DashboardController::class, 'index']);
+    Route::get('/dashboard/approved-deals', [DashboardController::class, 'approvedDeals']);
 });
