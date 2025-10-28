@@ -12,18 +12,10 @@ class AdminMiddleware
 
     public function handle(Request $request, Closure $next): Response
     {
-
-        if (Auth::guard('api')->check()) {
-            return "wrong";
-        }
-
-        dd('wrokksfsf');
-
-        $user = auth()->user();
-
-        if ($user && $user->role === 'admin') {
+        if (Auth::check() && Auth::user()->role === 'admin') {
             return $next($request);
         }
-        return response()->json(['status' => false, 'message' => 'Unauthorized access. Role should be admin.', 'code' => 403], 403);
+        Auth::logout();
+        return redirect()->route('login');
     }
 }
