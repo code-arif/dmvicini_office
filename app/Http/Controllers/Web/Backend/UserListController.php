@@ -12,7 +12,7 @@ class UserListController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $query = User::where('role', '!=', 'admin');
+            $query = User::where('role', '!=', 'admin')->latest('id');
 
             if ($request->has('role') && $request->role !== 'all') {
                 $query->where('role', $request->role);

@@ -54,12 +54,12 @@ class InvestmentResource extends JsonResource
                 ]);
             }),
             'risks' => $this->whenLoaded('risks', function () {
-                return $this->risks->map(fn($r) => [
-                    'title'       => $r->title,
-                    'description' => $r->description,
-                    'risk_level'  => $r->risk_level,
-                ]);
+                return [
+                    'title'       => $this->risks->title,
+                    'description' => $this->risks->description,
+                ];
             }),
+
         ];
     }
 }
