@@ -20,9 +20,12 @@ Route::group(['middleware' => 'guest:api'], function () {
 
     // Login & Register
     Route::post('/login', [AuthenticationController::class, 'login']); // working
-    Route::post('/register', [AuthenticationController::class, 'register']); // working
-    Route::post('/verify-email', [AuthenticationController::class, 'verifyEmail']); // working
-    Route::post('/resend-register-otp', [AuthenticationController::class, 'resendRegisterOtp']); // working
+    // Route::post('/register', [AuthenticationController::class, 'register']); // working
+    // Route::post('/verify-email', [AuthenticationController::class, 'verifyEmail']); // working
+    // Route::post('/resend-register-otp', [AuthenticationController::class, 'resendRegisterOtp']); // working
+
+
+    Route::post('/register', [AuthenticationController::class, 'register']);
 
     // Password Reset
     Route::post('/forgot-password', [ResetPasswordController::class, 'forgotPassword']);
@@ -43,12 +46,12 @@ Route::group(['middleware' => 'guest:api'], function () {
     Route::get('/pinned/education', [EducationPageController::class, 'pinnedEducation']); // working
 
     // investment list
-     Route::get('/investment-list', [InvestmentController::class, 'investmentList']);
-   // working
+    Route::get('/investment-list', [InvestmentController::class, 'investmentList']);
+    // working
 
     // filtering item
     Route::get('/investment-strategy', [InvestmentController::class, 'investmentStrategy']); // get asset class
-    Route::get('/filter-data', [InvestmentController::class,'filterData']); // get country list
+    Route::get('/filter-data', [InvestmentController::class, 'filterData']); // get country list
 });
 
 

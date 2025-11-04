@@ -60,7 +60,6 @@ class EducationPageController extends Controller
                 'image'       => $education->image ? url('/' . $education->image) : null,
                 'created_at'  => $education->created_at,
                 'updated_at'  => $education->updated_at,
-
                 'category'    => $education->category,
             ];
         });

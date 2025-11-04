@@ -14,20 +14,24 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->string('email')->unique();
-            $table->string('password');
-
-            $table->string('otp')->nullable();
-            $table->boolean('is_otp_verified')->default(false);
-            $table->timestamp('otp_expires_at')->nullable();
+            $table->string('password')->nullable(); // nullable if you allow social login later
             $table->timestamp('email_verified_at')->nullable();
 
+            // Access Management
+            $table->enum('access_level', ['full', 'provisional', 'limited', 'review'])->default('review');
+            $table->boolean('is_active')->default(false);
+            $table->timestamp('provisional_expires_at')->nullable();
+
+            // Security
             $table->string('reset_password_token')->nullable();
             $table->timestamp('reset_password_token_expire_at')->nullable();
 
-            $table->enum('role', ['user', 'admin'])->nullable();
-            $table->tinyInteger('accept')->default(0);
+            // Role (admin functionality ke jonno)
+            $table->enum('role', ['user', 'admin'])->default('user');
+
             $table->rememberToken();
             $table->timestamps();
+            $table->softDeletes(); // compliance er jonno data retain
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

@@ -2,10 +2,11 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Artisan;
+use App\Http\Controllers\Api\Auth\AuthenticationController;
 // use App\Http\Controllers\Api\React\User\Auth\SocialLoginController;
 
 
-Route::get('/',function (){
+Route::get('/', function () {
     return view('welcome');
 });
 
@@ -102,9 +103,6 @@ Route::get('/run-storage-link', function () {
 // Route::get('social-login/{provider}',[SocialLoginController::class,'RedirectToProvider'])->name('social.login');
 // Route::get('social-login/{provider}/callback',[SocialLoginController::class,'HandleProviderCallback']);
 
+Route::get('/verify-email/{token}', [AuthenticationController::class, 'verifyEmail'])->name('verify.email');
 
-
-require __DIR__.'/auth.php';
-
-
-
+require __DIR__ . '/auth.php';

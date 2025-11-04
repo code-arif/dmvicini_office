@@ -27,31 +27,31 @@ class User extends Authenticatable implements JWTSubject
     protected $fillable = [
         'email',
         'password',
-        'otp',
-        'is_otp_verified',
-        'otp_expires_at',
         'email_verified_at',
-        'reset_password_token',
-        'reset_password_token_expire_at',
+        'access_level',
+        'is_active',
+        'provisional_expires_at',
         'role',
-        'avatar'
     ];
 
-    protected $hidden = [
-        'password',
-        'created_at',
-        'updated_at',
-        'otp',
-        'reset_password_token',
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'provisional_expires_at' => 'datetime',
+        'is_active' => 'boolean',
     ];
 
-    protected function casts(): array
+    public function profile()
     {
-        return [
-            'email_verified_at'              => 'datetime',
-            'otp_expires_at'                  => 'datetime',
-            'reset_password_token_expire_at' => 'datetime',
-            'is_otp_verified'                => 'boolean',
-        ];
+        return $this->hasOne(Profiles::class);
+    }
+
+    public function complianceAcknowledgment()
+    {
+        return $this->hasOne(ComplianceAcknowledgment::class);
+    }
+
+    public function accessRequests()
+    {
+        return $this->hasMany(AccessRequest::class);
     }
 }

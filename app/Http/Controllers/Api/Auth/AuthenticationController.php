@@ -2,229 +2,235 @@
 
 namespace App\Http\Controllers\Api\Auth;
 
-use Exception;
-use Carbon\Carbon;
+use App\Models\Firm;
 use App\Models\User;
-use App\Traits\ApiResponse;
+use App\Models\Profiles;
 use Illuminate\Http\Request;
-use App\Mail\RegisterOtpMail;
-use Illuminate\Support\Facades\Log;
+use App\Models\AccessRequest;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
+use App\Models\RegistrationAttempt;
 use App\Http\Controllers\Controller;
+use App\Mail\RegistrationVerifyMail;
+use App\Services\AccessLevelService;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
-use App\Http\Requests\Auth\LoginRequest;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Cache;
-
-
-use App\Http\Requests\Auth\OtpVerifyRequest;
-use App\Http\Requests\Auth\UserRegisterRequest;
+use App\Http\Requests\RegisterRequest;
+use App\Mail\WelcomePendingApprovalMail;
+use App\Models\ComplianceAcknowledgment;
+use Illuminate\Support\Facades\RateLimiter;
 
 class AuthenticationController extends Controller
 {
-    use ApiResponse;
+    public function __construct(
+        private AccessLevelService $accessLevelService
+    ) {}
 
-    /*
-    ** User registration
-    */
-    public function register(UserRegisterRequest $request)
+    public function register(RegisterRequest $request): JsonResponse
     {
-        try {
-            $validatedData = $request->validated();
+        $email = $request->input('email');
+        $ip = $request->ip();
 
-            $otp = rand(1000, 9999);
-            $otpExpiresAt = Carbon::now()->addMinutes(5);
-
-            $email = $validatedData['email'];
-
-            // Add OTP + expiry to the cached data
-            $cacheData = array_merge($validatedData, [
-                'otp' => $otp,
-                'otp_expires_at' => $otpExpiresAt,
-            ]);
-
-            // Store in cache
-            Cache::put("register_otp_{$email}", $otp, 300); // 5 minutes
-            Cache::put("register_data_{$email}", $cacheData, 300); // 5 minutes
-
-            // Send mail
-            // $fullName = $f_name . ' ' . $l_name;
-            Mail::to($email)->send(new RegisterOtpMail($otp));
-
-            return $this->success(
-                [
-                    'message' => 'OTP has been sent to your email. Please verify to complete registration.',
-                    'email' => $email,
-                    'otp' => $otp,
-                ],
-                'OTP Sent successfully.',
-                201
-            );
-        } catch (Exception $e) {
-            Log::error($e->getMessage());
-            return $this->error([], 'Something went wrong: ' . $e->getMessage(), 500);
+        // Rate Limiting
+        $emailKey = 'registration:email:' . $email;
+        if (RateLimiter::tooManyAttempts($emailKey, 3)) {
+            $seconds = RateLimiter::availableIn($emailKey);
+            return response()->json([
+                'message' => "Too many registration attempts. Please try again in " . ceil($seconds / 60) . " minutes."
+            ], 429);
         }
-    }
 
-    /*
-    ** Resend otp for registration
-    */
-    public function resendRegisterOtp(Request $request)
-    {
-        $request->validate([
-            'email' => 'required|email',
+        $ipKey = 'registration:ip:' . $ip;
+        if (RateLimiter::tooManyAttempts($ipKey, 10)) {
+            return response()->json([
+                'message' => 'Too many registration attempts from this IP. Please try again later.'
+            ], 429);
+        }
+
+        // Log attempt
+        RegistrationAttempt::create([
+            'email' => $email,
+            'ip_address' => $ip,
+            'attempted_at' => now(),
         ]);
 
-        $email = $request->email;
+        RateLimiter::hit($emailKey, 3600);
+        RateLimiter::hit($ipKey, 3600);
 
-        // Check if cached registration data exists
-        $cachedData = Cache::get("register_data_{$email}");
+        // Generate token
+        $token = $this->accessLevelService->generateSecureToken();
+        $cacheKey = "registration:{$token}";
 
-        if (!$cachedData) {
-            return $this->error([], 'No registration data found. Please register again.', 404);
-        }
+        // Prepare payload
+        $payload = array_merge($request->validated(), [
+            'ip_address' => $ip,
+            'user_agent' => $request->userAgent(),
+            'registered_at' => now()->toDateTimeString(),
+        ]);
 
-        try {
-            $otp = rand(1000, 9999);
-            $otpExpiresAt = Carbon::now()->addMinutes(5);
+        // Store in cache
+        Cache::put($cacheKey, $payload, now()->addMinutes(5));
 
-            // Update OTP in cached registration data
-            $cachedData['otp'] = $otp;
-            $cachedData['otp_expires_at'] = $otpExpiresAt;
+        // Create access request
+        AccessRequest::create([
+            'request_token' => $token,
+            'status' => 'pending',
+        ]);
 
-            // Save updated cache
-            Cache::put("register_otp_{$email}", $otp, 300);
-            Cache::put("register_data_{$email}", $cachedData, 300);
+        // Send verification email
+        $verifyUrl = route('verify.email', ['token' => $token]);
+        Mail::to($email)->queue(new RegistrationVerifyMail($verifyUrl));
 
-            // Send mail
-            Mail::to($email)->send(new RegisterOtpMail($otp));
-
-            return $this->success(
-                [
-                    'message' => 'A new OTP has been sent to your email address.',
-                    'email' => $email,
-                    'otp' => $otp,
-                ],
-                'OTP resent successfully.',
-                200
-            );
-        } catch (Exception $e) {
-            Log::error($e->getMessage());
-            return $this->error([], 'Something went wrong: ' . $e->getMessage(), 500);
-        }
+        return response()->json([
+            'message' => 'Verification email sent. Link valid for 5 minutes.',
+            'expires_at' => now()->addMinutes(5)->diffForHumans(),
+        ], 200);
     }
 
-    /*
-    ** Verify Register Otp
-    */
-    public function verifyEmail(OtpVerifyRequest $request)
+    /**
+     * Verify email - NOW RETURNS REDIRECT INSTEAD OF JSON
+     */
+    public function verifyEmail(string $token): RedirectResponse
     {
+        $cacheKey = "registration:{$token}";
+        $payload = Cache::get($cacheKey);
+
+        if (!$payload) {
+            // Check if already processed
+            $accessReq = AccessRequest::where('request_token', $token)->first();
+            if ($accessReq && $accessReq->user_id) {
+                return redirect('https://pinnaclealts.com/?error=already_used')
+                    ->with('error', 'This registration link has already been used.');
+            }
+
+            return redirect('https://pinnaclealts.com/?error=expired')
+                ->with('error', 'Token expired or invalid. Please re-submit registration.');
+        }
+
+        DB::beginTransaction();
         try {
-            $validatedData = $request->validated();
-            $email = $validatedData['email'];
-            $otp = $validatedData['otp'];
-
-            $cachedOtp = Cache::get("register_otp_{$email}");
-            $cachedData = Cache::get("register_data_{$email}");
-
-            if (!$cachedOtp || !$cachedData) {
-                return $this->error([], 'OTP has expired or registration data not found.', 410);
-            }
-
-            if ($otp != $cachedOtp) {
-                return $this->error([], 'Your OTP is invalid.', 403);
-            }
-
-            if (Carbon::now()->gt(Carbon::parse($cachedData['otp_expires_at']))) {
-                return $this->error([], 'OTP has expired.', 410);
-            }
-
-            // Check if user already exists
-            if (User::where('email', $email)->exists()) {
-                return $this->error([], 'Email already registered.', 409);
-            }
-
-            // Save user to database
+            // Create User
             $user = User::create([
-                'email' => $cachedData['email'],
-                'password' => Hash::make($cachedData['password']),
-                'is_otp_verified' => true,
-                'email_verified_at' => Carbon::now(),
-                'accept' => false,
+                'email' => $payload['email'],
+                'password' => Hash::make($payload['password']),
+                'email_verified_at' => now(),
                 'role' => 'user',
-                'otp' => ''
+                'access_level' => 'review', // Default to review
+                'is_active' => false, // Not active until admin approves
             ]);
 
-            // Clear cache after successful registration
-            Cache::forget("register_otp_{$email}");
-            Cache::forget("register_data_{$email}");
+            // Create Profile
+            $profile = Profiles::create([
+                'user_id' => $user->id,
+                'first_name' => $payload['first_name'],
+                'last_name' => $payload['last_name'],
+                'title' => $payload['title'] ?? null,
+                'firm_name' => $payload['firm_name'],
+                'phone' => $payload['phone'],
+                'country' => $payload['country'],
+                'investor_type' => $payload['investor_type'],
+                'investor_type_other' => $payload['investor_type'] === 'other'
+                    ? $payload['investor_type_other']
+                    : null,
+            ]);
 
-            $userData = [
-                'id' => $user->id,
-                'email' => $user->email,
-                'role' => $user->role,
-                'is_otp_verified' => $user->is_otp_verified,
-            ];
+            // Create Firm
+            $firm = Firm::create([
+                'profile_id' => $profile->id,
+                'is_registered' => (bool)$payload['is_registered'],
+                'firm_crd' => $payload['firm_crd'] ?? null,
+                'individual_crd' => $payload['individual_crd'] ?? null,
+                'firm_aum_min' => $payload['firm_aum_min'] ?? null,
+                'firm_aum_max' => $payload['firm_aum_max'] ?? null,
+                'address' => $payload['address'] ?? null,
+                'explanation_if_not_registered' => $payload['explain_not_registered'] ?? null,
+            ]);
 
-            return $this->success($userData, 'Otp verified successfully. You are now registered.', 200);
-        } catch (Exception $e) {
-            Log::error($e->getMessage());
-            return $this->error([], 'Something went wrong: ' . $e->getMessage(), 500);
+            // Store Compliance Acknowledgments
+            $now = now();
+            ComplianceAcknowledgment::create([
+                'user_id' => $user->id,
+                'terms_agreed' => true,
+                'terms_agreed_at' => $now,
+                'privacy_agreed' => true,
+                'privacy_agreed_at' => $now,
+                'investor_acknowledgment' => true,
+                'investor_acknowledgment_at' => $now,
+                'confidentiality_agreed' => true,
+                'confidentiality_agreed_at' => $now,
+                'marketing_opt_in' => $payload['marketing_opt_in'] ?? false,
+                'marketing_opt_in_at' => ($payload['marketing_opt_in'] ?? false) ? $now : null,
+                'ip_address' => $payload['ip_address'] ?? null,
+                'user_agent' => $payload['user_agent'] ?? null,
+            ]);
+
+            // Update Access Request
+            $accessReq = AccessRequest::where('request_token', $token)->first();
+            if ($accessReq) {
+                $accessReq->update([
+                    'user_id' => $user->id,
+                    'status' => 'review',
+                ]);
+            }
+
+            DB::commit();
+
+            // Clear cache
+            Cache::forget($cacheKey);
+
+            // Send welcome email with pending approval notice
+            Mail::to($user->email)->queue(new WelcomePendingApprovalMail($user, $profile));
+
+            // Redirect to success page
+            return redirect('https://pinnaclealts.com/?verified=success&status=pending_approval')
+                ->with('success', 'Registration verified! Please wait for admin approval.');
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            report($e);
+
+            return redirect('https://pinnaclealts.com/?error=failed')
+                ->with('error', 'Registration failed. Please try again or contact support.');
         }
     }
 
-    /*
-    ** User login
-    */
-    public function login(LoginRequest $request)
+    /**
+     * Logout
+     */
+    public function logout(Request $request): JsonResponse
     {
-        try {
-            $validatedData = $request->validated();
+        // Delete current access token
+        $request->user()->currentAccessToken()->delete();
 
-            $user = User::where('email', $validatedData['email'])->first();
-
-            if (!$user) {
-                return $this->error([], 'Invalid email or password.', 422);
-            }
-
-            if (!$user->is_otp_verified) {
-                return $this->error([], 'Please verify your email with the OTP before logging in.', 422);
-            }
-
-            if (!$user->accept) {
-                return $this->error([], 'Your account has not been approved yet.', 422);
-            }
-
-            if (!($token = auth('api')->attempt($validatedData))) {
-                return $this->error([], 'Invalid email or password.', 422);
-            }
-
-            $userData = [
-                'id' => $user->id,
-                'email' => $user->email,
-                'role' => $user->role,
-                'token' => $token,
-            ];
-
-            return $this->success($userData, 'Successfully logged in!', 200);
-        } catch (Exception $e) {
-            Log::error($e->getMessage());
-            return $this->error([], 'An error occurred during login.', 500);
-        }
+        return response()->json([
+            'message' => 'Logged out successfully.'
+        ], 200);
     }
 
-    /*
-    ** User logout
-    */
-    public function logout()
+    /**
+     * Logout from all devices
+     */
+    public function logoutAll(Request $request): JsonResponse
     {
-        try {
+        // Delete all tokens
+        $request->user()->tokens()->delete();
 
-            auth('api')->logout();
-            return $this->success([], 'Successfully logged out.', 200);
-        } catch (Exception $e) {
+        return response()->json([
+            'message' => 'Logged out from all devices successfully.'
+        ], 200);
+    }
 
-            Log::info($e->getMessage());
-            return $this->error([], $e->getMessage(), 500);
-        }
+    /**
+     * Get current user
+     */
+    public function me(Request $request): JsonResponse
+    {
+        $user = $request->user()->load('profile');
+
+        return response()->json([
+            'user' => $user
+        ], 200);
     }
 }
