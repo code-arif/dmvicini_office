@@ -1,14 +1,16 @@
 <?php
 
+use Illuminate\Auth\Events\Login;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Contracts\Auth\UserProvider;
+use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\Api\Auth\LoginController;
+use App\Http\Controllers\Api\InvestmentController;
 use App\Http\Controllers\Api\EducationPageController;
 use App\Http\Controllers\Api\HelpcenterPageController;
 use App\Http\Controllers\Api\Auth\UserProfileController;
 use App\Http\Controllers\Api\Auth\ResetPasswordController;
 use App\Http\Controllers\Api\Auth\AuthenticationController;
-use App\Http\Controllers\Api\DashboardController;
-use App\Http\Controllers\Api\InvestmentController;
-use Illuminate\Contracts\Auth\UserProvider;
 
 //health-check
 Route::get("/check", function () {
@@ -19,13 +21,9 @@ Route::get("/check", function () {
 Route::group(['middleware' => 'guest:api'], function () {
 
     // Login & Register
-    Route::post('/login', [AuthenticationController::class, 'login']); // working
-    // Route::post('/register', [AuthenticationController::class, 'register']); // working
-    // Route::post('/verify-email', [AuthenticationController::class, 'verifyEmail']); // working
-    // Route::post('/resend-register-otp', [AuthenticationController::class, 'resendRegisterOtp']); // working
+    Route::post('/login', [LoginController::class, 'login']); // working
 
-
-    Route::post('/register', [AuthenticationController::class, 'register']);
+    Route::post('/register', [AuthenticationController::class, 'register']); // working
 
     // Password Reset
     Route::post('/forgot-password', [ResetPasswordController::class, 'forgotPassword']);
@@ -46,8 +44,7 @@ Route::group(['middleware' => 'guest:api'], function () {
     Route::get('/pinned/education', [EducationPageController::class, 'pinnedEducation']); // working
 
     // investment list
-    Route::get('/investment-list', [InvestmentController::class, 'investmentList']);
-    // working
+    Route::get('/investment-list', [InvestmentController::class, 'investmentList']); // working
 
     // filtering item
     Route::get('/investment-strategy', [InvestmentController::class, 'investmentStrategy']); // get asset class
@@ -58,10 +55,10 @@ Route::group(['middleware' => 'guest:api'], function () {
 
 Route::group(['middleware' => 'auth:api'], function () {
     //User logout
-    Route::post('/logout', [AuthenticationController::class, 'logout']);
+    Route::post('/logout', [LoginController::class, 'logout']); // working
 
     // user profile
-    Route::get('/profile', [UserProfileController::class, 'profile']);
+    Route::get('/profile', [UserProfileController::class, 'me']); // working
     Route::post('/update-profile', [UserProfileController::class, 'updateProfile']);
     Route::post('/update-password', [UserProfileController::class, 'updatePassword']);
 

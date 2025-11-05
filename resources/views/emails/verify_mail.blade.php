@@ -29,7 +29,7 @@
         }
 
         .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #172971;
             padding: 40px 30px;
             text-align: center;
         }
@@ -71,7 +71,7 @@
 
         .cta-button {
             display: inline-block;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #172971;
             color: #ffffff;
             text-decoration: none;
             padding: 16px 48px;
@@ -82,7 +82,7 @@
 
         .info-box {
             background: #f7fafc;
-            border-left: 4px solid #667eea;
+            border-left: 4px solid #172971;
             padding: 16px 20px;
             margin: 30px 0;
             border-radius: 4px;
@@ -122,7 +122,7 @@
         }
 
         .footer a {
-            color: #667eea;
+            color: #172971;
             text-decoration: none;
         }
 

@@ -30,9 +30,24 @@ Route::middleware(['auth', 'admin'])->group(function () {
     // Dashboard data for charts
     Route::get('dashboard/data', [DashboardController::class, 'getDashboardData'])->name('dashboard.data');
 
-    // investor manage
-    Route::get('/investor-list', [UserListController::class, 'index'])->name('investor.lsit');
-    Route::post('/investors/change-status', [UserListController::class, 'changeAcceptStatus'])->name('investor.changeStatus');
+
+    // investor management routes
+    Route::prefix('investors')->name('investor.')->group(function () {
+        // Investor List (DataTable AJAX)
+        Route::get('/', [UserListController::class, 'index'])->name('list');
+
+        // View Single Investor
+        Route::get('/{id}', [UserListController::class, 'show'])->name('show');
+
+        // Approve Investor
+        Route::post('/approve', [UserListController::class, 'approve'])->name('approve');
+
+        // Change Access Level
+        Route::post('/change-access', [UserListController::class, 'changeAccessLevel'])->name('changeAccess');
+
+        // Delete Investor
+        Route::delete('/{id}', [UserListController::class, 'destroy'])->name('destroy');
+    });
 
 
     // cms management

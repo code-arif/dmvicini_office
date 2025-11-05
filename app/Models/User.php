@@ -31,7 +31,11 @@ class User extends Authenticatable implements JWTSubject
         'access_level',
         'is_active',
         'provisional_expires_at',
+        'reset_password_token',
+        'reset_password_token_expire_at',
         'role',
+        'otp',
+        'otp_expires_at',
     ];
 
     protected $casts = [
@@ -53,5 +57,55 @@ class User extends Authenticatable implements JWTSubject
     public function accessRequests()
     {
         return $this->hasMany(AccessRequest::class);
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    public function accessRequest()
+    {
+        return $this->hasOne(AccessRequest::class);
+    }
+
+    /**
+     * Get the user's registration attempts
+     */
+    public function registrationAttempts()
+    {
+        return $this->hasMany(RegistrationAttempt::class, 'email', 'email');
+    }
+
+    /**
+     * Scope for active users
+     */
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
+
+    /**
+     * Scope for users with full access
+     */
+    public function scopeFullAccess($query)
+    {
+        return $query->where('access_level', 'full');
+    }
+
+    /**
+     * Scope for investors only
+     */
+    public function scopeInvestors($query)
+    {
+        return $query->where('role', 'user');
+    }
+
+    /**
+     * Check if user has full access
+     */
+    public function hasFullAccess()
+    {
+        return $this->is_active && $this->access_level === 'full';
     }
 }

@@ -39,8 +39,8 @@
 
                 {{-- users --}}
                 <li class="slide">
-                    <a class="side-menu__item {{ request()->routeIs('investor.lsit') ? 'has-link' : '' }}"
-                        href="{{ route('investor.lsit') }}">
+                    <a class="side-menu__item {{ request()->routeIs('investor.list') ? 'has-link' : '' }}"
+                        href="{{ route('investor.list') }}">
                         <i class="fa-solid fa-users side-menu__icon"
                             style="font-size:24px; width:24px; height:24px;"></i>
                         <span class="side-menu__label">Investor Manage</span>

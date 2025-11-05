@@ -124,4 +124,5 @@ return [
     ],
 
     'verification_url' => env('APP_URL') . '/verify-email-page',
+    'frontend_url' => env('FRONTEND_URL', 'https://pinnaclealts.com'),
 ];

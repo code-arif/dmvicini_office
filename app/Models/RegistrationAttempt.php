@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class RegistrationAttempt extends Model
 {
+    use HasFactory;
+
     public $timestamps = false;
 
     protected $fillable = [
@@ -14,7 +17,5 @@ class RegistrationAttempt extends Model
         'attempted_at',
     ];
 
-    protected $casts = [
-        'attempted_at' => 'datetime',
-    ];
+    protected $dates = ['attempted_at'];
 }

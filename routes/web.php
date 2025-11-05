@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Artisan;
+use App\Http\Controllers\UserApprovalController;
 use App\Http\Controllers\Api\Auth\AuthenticationController;
 // use App\Http\Controllers\Api\React\User\Auth\SocialLoginController;
 
@@ -104,5 +105,11 @@ Route::get('/run-storage-link', function () {
 // Route::get('social-login/{provider}/callback',[SocialLoginController::class,'HandleProviderCallback']);
 
 Route::get('/verify-email/{token}', [AuthenticationController::class, 'verifyEmail'])->name('verify.email');
+
+Route::get('/approve/{token}', [UserApprovalController::class, 'approve'])
+    ->name('admin.approve');
+
+Route::get('/reject/{token}', [UserApprovalController::class, 'reject'])
+    ->name('admin.reject');
 
 require __DIR__ . '/auth.php';

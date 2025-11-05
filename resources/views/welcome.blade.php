@@ -2,11 +2,11 @@
 
 @section('content')
 <!-- CONTAINER OPEN -->
-<div class="col col-login mx-auto text-center">
-    <a href="index.html" class="text-center">
+{{-- <div class="col col-login mx-auto text-center">
+    <a href="{{ route('dashboard') }}" class="text-center">
         <img src="{{ asset($settings->logo ?? 'default/logo.png') }}" class="header-brand-img" alt="">
     </a>
-</div>
+</div> --}}
 <div class="container-login100">
     <div class="wrap-login100 p-5 bg-white rounded-lg shadow" style="max-width: 400px;">
         <div class="card-body text-center">

@@ -16,9 +16,11 @@ class AccessRequest extends Model
         'verified_at',
         'verified_by',
         'admin_notes',
+        'payload',
     ];
 
     protected $casts = [
+        'payload' => 'array',
         'verified_at' => 'datetime',
     ];
 

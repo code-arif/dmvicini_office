@@ -19,17 +19,78 @@ class UserProfileController extends Controller
 
 
     //get user progile
-    public function profile()
+    /**
+     * Get authenticated user details
+     */
+    public function me(Request $request)
     {
         try {
             $user = auth('api')->user();
+
             if (!$user) {
-                return $this->error([], 'User not found.', 200);
+                return $this->error([], 'User not authenticated.', 401);
             }
 
-            return $this->success(new UserResource($user), 'User Profile Retrieved successfully', 200);
+            // Load relationships
+            $user->load(['profile.firm', 'accessRequest', 'complianceAcknowledgment']);
+
+            // Check if still active
+            if (!$user->is_active) {
+                return $this->error([], 'Your account has been deactivated.', 403);
+            }
+
+            $userData = [
+                'id' => $user->id,
+                'email' => $user->email,
+                'role' => $user->role,
+                'access_level' => $user->access_level,
+                'is_active' => $user->is_active,
+                'avatar' => $user->avatar ? asset('storage/' . $user->avatar) : null,
+                'created_at' => $user->created_at->toISOString(),
+                'last_login_at' => $user->last_login_at ? $user->last_login_at->toISOString() : null,
+            ];
+
+            // Add profile
+            if ($user->profile) {
+                $userData['profile'] = [
+                    'first_name' => $user->profile->first_name,
+                    'last_name' => $user->profile->last_name,
+                    'full_name' => $user->profile->full_name,
+                    'title' => $user->profile->title,
+                    'firm_name' => $user->profile->firm_name,
+                    'phone' => $user->profile->phone,
+                    'country' => $user->profile->country,
+                    'investor_type' => $user->profile->investor_type,
+                ];
+
+                // Add firm data
+                if ($user->profile->firm) {
+                    $userData['firm'] = [
+                        'is_registered' => $user->profile->firm->is_registered,
+                        'firm_crd' => $user->profile->firm->firm_crd,
+                        'individual_crd' => $user->profile->firm->individual_crd,
+                    ];
+                }
+            }
+
+            // Add access request status
+            if ($user->accessRequest) {
+                $userData['access_request'] = [
+                    'status' => $user->accessRequest->status,
+                    'verified_at' => $user->accessRequest->verified_at ? $user->accessRequest->verified_at->toISOString() : null,
+                ];
+            }
+
+            // Add provisional expiry if applicable
+            if ($user->access_level === 'provisional' && $user->provisional_expires_at) {
+                $userData['provisional_expires_at'] = $user->provisional_expires_at->toISOString();
+                $userData['provisional_days_remaining'] = now()->diffInDays($user->provisional_expires_at, false);
+            }
+
+            return $this->success($userData, 'User details retrieved successfully.', 200);
         } catch (Exception $e) {
-            return $this->error([], $e->getMessage(), 500);
+            Log::error('Get User Error: ' . $e->getMessage());
+            return $this->error([], 'Failed to retrieve user details.', 500);
         }
     }
 

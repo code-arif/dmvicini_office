@@ -25,6 +25,11 @@ class Profiles extends Model
 
     public function firm()
     {
-        return $this->hasOne(Firm::class);
+        return $this->hasOne(Firm::class, 'profile_id');
+    }
+
+    public function getFullNameAttribute()
+    {
+        return "{$this->first_name} {$this->last_name}";
     }
 }

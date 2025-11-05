@@ -12,14 +12,15 @@ class RegistrationVerifyMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public $verifyUrl; // Public property
+    public $verifyUrl;
     public $expiresIn;
     public $appName;
 
     public function __construct($verifyUrl)
     {
         $this->verifyUrl = $verifyUrl;
-        $this->expiresIn = 5; // minutes
+        $this->expiresIn = 5;
+        $this->appName = config('app.name'); // ✅ FIX
     }
 
     public function build()
