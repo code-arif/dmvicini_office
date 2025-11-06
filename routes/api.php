@@ -61,6 +61,8 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::get('/profile', [UserProfileController::class, 'me']); // working
     Route::post('/update-profile', [UserProfileController::class, 'updateProfile']);
     Route::post('/update-password', [UserProfileController::class, 'updatePassword']);
+    Route::post('/update-avatar', [UserProfileController::class, 'updateAvatar']);
+    Route::post('/update-firm', [UserProfileController::class, 'updateFirm']);
 
 
     Route::get('/education/{id}', [EducationPageController::class, 'show']); // education details

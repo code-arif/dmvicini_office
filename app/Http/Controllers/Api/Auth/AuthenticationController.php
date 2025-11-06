@@ -83,7 +83,7 @@ class AuthenticationController extends Controller
 
         // Send verification email
         $verifyUrl = route('verify.email', ['token' => $token]);
-        Mail::to($email)->queue(new RegistrationVerifyMail($verifyUrl));
+        Mail::to($email)->send(new RegistrationVerifyMail($verifyUrl));
 
         return response()->json([
             'message' => 'Verification email sent. Link valid for 5 minutes.',
@@ -174,12 +174,12 @@ class AuthenticationController extends Controller
         // -----------------------------------------------------------------
         // 7. Success → welcome mail + redirect
         // -----------------------------------------------------------------
-        Mail::to($user->email)->queue(new WelcomePendingApprovalMail($user, $profile ?? null));
+        Mail::to($user->email)->send(new WelcomePendingApprovalMail($user, $profile ?? null));
 
         // Notify all admins
         $admins = User::where('role', 'admin')->get();
         foreach ($admins as $admin) {
-            Mail::to($admin->email)->queue(new NewRegistrationMail($user));
+            Mail::to($admin->email)->send(new NewRegistrationMail($user));
         }
 
         return redirect()->away(
