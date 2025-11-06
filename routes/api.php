@@ -3,9 +3,11 @@
 use Illuminate\Auth\Events\Login;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Contracts\Auth\UserProvider;
+use App\Http\Controllers\Api\FooterController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\Auth\LoginController;
 use App\Http\Controllers\Api\InvestmentController;
+use App\Http\Controllers\Api\NewsletterController;
 use App\Http\Controllers\Api\EducationPageController;
 use App\Http\Controllers\Api\HelpcenterPageController;
 use App\Http\Controllers\Api\Auth\UserProfileController;
@@ -49,6 +51,9 @@ Route::group(['middleware' => 'guest:api'], function () {
     // filtering item
     Route::get('/investment-strategy', [InvestmentController::class, 'investmentStrategy']); // get asset class
     Route::get('/filter-data', [InvestmentController::class, 'filterData']); // get country list
+
+
+    Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe']);
 });
 
 
@@ -67,7 +72,10 @@ Route::group(['middleware' => 'auth:api'], function () {
 
     Route::get('/education/{id}', [EducationPageController::class, 'show']); // education details
     Route::get('/investment/{id}', [InvestmentController::class, 'show']); // investment details
+    Route::get('/categories', [EducationPageController::class, 'getCategories']); // categories list
 
+    // footer data
+    Route::get('/footer', [FooterController::class, 'index']);
 
     // dashboard stats
     Route::get('/dashboard/stats', [DashboardController::class, 'index']);

@@ -30,14 +30,6 @@ class EducationController extends Controller
                 // Sub Title
                 ->addColumn('sub_title', fn($item) => $item->sub_title ?? '-')
 
-                // Description (truncate to 50 chars)
-                ->addColumn('description', function ($item) {
-                    $text = strip_tags($item->description); // remove HTML tags
-                    return strlen($text) > 50
-                        ? substr($text, 0, 50) . '...'
-                        : $text;
-                })
-
                 // Category
                 // ->addColumn('category', fn($item) => $item->category->title ?? 'Uncategorized')
                 ->addColumn('category', function ($item) {
@@ -95,7 +87,7 @@ class EducationController extends Controller
                         </div>';
                 })
 
-                ->rawColumns(['description', 'action', 'image', 'category', 'status'])
+                ->rawColumns(['action', 'image', 'category', 'status'])
                 ->make(true);
         }
 

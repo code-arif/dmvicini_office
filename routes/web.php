@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Artisan;
 use App\Http\Controllers\UserApprovalController;
+use App\Http\Controllers\Api\NewsletterController;
 use App\Http\Controllers\Api\Auth\AuthenticationController;
 // use App\Http\Controllers\Api\React\User\Auth\SocialLoginController;
 
@@ -111,5 +112,9 @@ Route::get('/approve/{token}', [UserApprovalController::class, 'approve'])
 
 Route::get('/reject/{token}', [UserApprovalController::class, 'reject'])
     ->name('admin.reject');
+
+
+// Newsletter verification route
+Route::get('/newsletter/verify/{token}', [NewsletterController::class, 'verify'])->name('newsletter.verify');
 
 require __DIR__ . '/auth.php';

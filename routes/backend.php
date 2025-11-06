@@ -2,12 +2,15 @@
 
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\FooterController;
 use App\Http\Controllers\Web\Backend\FaqController;
 use App\Http\Controllers\Web\Backend\CategoryController;
 use App\Http\Controllers\Web\Backend\UserListController;
 use App\Http\Controllers\Web\Backend\DashboardController;
 use App\Http\Controllers\Web\Backend\EducationController;
+use App\Http\Controllers\Web\Backend\SubscriberController;
 use App\Http\Controllers\Web\Backend\CMS\AuthPageController;
+use App\Http\Controllers\Web\Backend\FooterManageController;
 use App\Http\Controllers\Web\Backend\CMS\HelpCenterController;
 use App\Http\Controllers\Web\Backend\Investment\RiskController;
 use App\Http\Controllers\Web\Backend\InvestmentImportController;
@@ -55,6 +58,10 @@ Route::middleware(['auth', 'admin'])->group(function () {
         //help center page
         Route::get('/help-center', [HelpCenterController::class, 'helpCenterPage'])->name('help.center.hero');
         Route::post('/update-hero', [HelpCenterController::class, 'updateHero'])->name('update.hero');
+
+        // footer management routes
+        Route::get('/footer', [FooterManageController::class, 'index'])->name('footer.index');
+        Route::post('/footer/update', [FooterManageController::class, 'update'])->name('footer.update');
     });
 
 
@@ -126,6 +133,10 @@ Route::middleware(['auth', 'admin'])->group(function () {
         ->name('investments.import');
     Route::get('/investments/download-template', [InvestmentImportController::class, 'downloadTemplate'])
         ->name('investments.download-template');
+
+
+    Route::get('/subscribers', [SubscriberController::class, 'index'])
+        ->name('subscribers.index');
 });
 
 

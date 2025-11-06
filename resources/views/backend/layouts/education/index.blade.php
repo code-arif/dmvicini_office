@@ -49,11 +49,10 @@
                                         <thead>
                                             <tr>
                                                 <th>SN.</th>
+                                                <th>Image</th>
                                                 <th>Title</th>
                                                 <th>Sub Title</th>
                                                 <th>Category</th>
-                                                <th>Description</th>
-                                                <th>Image</th>
                                                 <th>Created</th>
                                                 <th>Vabluable</th>
                                                 <th>Action</th>
@@ -236,12 +235,6 @@
                     {
                         data: 'category',
                         name: 'category',
-                        orderable: false,
-                        searchable: false
-                    },
-                    {
-                        data: 'description',
-                        name: 'description',
                         orderable: false,
                         searchable: false
                     },
