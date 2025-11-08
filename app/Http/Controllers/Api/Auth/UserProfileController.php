@@ -32,7 +32,7 @@ class UserProfileController extends Controller
 
             // Load all needed relations in one go
             $user->loadMissing(['profile.firm', 'accessRequest', 'complianceAcknowledgment']);
-            
+
             if (! $user->is_active) {
                 return $this->error([], 'Your account has been deactivated.', 403);
             }
@@ -91,20 +91,10 @@ class UserProfileController extends Controller
             'last_name'             => ['required', 'string', 'max:255'],
             'title'                 => ['nullable', 'string', 'max:255'],
             'firm_name'             => ['required', 'string', 'max:255'],
-            'phone'                 => ['required', 'string', 'regex:/^\+?[1-9]\d{1,14}$/'], // E.164
+            'phone'                 => ['required', 'string'],
             'country'               => ['required', 'string', 'max:2'],
-            'investor_type'         => [
-                'required',
-                Rule::in([
-                    'ria_adviser',
-                    'broker_dealer',
-                    'family_office',
-                    'institutional',
-                    'fund_manager',
-                    'other',
-                ]),
-            ],
-            'investor_type_other'   => ['nullable', 'required_if:investor_type,other', 'string'],
+            'investor_type'         => ['nullable', 'string'],
+            'investor_type_other'   => ['nullable'],
         ]);
 
         if ($validator->fails()) {
@@ -217,8 +207,7 @@ class UserProfileController extends Controller
             'is_registered'                 => ['required', 'boolean'],
             'firm_crd'                      => ['nullable', 'string', 'size:7'],
             'individual_crd'                => ['nullable', 'string', 'size:7'],
-            'firm_aum_min'                  => ['nullable', 'integer', 'min:0'],
-            'firm_aum_max'                  => ['nullable', 'integer', 'min:0', 'gte:firm_aum_min'],
+            'firm_aum'                      => ['nullable', 'integer', 'min:0'],
             'address'                       => ['nullable', 'string'],
             'explanation_if_not_registered' => ['nullable', 'required_if:is_registered,0', 'string'],
         ]);

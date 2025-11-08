@@ -25,14 +25,7 @@ return new class extends Migration
             $table->string('country');
 
             // Investor Info
-            $table->enum('investor_type', [
-                'ria_adviser',
-                'broker_dealer',
-                'family_office',
-                'institutional',
-                'fund_manager',
-                'other'
-            ]);
+            $table->string('investor_type')->nullable()->default('other');
             $table->text('investor_type_other')->nullable();
 
             $table->timestamps();

@@ -34,7 +34,6 @@ class UserListController extends Controller
                         ? $user->profile->first_name . ' ' . $user->profile->last_name
                         : 'N/A';
 
-                    // Status badge based on access_level and is_active
                     $statusBadge = $this->getStatusBadge($user);
 
                     return '
@@ -53,7 +52,7 @@ class UserListController extends Controller
                         return '<span class="text-muted">No profile data</span>';
                     }
 
-                    $investorType = ucwords(str_replace('_', ' ', $user->profile->investor_type));
+                    $investorType = ucwords(str_replace('_', ' ', $user->profile->investor_type ?? 'N/A'));
                     $firmName = $user->profile->firm_name ?? 'N/A';
                     $country = $user->profile->country ?? 'N/A';
 
@@ -130,20 +129,20 @@ class UserListController extends Controller
                     'firm_name' => $user->profile->firm_name,
                     'phone' => $user->profile->phone,
                     'country' => $user->profile->country,
-                    'investor_type' => ucwords(str_replace('_', ' ', $user->profile->investor_type)),
+                    'investor_type' => ucwords(str_replace('_', ' ', $user->profile->investor_type ?? 'Other')),
                     'investor_type_other' => $user->profile->investor_type_other,
                 ] : null,
                 'firm' => $user->profile && $user->profile->firm ? [
                     'is_registered' => $user->profile->firm->is_registered,
                     'firm_crd' => $user->profile->firm->firm_crd,
                     'individual_crd' => $user->profile->firm->individual_crd,
-                    'firm_aum_min' => $user->profile->firm->firm_aum_min
-                        ? '$' . number_format($user->profile->firm->firm_aum_min)
-                        : 'N/A',
-                    'firm_aum_max' => $user->profile->firm->firm_aum_max
-                        ? '$' . number_format($user->profile->firm->firm_aum_max)
+                    'firm_aum' => $user->profile->firm->firm_aum
+                        ? '$' . number_format($user->profile->firm->firm_aum)
                         : 'N/A',
                     'address' => $user->profile->firm->address,
+                    'city' => $user->profile->firm->city,
+                    'state' => $user->profile->firm->state,
+                    'zip' => $user->profile->firm->zip,
                     'explanation_if_not_registered' => $user->profile->firm->explanation_if_not_registered,
                 ] : null,
                 'access_request' => $user->accessRequest ? [
@@ -153,13 +152,29 @@ class UserListController extends Controller
                         ? $user->accessRequest->verified_at->format('M d, Y h:i A')
                         : null,
                     'admin_notes' => $user->accessRequest->admin_notes,
+                    'verifier_document' => $user->accessRequest->verifier_document,
+                    'verifier_reference' => $user->accessRequest->verifier_reference,
                 ] : null,
                 'compliance' => $user->complianceAcknowledgment ? [
                     'terms_agreed' => $user->complianceAcknowledgment->terms_agreed,
+                    'terms_agreed_at' => $user->complianceAcknowledgment->terms_agreed_at
+                        ? $user->complianceAcknowledgment->terms_agreed_at->format('M d, Y h:i A')
+                        : null,
                     'privacy_agreed' => $user->complianceAcknowledgment->privacy_agreed,
+                    'privacy_agreed_at' => $user->complianceAcknowledgment->privacy_agreed_at
+                        ? $user->complianceAcknowledgment->privacy_agreed_at->format('M d, Y h:i A')
+                        : null,
                     'investor_acknowledgment' => $user->complianceAcknowledgment->investor_acknowledgment,
+                    'investor_acknowledgment_at' => $user->complianceAcknowledgment->investor_acknowledgment_at
+                        ? $user->complianceAcknowledgment->investor_acknowledgment_at->format('M d, Y h:i A')
+                        : null,
                     'confidentiality_agreed' => $user->complianceAcknowledgment->confidentiality_agreed,
+                    'confidentiality_agreed_at' => $user->complianceAcknowledgment->confidentiality_agreed_at
+                        ? $user->complianceAcknowledgment->confidentiality_agreed_at->format('M d, Y h:i A')
+                        : null,
+                    'marketing_opt_in' => $user->complianceAcknowledgment->marketing_opt_in,
                     'ip_address' => $user->complianceAcknowledgment->ip_address,
+                    'user_agent' => $user->complianceAcknowledgment->user_agent,
                 ] : null,
             ]
         ]);
@@ -169,17 +184,14 @@ class UserListController extends Controller
     {
         $request->validate([
             'id' => 'required|exists:users,id',
-            'admin_notes' => 'nullable|string|max:1000',
         ]);
 
         $user = User::with('accessRequest')->findOrFail($request->id);
 
-        // Update user status
         $user->is_active = true;
         $user->access_level = 'full';
         $user->save();
 
-        // Update access request if exists
         if ($user->accessRequest) {
             $user->accessRequest->update([
                 'status' => 'approved',
@@ -205,7 +217,6 @@ class UserListController extends Controller
         $user = User::findOrFail($request->id);
         $user->access_level = $request->access_level;
 
-        // If setting to full, make active
         if ($request->access_level === 'full') {
             $user->is_active = true;
         }

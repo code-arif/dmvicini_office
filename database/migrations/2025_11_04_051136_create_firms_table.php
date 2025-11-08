@@ -22,11 +22,13 @@ return new class extends Migration
             $table->string('individual_crd')->nullable();
 
             // AUM (using bigInteger for larger amounts)
-            $table->bigInteger('firm_aum_min')->nullable();
-            $table->bigInteger('firm_aum_max')->nullable();
+            $table->bigInteger('firm_aum')->nullable();
 
             // Address
             $table->text('address')->nullable();
+            $table->string('city')->nullable();
+            $table->string('state')->nullable();
+            $table->string('zip')->nullable();
 
             // If not registered
             $table->text('explanation_if_not_registered')->nullable();

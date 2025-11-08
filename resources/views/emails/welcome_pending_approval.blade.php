@@ -245,11 +245,6 @@
                     <li style="margin-bottom: 8px;">You'll be notified via email of the decision</li>
                 </ul>
             </div>
-
-            <div class="info-box">
-                <p><strong>💡 Need Help?</strong></p>
-                <p>If you have any questions about your application status, please contact our support team at <a href="mailto:support@{{ parse_url(config('app.url'), PHP_URL_HOST) }}" style="color: #667eea;">support@{{ parse_url(config('app.url'), PHP_URL_HOST) }}</a></p>
-            </div>
         </div>
 
         <div class="footer">

@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Symfony\Component\HttpKernel\Profiler\Profile;
 
 class Firm extends Model
 {
@@ -12,18 +11,14 @@ class Firm extends Model
         'is_registered',
         'firm_crd',
         'individual_crd',
-        'firm_aum_min',
-        'firm_aum_max',
+        'firm_aum',
+        'state',
+        'city',
+        'zip',
         'address',
         'explanation_if_not_registered',
     ];
 
-    // Boolean cast
-    protected $casts = [
-        'is_registered' => 'boolean',
-        'firm_aum_min' => 'integer',
-        'firm_aum_max' => 'integer',
-    ];
 
     public function profile()
     {

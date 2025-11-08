@@ -16,16 +16,16 @@ class UserSeeder extends Seeder
         // Admin Users
         $adminUsers = [
             [
-                'email' => 'admin@example.com',
-                'password' => Hash::make('password123'),
+                'email' => 'admin@gmail.com',
+                'password' => Hash::make('12345678'),
                 'email_verified_at' => now(),
                 'access_level' => 'full',
                 'is_active' => true,
                 'role' => 'admin',
             ],
             [
-                'email' => 'superadmin@example.com',
-                'password' => Hash::make('password123'),
+                'email' => 'superadmin@gmail.com',
+                'password' => Hash::make('12345678'),
                 'email_verified_at' => now(),
                 'access_level' => 'full',
                 'is_active' => true,
@@ -37,7 +37,7 @@ class UserSeeder extends Seeder
         $regularUsers = [
             [
                 'email' => 'john.doe@investment.com',
-                'password' => Hash::make('password123'),
+                'password' => Hash::make('12345678'),
                 'email_verified_at' => now(),
                 'access_level' => 'full',
                 'is_active' => true,
@@ -46,7 +46,7 @@ class UserSeeder extends Seeder
             ],
             [
                 'email' => 'jane.smith@advisory.com',
-                'password' => Hash::make('password123'),
+                'password' => Hash::make('12345678'),
                 'email_verified_at' => now(),
                 'access_level' => 'provisional',
                 'is_active' => true,
@@ -55,7 +55,7 @@ class UserSeeder extends Seeder
             ],
             [
                 'email' => 'mike.johnson@retail.com',
-                'password' => Hash::make('password123'),
+                'password' => Hash::make('12345678'),
                 'email_verified_at' => now(),
                 'access_level' => 'limited',
                 'is_active' => false,

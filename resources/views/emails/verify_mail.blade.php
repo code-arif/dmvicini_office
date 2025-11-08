@@ -185,16 +185,6 @@
 
             <div class="divider"></div>
 
-            <div class="message">
-                <p><strong>What happens next?</strong></p>
-                <ul style="margin-left: 20px; color: #4a5568;">
-                    <li style="margin-bottom: 8px;">Your account will be created upon verification</li>
-                    <li style="margin-bottom: 8px;">You'll receive provisional access for 7 days</li>
-                    <li style="margin-bottom: 8px;">Our compliance team will review your application</li>
-                    <li style="margin-bottom: 8px;">You'll be notified once full access is granted</li>
-                </ul>
-            </div>
-
             <div class="info-box warning">
                 <p><strong>⚠️ Didn't create an account?</strong> If you didn't request this registration, please ignore
                     this email. No account will be created without verification.</p>

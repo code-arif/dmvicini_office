@@ -32,6 +32,7 @@ class AuthenticationController extends Controller
 
     public function register(RegisterRequest $request): JsonResponse
     {
+        // dd($request->all());
         $email = $request->input('email');
         $ip = $request->ip();
 
@@ -204,7 +205,7 @@ class AuthenticationController extends Controller
             'firm_name' => 'required|string',
             'phone'    => 'required|string',
             'country'  => 'required|string',
-            'investor_type' => 'required|in:ria_adviser,broker_dealer,family_office,institutional,fund_manager,other',
+            'investor_type' => 'nullable|string',
         ];
 
         $validator = Validator::make($payload, $rules);
@@ -225,8 +226,12 @@ class AuthenticationController extends Controller
         ]);
     }
 
+
     private function createProfile(User $user, array $payload): Profiles
     {
+        // Default fallback: if investor_type is null/empty, set to 'other'
+        $investorType = $payload['investor_type'] ?? 'other';
+
         return Profiles::create([
             'user_id'           => $user->id,
             'first_name'        => $payload['first_name'],
@@ -234,8 +239,8 @@ class AuthenticationController extends Controller
             'firm_name'         => $payload['firm_name'],
             'phone'             => $payload['phone'],
             'country'           => $payload['country'],
-            'investor_type'     => $payload['investor_type'],
-            'investor_type_other' => $payload['investor_type'] === 'other'
+            'investor_type'     => $investorType,
+            'investor_type_other' => $investorType === 'other'
                 ? ($payload['investor_type_other'] ?? null)
                 : null,
         ]);
@@ -248,9 +253,11 @@ class AuthenticationController extends Controller
             'is_registered'                  => (bool)($payload['is_registered'] ?? false),
             'firm_crd'                       => $payload['firm_crd'] ?? null,
             'individual_crd'                 => $payload['individual_crd'] ?? null,
-            'firm_aum_min'                   => $payload['firm_aum_min'] ?? null,
-            'firm_aum_max'                   => $payload['firm_aum_max'] ?? null,
+            'firm_aum'                       => $payload['firm_aum'] ?? null,
             'address'                        => $payload['address'] ?? null,
+            'city'                           => $payload['city'] ?? null,
+            'state'                          => $payload['state'] ?? null,
+            'zip'                            => $payload['zip'] ?? null,
             'explanation_if_not_registered' => $payload['explain_not_registered'] ?? null,
         ]);
     }
@@ -272,14 +279,6 @@ class AuthenticationController extends Controller
             'marketing_opt_in_at'    => ($payload['marketing_opt_in'] ?? false) ? $now : null,
             'ip_address'             => $payload['ip_address'] ?? null,
             'user_agent'             => $payload['user_agent'] ?? null,
-        ]);
-    }
-
-    private function finalizeAccessRequest(AccessRequest $req, User $user): void
-    {
-        $req->update([
-            'user_id' => $user->id,
-            // 'status'  => 'review',
         ]);
     }
 }

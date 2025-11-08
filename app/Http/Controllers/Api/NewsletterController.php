@@ -4,12 +4,11 @@ namespace App\Http\Controllers\Api;
 
 use App\Models\Subscriber;
 use App\Traits\ApiResponse;
-use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Mail;
-use App\Mail\NewsletterVerificationMail;
+use App\Mail\NewsletterWelcomeMail;
 use Illuminate\Support\Facades\RateLimiter;
 
 class NewsletterController extends Controller
@@ -41,34 +40,27 @@ class NewsletterController extends Controller
         // Check if already subscribed
         $existing = Subscriber::where('email', $email)->first();
         if ($existing) {
-            if ($existing->is_verified) {
-                return $this->error([], "You're already subscribed!", 409);
-            } else {
-                return $this->error([], "Please check your email to verify your subscription.", 409);
-            }
+            return $this->error([], "You're already subscribed to our newsletter!", 409);
         }
 
         try {
-            // Create subscriber
+            // Create subscriber - directly verified
             $subscriber = Subscriber::create([
                 'email' => $email,
                 'ip_address' => $ip,
                 'user_agent' => $request->userAgent(),
+                'is_verified' => true,
+                'verified_at' => now(),
             ]);
 
-            // Generate verification token
-            $token = Str::random(60);
-            cache()->put("newsletter_verify:{$token}", $subscriber->id, now()->addHours(24));
-
-            // Send verification email
-            $verifyUrl = route('newsletter.verify', ['token' => $token]);
-            Mail::to($email)->send(new NewsletterVerificationMail($verifyUrl, $email));
+            // Send welcome email
+            Mail::to($email)->send(new NewsletterWelcomeMail($email));
 
             // Hit rate limiter
             RateLimiter::hit($emailKey, 3600);
             RateLimiter::hit($ipKey, 3600);
 
-            return $this->success([], 'Subscription successful! Please check your email to verify.', 201);
+            return $this->success([], 'Successfully subscribed! Check your email for a welcome message.', 201);
         } catch (\Exception $e) {
             Log::error('Newsletter subscription failed', [
                 'email' => $email,
@@ -79,26 +71,21 @@ class NewsletterController extends Controller
         }
     }
 
-    // Optional: Verify endpoint
-    public function verify($token)
+    // Optional: Unsubscribe endpoint
+    public function unsubscribe(Request $request)
     {
-        $subscriberId = cache()->get("newsletter_verify:{$token}");
-        if (!$subscriberId) {
-            return redirect()->to('/?newsletter=expired');
-        }
-
-        $subscriber = Subscriber::find($subscriberId);
-        if (!$subscriber) {
-            return redirect()->to('/?newsletter=invalid');
-        }
-
-        $subscriber->update([
-            'is_verified' => true,
-            'verified_at' => now(),
+        $request->validate([
+            'email' => 'required|email',
         ]);
 
-        cache()->forget("newsletter_verify:{$token}");
+        $subscriber = Subscriber::where('email', $request->email)->first();
 
-        return redirect()->to('/?newsletter=success');
+        if (!$subscriber) {
+            return $this->error([], 'Email not found in our subscriber list.', 404);
+        }
+
+        $subscriber->delete();
+
+        return $this->success([], 'Successfully unsubscribed from newsletter.', 200);
     }
 }
