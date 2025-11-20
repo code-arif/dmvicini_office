@@ -114,7 +114,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
 
 
         Route::prefix('investment')->name('investment.')->group(function () {
-            Route::get('/list', [InvestmentController::class, 'index'])->name('list'); 
+            Route::get('/list', [InvestmentController::class, 'index'])->name('list'); // working
             Route::get('/create', [InvestmentController::class, 'create'])->name('create');
             Route::post('/store/basic', [InvestmentController::class, 'storeBasic'])->name('basic.store');
             Route::get('/edit/{id}', [InvestmentController::class, 'edit'])->name('edit');
