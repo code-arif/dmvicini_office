@@ -15,8 +15,15 @@ return new class extends Migration
             $table->id();
             $table->foreignId('investment_id')->constrained()->cascadeOnDelete();
             $table->longText('overview')->nullable();
-            $table->json('targeted_returns')->nullable(); // { "IRR": "15%", "CashYield": "8%" }
-            $table->json('fees')->nullable();             // { "ManagementFee": "$1000" }
+            $table->string('targeted_irr')->nullable();
+            $table->string('tax_doc')->nullable();
+            $table->text('investor_waterfall')->nullable();
+            $table->text('promoted_interest')->nullable();
+            $table->string('asset_management_fee')->nullable();
+            $table->string('organizational_and_offering_fee')->nullable();
+            $table->string('acquisition_fee')->nullable();
+            $table->string('disposition_fee')->nullable();
+            $table->string('fund_administration_fee')->nullable();
             $table->timestamps();
         });
     }

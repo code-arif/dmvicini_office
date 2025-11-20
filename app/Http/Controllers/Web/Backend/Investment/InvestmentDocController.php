@@ -13,63 +13,78 @@ class InvestmentDocController extends Controller
     /**
      * Store investment media (documents + images)
      */
-    public function mediaStore(Request $request)
+    public function uploadDocument(Request $request, $investment_id)
     {
         $request->validate([
-            'investment_id' => 'required|exists:investments,id',
-            'documents.*'   => 'nullable|file|mimes:pdf,doc,docx,xlsx,pptx',
-            'images.*'      => 'nullable|image|mimes:jpeg,jpg,png,gif,webp|max:2048',
+            'name'      => 'required|string|max:255',
+            'file'      => 'required|file|mimes:pdf,doc,docx,xlsx,ppt,pptx|max:20480',
         ]);
 
-        $investmentId = $request->investment_id;
+        $path = Helper::fileUpload($request->file('file'), 'investment/documents', time() . '_' . $request->name);
 
-        // Handle documents only if new ones uploaded
-        if ($request->hasFile('documents')) {
-            $oldDocs = InvestmentDocument::where('investment_id', $investmentId)->get();
-            foreach ($oldDocs as $doc) {
-                if ($doc->file_path) {
-                    Helper::deleteImage($doc->file_path);
-                }
-                $doc->delete();
-            }
+        $doc = InvestmentDocument::create([
+            'investment_id' => $investment_id,
+            'name'          => $request->name,
+            'file_path'     => $path
+        ]);
 
-            foreach ($request->file('documents') as $document) {
-                $fileName = $document->getClientOriginalName();
-                $filePath = $document->store('investment_documents', 'public');
+        return response()->json([
+            'success' => true,
+            'document' => $doc,
+            'message' => 'Document uploaded!'
+        ]);
+    }
 
-                InvestmentDocument::create([
-                    'investment_id' => $investmentId,
-                    'name'          => $fileName,
-                    'file_path'     => $filePath,
-                ]);
-            }
+    /**
+     * delete document
+     */
+    public function deleteDocument($id)
+    {
+        $doc = InvestmentDocument::findOrFail($id);
+        if ($doc->file_path && file_exists(public_path($doc->file_path))) {
+            @unlink(public_path($doc->file_path));
         }
+        $doc->delete();
 
-        // Handle images only if new ones uploaded
-        if ($request->hasFile('images')) {
-            $oldImages = InvestmentImage::where('investment_id', $investmentId)->get();
-            foreach ($oldImages as $img) {
-                if ($img->image_url) {
-                    Helper::deleteImage($img->image_url);
-                }
-                $img->delete();
-            }
+        return response()->json(['success' => true, 'message' => 'Document deleted']);
+    }
 
-            foreach ($request->file('images') as $image) {
-                // Generate a unique filename for each image
-                $uniqueName = uniqid() . '_' . time();
-                $path = Helper::fileUpload($image, 'investment_images', $uniqueName);
+    /**
+     * upload investment images
+     */
+    // ====================== 4. Gallery Images ======================
+    public function uploadImage(Request $request, $investment_id)
+    {
+        $request->validate([
+            'images.*' => 'required|image|mimes:jpeg,png,jpg,webp|max:5120'
+        ]);
 
-                InvestmentImage::create([
-                    'investment_id' => $investmentId,
-                    'image_url'     => $path,
-                ]);
-            }
+        $uploaded = [];
+        foreach ($request->file('images') as $image) {
+            $path = Helper::fileUpload($image, 'investment/gallery', time() . '_' . $image->getClientOriginalName());
+            $uploaded[] = InvestmentImage::create([
+                'investment_id' => $investment_id,
+                'image_url'     => $path
+            ]);
         }
 
         return response()->json([
             'success' => true,
-            'message' => 'Investment media uploaded successfully.'
+            'images' => $uploaded,
+            'message' => 'Images uploaded!'
         ]);
+    }
+
+    /**
+     * Delete investment images
+     */
+    public function deleteImage($id)
+    {
+        $img = InvestmentImage::findOrFail($id);
+        if ($img->image_url && file_exists(public_path($img->image_url))) {
+            @unlink(public_path($img->image_url));
+        }
+        $img->delete();
+        return response()->json(['success' => true]);
     }
 }

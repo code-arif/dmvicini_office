@@ -54,19 +54,9 @@ class User extends Authenticatable implements JWTSubject
         return $this->hasOne(ComplianceAcknowledgment::class);
     }
 
-    public function accessRequests()
-    {
-        return $this->hasMany(AccessRequest::class);
-    }
-
     public function isAdmin(): bool
     {
         return $this->role === 'admin';
-    }
-
-    public function accessRequest()
-    {
-        return $this->hasOne(AccessRequest::class);
     }
 
     /**

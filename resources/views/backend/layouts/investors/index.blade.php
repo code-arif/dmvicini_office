@@ -54,7 +54,7 @@
         }
 
         #viewInvestorModal .modal-body::-webkit-scrollbar-thumb {
-            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+            background: #96bbf325;
             border-radius: 10px;
             border: 2px solid #f1f1f1;
         }
@@ -93,13 +93,13 @@
 
         /* Section Header */
         .section-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background: #96bbf325;
+            color: #000;
             padding: 12px 20px;
             margin: 20px -20px 15px -20px;
             font-weight: 600;
             font-size: 15px;
-            border-left: 5px solid #ffd700;
+            border-left: 5px solid #1e53a4;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
@@ -120,10 +120,10 @@
 
         /* Avatar Section */
         .investor-avatar-section {
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            background: #96bbf325;
             padding: 25px 20px;
             margin: -20px -20px 20px -20px;
-            border-bottom: 3px solid #667eea;
+            border-bottom: 3px solid #1e53a4;
             text-align: center;
         }
 
@@ -327,14 +327,14 @@
                 // User Info Section with Avatar
                 html += `
         <div class="investor-avatar-section text-center">
-            <img src="${data.user.avatar}" alt="avatar" class="rounded-circle mb-3" width="100" height="100" style="object-fit: cover; border: 3px solid #007bff;">
+            <img src="${data.user.avatar}" alt="avatar" class="rounded-circle mb-3" width="100" height="100" style="object-fit: cover; border: 3px solid #1e53a4;">
             <h5>${data.profile ? data.profile.first_name + ' ' + data.profile.last_name : 'N/A'}</h5>
             <p class="text-muted mb-2">${data.user.email}</p>
             <div>
-                <span class="badge ${getAccessBadgeClass(data.user.access_level, data.user.is_active)} me-2">
+                <span class="badge ${getAccessBadgeClass(data.user.access_level, data.user.is_active)} me-2 py-3">
                     ${data.user.is_active && data.user.access_level === 'full' ? 'Approved' : ucFirst(data.user.access_level)}
                 </span>
-                <span class="badge ${data.user.is_active ? 'bg-success' : 'bg-danger'}">
+                <span class="badge ${data.user.is_active ? 'bg-success' : 'bg-danger'} py-3">
                     ${data.user.is_active ? 'Active' : 'Inactive'}
                 </span>
             </div>
@@ -403,7 +403,7 @@
                     <div class="info-row">
                         <div class="info-label">Registered with SEC</div>
                         <div class="info-value">
-                            <span class="badge ${data.firm.is_registered ? 'bg-success' : 'bg-warning'}">
+                            <span class="badge ${data.firm.is_registered ? 'bg-success' : 'bg-warning'} py-3">
                                 ${data.firm.is_registered ? 'Yes' : 'No'}
                             </span>
                         </div>

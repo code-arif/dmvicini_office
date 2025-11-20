@@ -34,7 +34,7 @@
                             <div class="card-header border-bottom">
                                 <h3 class="card-title mb-0">Investment List</h3>
                                 <div class="card-options ms-auto">
-                                    <a href="{{ route('create.investment') }}" class="btn btn-primary btn-sm">Add
+                                    <a href="{{ route('investment.create') }}" class="btn btn-primary btn-sm">Add
                                         Investment</a>
                                 </div>
                             </div>
@@ -97,7 +97,7 @@
                 responsive: true,
                 // scrollX: true,
                 ajax: {
-                    url: "{{ route('get.investments') }}",
+                    url: "{{ route('investment.list') }}",
                     type: "GET",
                 },
                 columns: [{
@@ -224,7 +224,7 @@
         // Delete Button
         function deleteItem(id) {
             NProgress.start();
-            let url = "{{ route('destroy.investment', ':id') }}";
+            let url = "{{ route('investment.destroy', ':id') }}";
             let csrfToken = '{{ csrf_token() }}';
             $.ajax({
                 type: "DELETE",

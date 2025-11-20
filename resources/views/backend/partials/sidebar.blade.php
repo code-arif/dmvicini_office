@@ -38,15 +38,47 @@
                     <a class="side-menu__item {{ request()->routeIs('investor.list') ? 'has-link' : '' }}"
                         href="{{ route('investor.list') }}">
                         <i class="fa-solid fa-users"></i>
-                        <span class="side-menu__label">Investor Manage</span>
+                        <span class="side-menu__label">User Management</span>
                     </a>
+                </li>
+
+                {{-- Deals --}}
+                <li class="slide">
+                    <a class="side-menu__item" data-bs-toggle="slide" href="#">
+                        <i class="fa-brands fa-delicious"></i>
+                        <span class="side-menu__label">Deal Management</span>
+                        <i class="angle fa fa-angle-right"></i>
+                    </a>
+
+
+                    <ul class="slide-menu">
+                        <li><a href="{{ route('investment.list') }}" class="slide-item">Deals </a>
+                        </li>
+                    </ul>
+                </li>
+
+                {{-- manage investment --}}
+                <li class="slide">
+                    <a class="side-menu__item" data-bs-toggle="slide" href="#">
+                        <i class="fa-solid fa-tags"></i>
+                        <span class="side-menu__label">Manage Tags</span>
+                        <i class="angle fa fa-angle-right"></i>
+                    </a>
+                    <ul class="slide-menu">
+                        <li><a href="{{ route('show.asset.class.list') }}" class="slide-item">Asset Classes</a>
+                        </li>
+                        <li><a href="{{ route('show.investment.type.list') }}" class="slide-item">Investment Types</a>
+                        </li>
+                        <li><a href="{{ route('show.investment.strategy.list') }}" class="slide-item">Strategies</a>
+                        </li>
+                    </ul>
                 </li>
 
                 {{-- blog/education --}}
                 <li class="slide">
                     <a class="side-menu__item" data-bs-toggle="slide" href="#">
                         <i class="fa-solid fa-blog"></i>
-                        <span class="side-menu__label">Education manage</span>
+                        <span class="side-menu__label">Education</span>
                         <i class="angle fa fa-angle-right"></i>
                     </a>
 
@@ -59,42 +91,21 @@
                     </ul>
                 </li>
 
-                {{-- faq --}}
+                {{-- FAQ/Help Center --}}
                 <li class="slide">
                     <a class="side-menu__item {{ request()->routeIs('faq') ? 'has-link' : '' }}"
                         href="{{ route('admin.faq.index') }}">
                         <i class="fa-solid fa-clipboard-question"></i>
-                        <span class="side-menu__label">FAQ</span>
+                        <span class="side-menu__label">FAQ/Help Center</span>
                     </a>
                 </li>
 
-                {{-- manage investment --}}
-                <li class="slide">
-                    <a class="side-menu__item" data-bs-toggle="slide" href="#">
-                        <i class="fa-solid fa-seedling"></i>
-                        <span class="side-menu__label">Manage Investment</span>
-                        <i class="angle fa fa-angle-right"></i>
-                    </a>
-
-
-                    <ul class="slide-menu">
-                        <li><a href="{{ route('show.asset.class.list') }}" class="slide-item">Assets Classes</a>
-                        </li>
-                        <li><a href="{{ route('show.investment.type.list') }}" class="slide-item">Investment Types</a>
-                        </li>
-                        <li><a href="{{ route('show.investment.strategy.list') }}" class="slide-item">Strategies</a>
-                        </li>
-                        <li><a href="{{ route('get.investments') }}" class="slide-item">Investments</a>
-                        </li>
-                    </ul>
-                </li>
-
-                {{-- excel/csv upload --}}
+                {{-- import- Import Deal/ excel/csv upload --}}
                 <li class="slide">
                     <a class="side-menu__item {{ request()->routeIs('faq') ? 'has-link' : '' }}"
                         href="{{ route('investments.import.form') }}">
                         <i class="fa-solid fa-file-excel"></i>
-                        <span class="side-menu__label">Import CSV/Excel</span>
+                        <span class="side-menu__label">Import Deal</span>
                     </a>
                 </li>
 
@@ -103,7 +114,7 @@
                     <a class="side-menu__item {{ request()->routeIs('subscribers.index') ? 'has-link' : '' }}"
                         href="{{ route('subscribers.index') }}">
                         <i class="fa-solid fa-user-plus"></i>
-                        <span class="side-menu__label">Subscribers</span>
+                        <span class="side-menu__label">Platform Subscribers</span>
                     </a>
                 </li>
 
@@ -188,6 +199,7 @@
     .side-menu__label {
         flex: 1;
         display: inline-block;
+        margin-bottom: 5px;
     }
 
     /* Submenu items */

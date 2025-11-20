@@ -17,25 +17,21 @@ return new class extends Migration
             $table->foreignId('asset_class_id')->nullable()->constrained()->cascadeOnDelete();
             $table->foreignId('investment_type_id')->nullable()->constrained()->cascadeOnDelete();
             $table->foreignId('investments_strategy_id')->nullable()->constrained('investment_strategies')->nullOnDelete();
+            $table->foreignId('tax_strategie_id')->nullable()->constrained('tax_strategies')->nullOnDelete();
 
             $table->string('term')->nullable();
             $table->string('min_investment')->nullable();
-            $table->string('targeted_irr')->nullable();
-            $table->string('targeted_eps')->nullable();
-            $table->string('thumbnail')->nullable();
-            $table->longText('summary')->nullable();
+            $table->string('mountain_image')->nullable();
+            $table->text('investment_details')->nullable();
 
             //location
             $table->string('country')->nullable();
             $table->string('city')->nullable();
             $table->string('state')->nullable();
             $table->string('address')->nullable();
-            $table->text('map_url')->nullable();
             $table->decimal('latitude', 10, 7)->nullable();
             $table->decimal('longitude', 10, 7)->nullable();
 
-            $table->string('banker_phone')->nullable();
-            $table->string('banker_email')->nullable();
             $table->enum('status', ['draft', 'active', 'closed'])->default('draft');
 
             // spreadsheet file upload
@@ -50,6 +46,7 @@ return new class extends Migration
             $table->text('market_overview')->nullable();
 
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

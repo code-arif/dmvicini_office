@@ -7,5 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class AssetClass extends Model
 {
-    protected $guarded = [];
+    protected $fillable = [
+        "name",
+        "asset_type",
+        "description"
+    ];
 }

@@ -2,7 +2,6 @@
 
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\FooterController;
 use App\Http\Controllers\Web\Backend\FaqController;
 use App\Http\Controllers\Web\Backend\CategoryController;
 use App\Http\Controllers\Web\Backend\UserListController;
@@ -12,7 +11,7 @@ use App\Http\Controllers\Web\Backend\SubscriberController;
 use App\Http\Controllers\Web\Backend\CMS\AuthPageController;
 use App\Http\Controllers\Web\Backend\FooterManageController;
 use App\Http\Controllers\Web\Backend\CMS\HelpCenterController;
-use App\Http\Controllers\Web\Backend\Investment\RiskController;
+use App\Http\Controllers\Web\Backend\Investment\InvestmentDesclaimerController;
 use App\Http\Controllers\Web\Backend\InvestmentImportController;
 use App\Http\Controllers\Web\Backend\Settings\ProfileController;
 use App\Http\Controllers\Web\Backend\Settings\SettingController;
@@ -25,10 +24,12 @@ use App\Http\Controllers\Web\Backend\Investment\InvestmentStrategyController;
 use App\Http\Controllers\Web\Backend\Investment\InvestmentHightlightController;
 
 Route::middleware(['auth', 'admin'])->group(function () {
-    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/dashboard/stats', [DashboardController::class, 'getStats'])->name('dashboard.stats');
-    Route::get('/investments/{id}/details', [DashboardController::class, 'getInvestmentDetails']);
-    Route::get('/dashboard/chart-data', [DashboardController::class, 'getChartData'])->name('dashboard.chart');
+    Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard'); // working
+    Route::get('/dashboard/stats', [DashboardController::class, 'getStats'])->name('dashboard.stats'); // working
+    Route::get('/investments/{id}/details', [DashboardController::class, 'getInvestmentDetails']); // working
+    Route::get('/users/{id}/details', [DashboardController::class, 'getUserDetails'])->name('user.details'); // working
+    Route::post('/users/{id}/approve', [DashboardController::class, 'approveUser'])->name('user.approve'); // working
+    // Route::get('/dashboard/chart-data', [DashboardController::class, 'getChartData'])->name('dashboard.chart');
 
     // Dashboard data for charts
     Route::get('dashboard/data', [DashboardController::class, 'getDashboardData'])->name('dashboard.data');
@@ -106,23 +107,28 @@ Route::middleware(['auth', 'admin'])->group(function () {
 
         //investment
         Route::get('/', [InvestmentController::class, 'index'])->name('get.investments');
-        Route::get('/create', [InvestmentController::class, 'create'])->name('create.investment');
-        Route::post('/store', [InvestmentController::class, 'store'])->name('store.investment');
-        Route::get('/edit/{id}', [InvestmentController::class, 'edit'])->name('edit.investment');
+
+
+
         Route::post('/update/{id}', [InvestmentController::class, 'update'])->name('update.investment');
-        Route::delete('/delete/{id}', [InvestmentController::class, 'destroy'])->name('destroy.investment');
-        Route::get('/show/{id}', [InvestmentController::class, 'show'])->name('show.investment');
-        Route::post('/status/update', [InvestmentController::class, 'updateStatus'])->name('investment.status.update');
 
 
-        //investment hightlight
-        Route::get('/highlight/{investment_id}', [InvestmentHightlightController::class, 'edit'])->name('get.highlight');
-        Route::post('/highlight/store', [InvestmentHightlightController::class, 'store'])->name('investment.highlights.store');
-        Route::post('/doc', [InvestmentDocController::class, 'mediaStore'])->name('investment.media.store');
+        Route::prefix('investment')->name('investment.')->group(function () {
+            Route::get('/list', [InvestmentController::class, 'index'])->name('list'); 
+            Route::get('/create', [InvestmentController::class, 'create'])->name('create');
+            Route::post('/store/basic', [InvestmentController::class, 'storeBasic'])->name('basic.store');
+            Route::get('/edit/{id}', [InvestmentController::class, 'edit'])->name('edit');
+            Route::post('/update/{id}', [InvestmentController::class, 'updateBasic'])->name('update');
+            Route::delete('/delete/{id}', [InvestmentController::class, 'destroy'])->name('destroy');
+            Route::post('/status/update', [InvestmentController::class, 'updateStatus'])->name('status.update');
+            Route::get('/show/{id}', [InvestmentController::class, 'getInvestment'])->name('show.investment');
 
-        //risk
-        Route::get('/risk/{investment_id}', [RiskController::class, 'edit'])->name('get.risk');
-        Route::post('/risk/store', [RiskController::class, 'store'])->name('investment.risk.store');
+            // investment highlight
+            Route::post('/{id}/highlight', [InvestmentHightlightController::class, 'storeOrUpdateHighlight'])->name('highlight.store');
+            Route::post('/{id}/document', [InvestmentDocController::class, 'uploadDocument'])->name('document.store');
+            Route::post('/{id}/images', [InvestmentDocController::class, 'uploadImage'])->name('images.store');
+            Route::post('/{id}/desclaimer', [InvestmentDesclaimerController::class, 'storeDisclaimer'])->name('disclaimer.store');
+        });
     });
 
 

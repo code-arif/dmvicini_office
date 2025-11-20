@@ -78,18 +78,24 @@ class DashboardController extends Controller
                     ];
                 });
 
-            // KYC Documents
-            $kycDocuments = InvestmentDocument::with('investment')
-                ->latest()
-                ->limit(4)
+            // Pending Approval Users (email verified but not approved by admin)
+            $pendingUsers = User::with(['profile', 'accessRequests'])
+                ->whereNotNull('email_verified_at')
+                ->where('access_level', 'provisional')
+                ->where('is_active', false)
+                ->where('role', 'user')
+                ->latest('created_at')
+                ->limit(10)
                 ->get()
-                ->map(function ($doc) {
+                ->map(function ($user) {
                     return [
-                        'id' => $doc->id,
-                        'name' => $doc->name ?? 'Document ' . $doc->id,
-                        'file_path' => $doc->file_path ? asset($doc->file_path) : null,
-                        'investment_title' => $doc->investment->title ?? 'N/A',
-                        'created_at' => $doc->created_at->format('M d, Y'),
+                        'id' => $user->id,
+                        'full_name' => ($user->profile->first_name ?? '') . ' ' . ($user->profile->last_name ?? ''),
+                        'email' => $user->email,
+                        'registered_date' => $user->created_at->format('M d, Y'),
+                        'registered_date_full' => $user->created_at->format('F d, Y h:i A'),
+                        'avatar' => $user->avatar ? asset($user->avatar) : null,
+                        'firm_name' => $user->profile->firm_name ?? 'N/A',
                     ];
                 });
 
@@ -113,7 +119,7 @@ class DashboardController extends Controller
                         'raw' => $avgROI,
                     ],
                     'approved_deals' => $approvedDeals,
-                    'kyc_documents' => $kycDocuments,
+                    'pending_users' => $pendingUsers,
                 ],
                 'message' => 'Dashboard statistics retrieved successfully'
             ], 200);
@@ -121,6 +127,144 @@ class DashboardController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to load statistics',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Get user details for approval modal
+     */
+    public function getUserDetails($id)
+    {
+        try {
+            $user = User::with([
+                'profile',
+                'profile.firm',
+                'accessRequest',
+                'complianceAcknowledgment'
+            ])->find($id);
+
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'User not found'
+                ], 404);
+            }
+
+            $profile = $user->profile;
+            $firm = $profile->firm ?? null;
+            $compliance = $user->complianceAcknowledgment;
+
+            $data = [
+                'id' => $user->id,
+                'email' => $user->email,
+                'email_verified_at' => $user->email_verified_at ? $user->email_verified_at->format('M d, Y h:i A') : null,
+                'registered_at' => $user->created_at->format('M d, Y h:i A'),
+                'access_level' => $user->access_level,
+                'is_active' => $user->is_active,
+                'avatar' => $user->avatar ? asset($user->avatar) : null,
+
+                // Profile Info
+                'first_name' => $profile->first_name ?? null,
+                'last_name' => $profile->last_name ?? null,
+                'full_name' => ($profile->first_name ?? '') . ' ' . ($profile->last_name ?? ''),
+                'title' => $profile->title ?? null,
+                'firm_name' => $profile->firm_name ?? null,
+                'phone' => $profile->phone ?? null,
+                'country' => $profile->country ?? null,
+                'investor_type' => $profile->investor_type ?? null,
+                'investor_type_other' => $profile->investor_type_other ?? null,
+
+                // Firm Info
+                'firm_info' => $firm ? [
+                    'is_registered' => $firm->is_registered,
+                    'firm_crd' => $firm->firm_crd,
+                    'individual_crd' => $firm->individual_crd,
+                    'firm_aum' => $firm->firm_aum ? '$' . number_format($firm->firm_aum, 0) : null,
+                    'address' => $firm->address,
+                    'city' => $firm->city,
+                    'state' => $firm->state,
+                    'zip' => $firm->zip,
+                    'explanation_if_not_registered' => $firm->explanation_if_not_registered,
+                ] : null,
+
+                // Compliance Info
+                'compliance' => $compliance ? [
+                    'terms_agreed' => $compliance->terms_agreed,
+                    'terms_agreed_at' => $compliance->terms_agreed_at ? $compliance->terms_agreed_at->format('M d, Y h:i A') : null,
+                    'privacy_agreed' => $compliance->privacy_agreed,
+                    'privacy_agreed_at' => $compliance->privacy_agreed_at ? $compliance->privacy_agreed_at->format('M d, Y h:i A') : null,
+                    'investor_acknowledgment' => $compliance->investor_acknowledgment,
+                    'investor_acknowledgment_at' => $compliance->investor_acknowledgment_at ? $compliance->investor_acknowledgment_at->format('M d, Y h:i A') : null,
+                    'confidentiality_agreed' => $compliance->confidentiality_agreed,
+                    'confidentiality_agreed_at' => $compliance->confidentiality_agreed_at ? $compliance->confidentiality_agreed_at->format('M d, Y h:i A') : null,
+                    'marketing_opt_in' => $compliance->marketing_opt_in,
+                    'ip_address' => $compliance->ip_address,
+                ] : null,
+
+                // Access Request Info
+                'access_request' => $user->accessRequest ? [
+                    'status' => $user->accessRequest->status,
+                    'verification_type' => $user->accessRequest->verification_type,
+                    'verifier_document' => $user->accessRequest->verifier_document ? asset($user->accessRequest->verifier_document) : null,
+                    'admin_notes' => $user->accessRequest->admin_notes,
+                ] : null,
+            ];
+
+            return response()->json([
+                'success' => true,
+                'data' => $data,
+                'message' => 'User details retrieved successfully'
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to load user details',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Approve user access
+     */
+    public function approveUser(Request $request, $id)
+    {
+        try {
+            $user = User::with('accessRequest')->find($id);
+
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'User not found'
+                ], 404);
+            }
+
+            // Update user status
+            $user->update([
+                'access_level' => 'full',
+                'is_active' => true,
+            ]);
+
+            // Update access request if exists
+            if ($user->accessRequest) {
+                $user->accessRequest->update([
+                    'status' => 'approved',
+                    'verified_at' => now(),
+                    'verified_by' => auth()->id(),
+                    'admin_notes' => $request->input('notes', null),
+                ]);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'User approved successfully'
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to approve user',
                 'error' => $e->getMessage()
             ], 500);
         }
@@ -212,65 +356,6 @@ class DashboardController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to load investment details',
-                'error' => $e->getMessage()
-            ], 500);
-        }
-    }
-
-    /**
-     * Get chart data for dashboard
-     */
-    public function getChartData(Request $request)
-    {
-        try {
-            $period = $request->get('period', 'month'); // day, week, month, year
-
-            // Investment trend over time
-            $investmentTrend = Investment::selectRaw('DATE(created_at) as date, COUNT(*) as count')
-                ->where('status', '!=', 'draft')
-                ->groupBy('date')
-                ->orderBy('date', 'desc')
-                ->limit(30)
-                ->get();
-
-            // Investment by asset class
-            $byAssetClass = Investment::selectRaw('asset_class_id, COUNT(*) as count')
-                ->with('assetClass')
-                ->where('status', '!=', 'draft')
-                ->whereNotNull('asset_class_id')
-                ->groupBy('asset_class_id')
-                ->get()
-                ->map(function ($item) {
-                    return [
-                        'name' => $item->assetClass->name ?? 'Unknown',
-                        'count' => $item->count,
-                    ];
-                });
-
-            // Investment by status
-            $byStatus = Investment::selectRaw('status, COUNT(*) as count')
-                ->groupBy('status')
-                ->get()
-                ->map(function ($item) {
-                    return [
-                        'status' => ucfirst($item->status),
-                        'count' => $item->count,
-                    ];
-                });
-
-            return response()->json([
-                'success' => true,
-                'data' => [
-                    'investment_trend' => $investmentTrend,
-                    'by_asset_class' => $byAssetClass,
-                    'by_status' => $byStatus,
-                ],
-                'message' => 'Chart data retrieved successfully'
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to load chart data',
                 'error' => $e->getMessage()
             ], 500);
         }

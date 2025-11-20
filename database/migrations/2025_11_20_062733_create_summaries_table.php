@@ -11,12 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('investment_faqs', function (Blueprint $table) {
+        Schema::create('summaries', function (Blueprint $table) {
             $table->id();
             $table->foreignId('investment_id')->nullable()->constrained()->cascadeOnDelete();
-            $table->string('question');
-            $table->longText('answer')->nullable();
-            $table->integer('sort_order')->default(0);
+            $table->text('summary')->nullable();
+            $table->string('project_picture')->nullable();
             $table->timestamps();
         });
     }
@@ -26,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('investment_faqs');
+        Schema::dropIfExists('summaries');
     }
 };

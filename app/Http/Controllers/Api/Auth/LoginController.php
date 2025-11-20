@@ -43,9 +43,9 @@ class LoginController extends Controller
             }
 
             // Check if account is active
-            if (!$user->is_active) {
-                return $this->error([], 'Your account is not yet activated. Please wait for admin approval.', 403);
-            }
+            // if (!$user->is_active) {
+            //     return $this->error([], 'Your account is not yet activated. Please wait for admin approval.', 403);
+            // }
 
             // Check access level and provide appropriate messages
             switch ($user->access_level) {
@@ -67,7 +67,7 @@ class LoginController extends Controller
                         ]);
                         return $this->error([], 'Your provisional access has expired. Please contact admin for full access.', 403);
                     }
-                    $limitedMessage = 'You have provisional access until ' . $user->provisional_expires_at->format('M d, Y');
+                    // $limitedMessage = 'You have provisional access until ' . $user->provisional_expires_at->format('M d, Y');
                     break;
 
                 case 'full':

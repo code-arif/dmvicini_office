@@ -6,5 +6,5 @@ use Illuminate\Database\Eloquent\Model;
 
 class InvestmentStrategy extends Model
 {
-    protected $guarded = [];
+    protected $fillable = ["name", "description"];
 }

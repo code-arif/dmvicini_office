@@ -16,13 +16,15 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('password')->nullable(); // nullable if you allow social login later
             $table->timestamp('email_verified_at')->nullable();
+            $table->string('avatar')->nullable();
 
             // Access Management
-            $table->enum('access_level', ['full', 'provisional', 'limited', 'review'])->default('review');
+            $table->enum('access_level', ['full', 'provisional'])->default('provisional');
             $table->boolean('is_active')->default(false);
-            $table->timestamp('provisional_expires_at')->nullable();
 
             // Security
+            $table->string('otp')->nullable();
+            $table->timestamp('otp_expires_at')->nullable();
             $table->string('reset_password_token')->nullable();
             $table->timestamp('reset_password_token_expire_at')->nullable();
 

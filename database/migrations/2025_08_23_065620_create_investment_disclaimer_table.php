@@ -11,14 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('registration_attempts', function (Blueprint $table) {
+        Schema::create('investment_disclaimer', function (Blueprint $table) {
             $table->id();
-            $table->string('email');
-            $table->ipAddress('ip_address');
-            $table->timestamp('attempted_at');
-
-            $table->index(['email', 'attempted_at']);
-            $table->index(['ip_address', 'attempted_at']);
+            $table->foreignId('investment_id')->nullable()->constrained()->cascadeOnDelete();
+            $table->string('title');
+            $table->text('description')->nullable();
             $table->timestamps();
         });
     }
@@ -28,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('registration_attempts');
+        Schema::dropIfExists('investment_risks');
     }
 };

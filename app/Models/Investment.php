@@ -3,30 +3,41 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Investment extends Model
 {
+    use SoftDeletes;
     protected $fillable = [
         'title',
         'asset_class_id',
         'investment_type_id',
         'investments_strategy_id',
+        'tax_strategie_id',
+
         'term',
         'min_investment',
-        'targeted_irr',
-        'targeted_eps',
-        'thumbnail',
-        'summary',
+        'mountain_image',
+        'investment_details',
+
         'country',
         'city',
         'state',
         'address',
-        'map_url',
         'latitude',
         'longitude',
-        'banker_phone',
-        'banker_email',
+
         'status',
+
+        'sponsor',
+        'fund_name',
+        'target_equity',
+        'target_raise',
+        'launch_date',
+        'close_date',
+        'property_type',
+        'unit_count',
+        'market_overview',
     ];
 
     public function assetClass()
@@ -55,7 +66,7 @@ class Investment extends Model
 
     public function risks()
     {
-        return $this->hasOne(InvestmentRisk::class);
+        return $this->hasOne(InvestmentDisclaimer::class);
     }
 
 

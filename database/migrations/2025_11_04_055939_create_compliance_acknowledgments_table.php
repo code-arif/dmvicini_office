@@ -33,10 +33,6 @@ return new class extends Migration
             $table->boolean('marketing_opt_in')->default(false);
             $table->timestamp('marketing_opt_in_at')->nullable();
 
-            // Audit Trail
-            $table->ipAddress('ip_address')->nullable();
-            $table->text('user_agent')->nullable();
-
             $table->timestamps();
         });
     }

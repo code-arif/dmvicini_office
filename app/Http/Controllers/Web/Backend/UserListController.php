@@ -92,15 +92,15 @@ class UserListController extends Controller
     private function getStatusBadge($user)
     {
         if ($user->is_active && $user->access_level === 'full') {
-            return '<span class="badge bg-success">Approved</span>';
+            return '<span class="badge bg-success py-3">Approved</span>';
         } elseif ($user->access_level === 'provisional') {
-            return '<span class="badge bg-warning">Provisional</span>';
+            return '<span class="badge bg-warning py-3">Provisional</span>';
         } elseif ($user->access_level === 'review') {
-            return '<span class="badge bg-info">Under Review</span>';
+            return '<span class="badge bg-info py-3">Under Review</span>';
         } elseif ($user->access_level === 'limited') {
-            return '<span class="badge bg-secondary">Limited Access</span>';
+            return '<span class="badge bg-secondary py-3">Limited Access</span>';
         } else {
-            return '<span class="badge bg-danger">Pending</span>';
+            return '<span class="badge bg-danger py-3">Pending</span>';
         }
     }
 
