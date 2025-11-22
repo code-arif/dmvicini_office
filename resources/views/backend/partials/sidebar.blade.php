@@ -71,6 +71,8 @@
                         </li>
                         <li><a href="{{ route('show.investment.strategy.list') }}" class="slide-item">Strategies</a>
                         </li>
+                        <li><a href="{{ route('show.tax.strategy.list') }}" class="slide-item">Tax Strategy</a>
+                        </li>
                     </ul>
                 </li>
 

@@ -1,141 +1,6 @@
 @extends('backend.app')
 @section('title', 'Edit Investment')
 
-@push('styles')
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.css" rel="stylesheet">
-    <style>
-        .step-wizard {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 2rem;
-            position: relative;
-        }
-
-        .step-wizard::before {
-            content: '';
-            position: absolute;
-            top: 20px;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: #e0e0e0;
-            z-index: 0;
-        }
-
-        .step-item {
-            flex: 1;
-            text-align: center;
-            position: relative;
-            z-index: 1;
-            cursor: pointer;
-        }
-
-        .step-circle {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: #fff;
-            border: 2px solid #e0e0e0;
-            color: #666;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            margin-bottom: 0.5rem;
-            transition: all 0.3s;
-        }
-
-        .step-item.active .step-circle {
-            background: #0d6efd;
-            border-color: #0d6efd;
-            color: white;
-        }
-
-        .step-item.completed .step-circle {
-            background: #28a745;
-            border-color: #28a745;
-            color: white;
-        }
-
-        .step-label {
-            font-size: 0.875rem;
-            color: #666;
-        }
-
-        .step-item.active .step-label {
-            color: #0d6efd;
-            font-weight: 600;
-        }
-
-        .step-content {
-            display: none;
-        }
-
-        .step-content.active {
-            display: block;
-        }
-
-        .nav-buttons {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 2rem;
-            padding-top: 1rem;
-            border-top: 1px solid #e0e0e0;
-        }
-
-        #map {
-            height: 400px;
-            border-radius: 8px;
-            border: 1px solid #dee2e6;
-        }
-
-        .image-preview-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-
-        .image-preview-item {
-            position: relative;
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        .image-preview-item img {
-            width: 100%;
-            height: 150px;
-            object-fit: cover;
-        }
-
-        .image-preview-item .remove-btn {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            background: rgba(220, 53, 69, 0.9);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            cursor: pointer;
-        }
-
-        .mountain-image-preview {
-            max-width: 200px;
-            max-height: 200px;
-            margin-top: 10px;
-            border-radius: 8px;
-        }
-
-        .existing-doc-item,
-        .existing-img-item {
-            position: relative;
-        }
-    </style>
-@endpush
-
 @section('content')
     <div class="app-content main-content mt-0">
         <div class="side-app">
@@ -146,7 +11,7 @@
                     </div>
                     <div class="ms-auto pageheader-btn">
                         <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="{{ route('get.investments') }}">Investments</a></li>
+                            <li class="breadcrumb-item"><a href="{{ route('investment.list') }}">Investments</a></li>
                             <li class="breadcrumb-item active">Edit</li>
                         </ol>
                     </div>
@@ -158,27 +23,27 @@
                             <div class="card-body">
                                 <!-- Step Wizard -->
                                 <div class="step-wizard">
-                                    <div class="step-item active completed" data-step="1" onclick="goToStep(1)">
+                                    <div class="step-item active" data-step="1">
                                         <div class="step-circle">1</div>
                                         <div class="step-label">Basic Info</div>
                                     </div>
-                                    <div class="step-item completed" data-step="2" onclick="goToStep(2)">
+                                    <div class="step-item" data-step="2">
                                         <div class="step-circle">2</div>
                                         <div class="step-label">Location</div>
                                     </div>
-                                    <div class="step-item completed" data-step="3" onclick="goToStep(3)">
+                                    <div class="step-item" data-step="3">
                                         <div class="step-circle">3</div>
                                         <div class="step-label">Highlights</div>
                                     </div>
-                                    <div class="step-item completed" data-step="4" onclick="goToStep(4)">
+                                    <div class="step-item" data-step="4">
                                         <div class="step-circle">4</div>
                                         <div class="step-label">Documents</div>
                                     </div>
-                                    <div class="step-item completed" data-step="5" onclick="goToStep(5)">
+                                    <div class="step-item" data-step="5">
                                         <div class="step-circle">5</div>
                                         <div class="step-label">Gallery</div>
                                     </div>
-                                    <div class="step-item completed" data-step="6" onclick="goToStep(6)">
+                                    <div class="step-item" data-step="6">
                                         <div class="step-circle">6</div>
                                         <div class="step-label">Disclaimers</div>
                                     </div>
@@ -186,7 +51,7 @@
 
                                 <form id="investmentForm" enctype="multipart/form-data">
                                     @csrf
-                                    <input type="hidden" name="investment_id" value="{{ $investment->id }}">
+                                    @method('POST')
 
                                     <!-- Step 1: Basic Info -->
                                     <div class="step-content active" data-step="1">
@@ -203,9 +68,11 @@
                                                     accept="image/*">
                                                 @if ($investment->mountain_image)
                                                     <img src="{{ asset($investment->mountain_image) }}"
-                                                        class="mountain-image-preview" style="display: block;">
+                                                        id="mountainImagePreview" class="mountain-image-preview"
+                                                        style="display: block;">
+                                                @else
+                                                    <img id="mountainImagePreview" class="mountain-image-preview">
                                                 @endif
-                                                <img id="mountainImagePreview" class="mountain-image-preview">
                                             </div>
                                         </div>
 
@@ -260,8 +127,7 @@
                                                     value="{{ $investment->min_investment }}">
                                             </div>
                                             <div class="col-md-4 mb-3">
-                                                <label class="form-label">Status <span
-                                                        class="text-danger">*</span></label>
+                                                <label class="form-label">Status <span class="text-danger">*</span></label>
                                                 <select name="status" class="form-select" required>
                                                     <option value="draft"
                                                         {{ $investment->status == 'draft' ? 'selected' : '' }}>Draft
@@ -391,19 +257,13 @@
                                         <h4 class="mb-4">Documents</h4>
 
                                         <!-- Existing Documents -->
-                                        <div class="mb-3">
-                                            <h6>Existing Documents</h6>
-                                            <div class="list-group" id="existingDocuments">
+                                        <div class="mb-4">
+                                            <h5>Existing Documents</h5>
+                                            <div id="existingDocuments" class="list-group">
                                                 @foreach ($investment->documents as $doc)
-                                                    <div class="list-group-item d-flex justify-content-between align-items-center existing-doc-item"
-                                                        data-id="{{ $doc->id }}">
-                                                        <span>
-                                                            <i class="fa fa-file"></i> {{ $doc->name }}
-                                                            <a href="{{ asset($doc->file_path) }}" target="_blank"
-                                                                class="ms-2">
-                                                                <i class="fa fa-download"></i>
-                                                            </a>
-                                                        </span>
+                                                    <div class="list-group-item d-flex justify-content-between align-items-center"
+                                                        data-doc-id="{{ $doc->id }}">
+                                                        <span><i class="fa fa-file"></i> {{ $doc->name }}</span>
                                                         <button type="button" class="btn btn-sm btn-danger"
                                                             onclick="deleteExistingDocument({{ $doc->id }})">
                                                             <i class="fa fa-trash"></i>
@@ -413,11 +273,10 @@
                                             </div>
                                         </div>
 
-                                        <!-- Add New Documents -->
+                                        <!-- New Documents -->
                                         <div id="documentsList" class="mb-3"></div>
                                         <div class="card bg-light">
                                             <div class="card-body">
-                                                <h6>Add New Documents</h6>
                                                 <div class="row">
                                                     <div class="col-md-8 mb-3">
                                                         <label class="form-label">Document Name</label>
@@ -430,7 +289,7 @@
                                                     </div>
                                                 </div>
                                                 <button type="button" class="btn btn-primary" id="addDocumentBtn">
-                                                    <i class="fa fa-plus"></i> Add Document
+                                                    <i class="fa fa-plus"></i> Add New Document
                                                 </button>
                                             </div>
                                         </div>
@@ -441,12 +300,11 @@
                                         <h4 class="mb-4">Gallery Images</h4>
 
                                         <!-- Existing Images -->
-                                        <div class="mb-3">
-                                            <h6>Existing Images</h6>
-                                            <div class="image-preview-grid" id="existingImages">
+                                        <div class="mb-4">
+                                            <h5>Existing Images</h5>
+                                            <div id="existingImages" class="image-preview-grid">
                                                 @foreach ($investment->images as $img)
-                                                    <div class="image-preview-item existing-img-item"
-                                                        data-id="{{ $img->id }}">
+                                                    <div class="image-preview-item" data-img-id="{{ $img->id }}">
                                                         <img src="{{ asset($img->image_url) }}" alt="Gallery Image">
                                                         <button type="button" class="remove-btn"
                                                             onclick="deleteExistingImage({{ $img->id }})">
@@ -457,10 +315,9 @@
                                             </div>
                                         </div>
 
-                                        <!-- Add New Images -->
+                                        <!-- New Images -->
                                         <div class="mb-3">
-                                            <h6>Add New Images</h6>
-                                            <label class="form-label">Select Multiple Images</label>
+                                            <label class="form-label">Add New Images</label>
                                             <input type="file" id="galleryImages" class="form-control"
                                                 accept="image/*" multiple>
                                         </div>
@@ -468,15 +325,15 @@
                                     </div>
 
                                     <!-- Step 6: Disclaimers -->
-                                    <div class="step-content" data-step="6">
+                                    {{-- <div class="step-content" data-step="6">
                                         <h4 class="mb-4">Disclaimers</h4>
 
                                         <!-- Existing Disclaimers -->
-                                        <div class="mb-3">
-                                            <h6>Existing Disclaimers</h6>
-                                            <div class="list-group" id="existingDisclaimers">
+                                        <div class="mb-4">
+                                            <h5>Existing Disclaimers</h5>
+                                            <div id="existingDisclaimers" class="list-group">
                                                 @foreach ($investment->disclaimers as $disc)
-                                                    <div class="list-group-item" data-id="{{ $disc->id }}">
+                                                    <div class="list-group-item" data-disc-id="{{ $disc->id }}">
                                                         <div class="d-flex justify-content-between align-items-start">
                                                             <div>
                                                                 <h6>{{ $disc->title }}</h6>
@@ -495,11 +352,10 @@
                                             </div>
                                         </div>
 
-                                        <!-- Add New Disclaimers -->
+                                        <!-- New Disclaimers -->
                                         <div id="disclaimersList" class="mb-3"></div>
                                         <div class="card bg-light">
                                             <div class="card-body">
-                                                <h6>Add New Disclaimer</h6>
                                                 <div class="mb-3">
                                                     <label class="form-label">Title <span
                                                             class="text-danger">*</span></label>
@@ -510,9 +366,22 @@
                                                     <textarea id="disclaimerDescription" class="form-control" rows="3"></textarea>
                                                 </div>
                                                 <button type="button" class="btn btn-primary" id="addDisclaimerBtn">
-                                                    <i class="fa fa-plus"></i> Add Disclaimer
+                                                    <i class="fa fa-plus"></i> Add New Disclaimer
                                                 </button>
                                             </div>
+                                        </div>
+                                    </div> --}}
+
+
+                                    <!-- Step 6: Disclaimer (Single) in Edit Page -->
+                                    <div class="step-content" data-step="6">
+                                        <h4 class="mb-4">Investment Disclaimer</h4>
+
+                                        <div class="mb-3">
+                                            <label class="form-label">Disclaimer Content</label>
+                                            <textarea name="disclaimer_description" id="disclaimerDescription" class="form-control">{{ $investment->disclaimer->description ?? '' }}</textarea>
+                                            <small class="text-muted">Add any legal disclaimers, risk warnings, or
+                                                important notices here.</small>
                                         </div>
                                     </div>
 
@@ -546,28 +415,40 @@
     </script>
 
     <script>
+        window.routes = {
+            highlightStore: "{{ route('investment.highlight.store', $investment->id) }}",
+            documentStore: "{{ route('investment.document.store', $investment->id) }}",
+            imagesStore: "{{ route('investment.images.store', $investment->id) }}",
+            disclaimerStore: "{{ route('investment.disclaimer.store', $investment->id) }}",
+            updateBasic: "{{ route('investment.update', $investment->id) }}"
+        };
+
+        const investmentId = {{ $investment->id }};
+    </script>
+
+    <script>
         let currentStep = 1;
         let totalSteps = 6;
-        let investmentId = {{ $investment->id }};
         let map, marker, geocoder, searchBox;
         let documents = [];
         let images = [];
         let disclaimers = [];
 
         $(document).ready(function() {
-            // Initialize Summernote
-            $('#investmentDetails, #overview, #investor_waterfall, #promoted_interest').summernote({
-                height: 200,
-                toolbar: [
-                    ['style', ['style']],
-                    ['font', ['bold', 'italic', 'underline', 'clear']],
-                    ['color', ['color']],
-                    ['para', ['ul', 'ol', 'paragraph']],
-                    ['table', ['table']],
-                    ['insert', ['link', 'picture']],
-                    ['view', ['fullscreen', 'codeview']]
-                ]
-            });
+            // Initialize Summernote for disclaimer
+            $('#investmentDetails, #overview, #investor_waterfall, #promoted_interest, #disclaimerDescription')
+                .summernote({
+                    height: 200,
+                    toolbar: [
+                        ['style', ['style']],
+                        ['font', ['bold', 'italic', 'underline', 'clear']],
+                        ['color', ['color']],
+                        ['para', ['ul', 'ol', 'paragraph']],
+                        ['table', ['table']],
+                        ['insert', ['link', 'picture']],
+                        ['view', ['fullscreen', 'codeview']]
+                    ]
+                });
 
             // Initialize Google Map
             initMap();
@@ -593,7 +474,7 @@
             });
 
             $('#prevBtn').on('click', () => navigateStep(-1));
-            $('#submitBtn').on('click', updateInvestment);
+            $('#submitBtn').on('click', submitInvestment);
 
             // Documents
             $('#addDocumentBtn').on('click', addDocument);
@@ -608,19 +489,19 @@
         function initMap() {
             const lat = parseFloat($('#latitude').val()) || 23.8103;
             const lng = parseFloat($('#longitude').val()) || 90.4125;
-            const center = {
+            const position = {
                 lat,
                 lng
             };
 
             map = new google.maps.Map(document.getElementById('map'), {
-                center: center,
+                center: position,
                 zoom: 13
             });
 
             marker = new google.maps.Marker({
                 map: map,
-                position: center,
+                position: position,
                 draggable: true
             });
 
@@ -698,7 +579,7 @@
 
             NProgress.start();
             $.ajax({
-                url: "{{ route('update.investment', $investment->id) }}",
+                url: window.routes.updateBasic,
                 type: "POST",
                 data: formData,
                 processData: false,
@@ -728,26 +609,535 @@
         function goToStep(step) {
             if (step < 1 || step > totalSteps) return;
 
-            $(`.step-content`).removeClass('active');
-            $(`.step-item`).removeClass('active');
+            $(`.step-content[data-step="${currentStep}"]`).removeClass('active');
+            $(`.step-item[data-step="${currentStep}"]`).removeClass('active').addClass('completed');
 
-            $(`.step-content[data-step="${step}"] `).addClass('active');
-                $(`.step-item[data-step="${step}"]`).addClass('active');
+            $(`.step-content[data-step="${step}"]`).addClass('active');
+            $(`.step-item[data-step="${step}"]`).addClass('active');
 
-        currentStep = step;
+            currentStep = step;
 
-        $('#prevBtn').toggle(currentStep > 1);
-        $('#nextBtn').toggle(currentStep < totalSteps);
-        $('#submitBtn').toggle(currentStep === totalSteps);
+            $('#prevBtn').toggle(currentStep > 1);
+            $('#nextBtn').toggle(currentStep < totalSteps);
+            $('#submitBtn').toggle(currentStep === totalSteps);
         }
 
         // Delete existing document
-        function deleteExistingDocument(id) {
+        function deleteExistingDocument(docId) {
             if (!confirm('Are you sure you want to delete this document?')) return;
 
             NProgress.start();
             $.ajax({
-                        url: `{{ url('admin/investment/
- </script>
+                url: `/deal/document/${docId}`,
+                type: "DELETE",
+                headers: {
+                    'X-CSRF-TOKEN': "{{ csrf_token() }}"
+                },
+                success: function(res) {
+                    NProgress.done();
+                    if (res.success) {
+                        $(`#existingDocuments [data-doc-id="${docId}"]`).remove();
+                        toastr.success('Document deleted successfully');
+                    }
+                },
+                error: function() {
+                    NProgress.done();
+                    toastr.error('Failed to delete document');
+                }
+            });
+        }
 
+        // Delete existing image
+        function deleteExistingImage(imgId) {
+            if (!confirm('Are you sure you want to delete this image?')) return;
+
+            NProgress.start();
+            $.ajax({
+                url: `/deal/image/${imgId}`,
+                type: "DELETE",
+                headers: {
+                    'X-CSRF-TOKEN': "{{ csrf_token() }}"
+                },
+                success: function(res) {
+                    NProgress.done();
+                    if (res.success) {
+                        $(`#existingImages [data-img-id="${imgId}"]`).remove();
+                        toastr.success('Image deleted successfully');
+                    }
+                },
+                error: function() {
+                    NProgress.done();
+                    toastr.error('Failed to delete image');
+                }
+            });
+        }
+
+        // Delete existing disclaimer
+        function deleteExistingDisclaimer(discId) {
+            if (!confirm('Are you sure you want to delete this disclaimer?')) return;
+
+            NProgress.start();
+            $.ajax({
+                url: `/deal/disclaimer/${discId}`,
+                type: "DELETE",
+                headers: {
+                    'X-CSRF-TOKEN': "{{ csrf_token() }}"
+                },
+                success: function(res) {
+                    NProgress.done();
+                    if (res.success) {
+                        $(`#existingDisclaimers [data-disc-id="${discId}"]`).remove();
+                        toastr.success('Disclaimer deleted successfully');
+                    }
+                },
+                error: function() {
+                    NProgress.done();
+                    toastr.error('Failed to delete disclaimer');
+                }
+            });
+        }
+
+        function addDocument() {
+            const name = $('#docName').val().trim();
+            const fileInput = $('#docFile')[0];
+            const file = fileInput.files[0];
+
+            if (!name || !file) {
+                toastr.error('Please provide document name and file');
+                return;
+            }
+
+            documents.push({
+                name,
+                file
+            });
+            renderDocuments();
+            $('#docName').val('');
+            $('#docFile').val('');
+        }
+
+        function renderDocuments() {
+            let html = '<div class="list-group">';
+            documents.forEach((doc, index) => {
+                html += `
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <span><i class="fa fa-file"></i> ${doc.name}</span>
+                        <button type="button" class="btn btn-sm btn-danger" onclick="removeDocument(${index})">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            $('#documentsList').html(html);
+        }
+
+        function removeDocument(index) {
+            documents.splice(index, 1);
+            renderDocuments();
+        }
+
+        function previewGalleryImages() {
+            const files = this.files;
+            images = Array.from(files);
+
+            let html = '';
+            images.forEach((file, index) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    $(`#img-preview-${index}`).attr('src', e.target.result);
+                };
+                reader.readAsDataURL(file);
+
+                html += `
+                    <div class="image-preview-item">
+                        <img id="img-preview-${index}" src="" alt="Preview">
+                        <button type="button" class="remove-btn" onclick="removeImage(${index})">
+                            <i class="fa fa-times"></i>
+                        </button>
+                    </div>
+                `;
+            });
+
+            $('#imagePreviewGrid').html(html);
+        }
+
+        function removeImage(index) {
+            images.splice(index, 1);
+            const dt = new DataTransfer();
+            images.forEach(file => dt.items.add(file));
+            $('#galleryImages')[0].files = dt.files;
+            previewGalleryImages.call($('#galleryImages')[0]);
+        }
+
+        function addDisclaimer() {
+            const title = $('#disclaimerTitle').val().trim();
+            const description = $('#disclaimerDescription').val().trim();
+
+            if (!title) {
+                toastr.error('Please provide disclaimer title');
+                return;
+            }
+
+            disclaimers.push({
+                title,
+                description
+            });
+            renderDisclaimers();
+            $('#disclaimerTitle').val('');
+            $('#disclaimerDescription').val('');
+        }
+
+        function renderDisclaimers() {
+            let html = '<div class="list-group">';
+            disclaimers.forEach((disc, index) => {
+                html += `
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                ${disc.description ? `<p class="mb-0 text-muted">${disc.description}</p>` : ''}
+                            </div>
+                            <button type="button" class="btn btn-sm btn-danger" onclick="removeDisclaimer(${index})">
+                                <i class="fa fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            $('#disclaimersList').html(html);
+        }
+
+        function removeDisclaimer(index) {
+            disclaimers.splice(index, 1);
+            renderDisclaimers();
+        }
+
+        // function submitInvestment() {
+        //     NProgress.start();
+
+        //     const promises = [];
+
+        //     // 1. Save highlights
+        //     const highlightData = {
+        //         overview: $('#overview').summernote('code'),
+        //         targeted_irr: $('[name="targeted_irr"]').val(),
+        //         tax_doc: $('[name="tax_doc"]').val(),
+        //         investor_waterfall: $('#investor_waterfall').summernote('code'),
+        //         promoted_interest: $('#promoted_interest').summernote('code'),
+        //         asset_management_fee: $('[name="asset_management_fee"]').val(),
+        //         organizational_and_offering_fee: $('[name="organizational_and_offering_fee"]').val(),
+        //         acquisition_fee: $('[name="acquisition_fee"]').val(),
+        //         disposition_fee: $('[name="disposition_fee"]').val(),
+        //         fund_administration_fee: $('[name="fund_administration_fee"]').val(),
+        //         _token: "{{ csrf_token() }}"
+        //     };
+
+        //     promises.push(
+        //         $.ajax({
+        //             url: window.routes.highlightStore,
+        //             type: "POST",
+        //             data: highlightData
+        //         })
+        //     );
+
+        //     // 2. Upload new documents
+        //     documents.forEach(doc => {
+        //         const formData = new FormData();
+        //         formData.append('name', doc.name);
+        //         formData.append('file', doc.file);
+        //         formData.append('_token', "{{ csrf_token() }}");
+
+        //         promises.push(
+        //             $.ajax({
+        //                 url: window.routes.documentStore,
+        //                 type: "POST",
+        //                 data: formData,
+        //                 processData: false,
+        //                 contentType: false
+        //             })
+        //         );
+        //     });
+
+        //     // 3. Upload new images
+        //     if (images.length > 0) {
+        //         const imageFormData = new FormData();
+        //         images.forEach(img => imageFormData.append('images[]', img));
+        //         imageFormData.append('_token', "{{ csrf_token() }}");
+
+        //         promises.push(
+        //             $.ajax({
+        //                 url: window.routes.imagesStore,
+        //                 type: "POST",
+        //                 data: imageFormData,
+        //                 processData: false,
+        //                 contentType: false
+        //             })
+        //         );
+        //     }
+
+        //     // 4. Save new disclaimers
+        //     disclaimers.forEach(disc => {
+        //         promises.push(
+        //             $.ajax({
+        //                 url: window.routes.disclaimerStore,
+        //                 type: "POST",
+        //                 data: {
+        //                     title: disc.title,
+        //                     description: disc.description,
+        //                     _token: "{{ csrf_token() }}"
+        //                 }
+        //             })
+        //         );
+        //     });
+
+        //     // Execute all promises
+        //     Promise.all(promises)
+        //         .then(() => {
+        //             NProgress.done();
+        //             toastr.success('Investment updated successfully!');
+        //             setTimeout(() => {
+        //                 window.location.href = "{{ route('investment.list') }}";
+        //             }, 1500);
+        //         })
+        //         .catch(err => {
+        //             NProgress.done();
+        //             console.error(err);
+        //             let message = 'Failed to complete investment update';
+        //             if (err.responseJSON && err.responseJSON.message) {
+        //                 message = err.responseJSON.message;
+        //             }
+        //             toastr.error(message);
+        //         });
+        // }
+
+
+        // Update submitInvestment function for edit page
+        function submitInvestment() {
+            NProgress.start();
+
+            const promises = [];
+
+            // 1. Save highlights
+            const highlightData = {
+                overview: $('#overview').summernote('code'),
+                targeted_irr: $('[name="targeted_irr"]').val(),
+                tax_doc: $('[name="tax_doc"]').val(),
+                investor_waterfall: $('#investor_waterfall').summernote('code'),
+                promoted_interest: $('#promoted_interest').summernote('code'),
+                asset_management_fee: $('[name="asset_management_fee"]').val(),
+                organizational_and_offering_fee: $('[name="organizational_and_offering_fee"]').val(),
+                acquisition_fee: $('[name="acquisition_fee"]').val(),
+                disposition_fee: $('[name="disposition_fee"]').val(),
+                fund_administration_fee: $('[name="fund_administration_fee"]').val(),
+                _token: "{{ csrf_token() }}"
+            };
+
+            promises.push(
+                $.ajax({
+                    url: window.routes.highlightStore,
+                    type: "POST",
+                    data: highlightData
+                })
+            );
+
+            // 2. Upload new documents
+            documents.forEach(doc => {
+                const formData = new FormData();
+                formData.append('name', doc.name);
+                formData.append('file', doc.file);
+                formData.append('_token', "{{ csrf_token() }}");
+
+                promises.push(
+                    $.ajax({
+                        url: window.routes.documentStore,
+                        type: "POST",
+                        data: formData,
+                        processData: false,
+                        contentType: false
+                    })
+                );
+            });
+
+            // 3. Upload new images
+            if (images.length > 0) {
+                const imageFormData = new FormData();
+                images.forEach(img => imageFormData.append('images[]', img));
+                imageFormData.append('_token', "{{ csrf_token() }}");
+
+                promises.push(
+                    $.ajax({
+                        url: window.routes.imagesStore,
+                        type: "POST",
+                        data: imageFormData,
+                        processData: false,
+                        contentType: false
+                    })
+                );
+            }
+
+            // 4. Save disclaimer (single)
+            const disclaimerContent = $('#disclaimerDescription').summernote('code');
+            if (disclaimerContent && disclaimerContent.trim() !== '') {
+                promises.push(
+                    $.ajax({
+                        url: window.routes.disclaimerStore,
+                        type: "POST",
+                        data: {
+                            description: disclaimerContent,
+                            _token: "{{ csrf_token() }}"
+                        }
+                    })
+                );
+            }
+
+            // Execute all promises
+            Promise.all(promises)
+                .then(() => {
+                    NProgress.done();
+                    toastr.success('Investment updated successfully!');
+                    setTimeout(() => {
+                        window.location.href = "{{ route('investment.list') }}";
+                    }, 1500);
+                })
+                .catch(err => {
+                    NProgress.done();
+                    console.error(err);
+                    let message = 'Failed to complete investment update';
+                    if (err.responseJSON && err.responseJSON.message) {
+                        message = err.responseJSON.message;
+                    }
+                    toastr.error(message);
+                });
+        }
+    </script>
+@endpush
+
+@push('styles')
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.css" rel="stylesheet">
+    <style>
+        .step-wizard {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .step-wizard::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #e0e0e0;
+            z-index: 0;
+        }
+
+        .step-item {
+            flex: 1;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .step-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #fff;
+            border: 2px solid #e0e0e0;
+            color: #666;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s;
+        }
+
+        .step-item.active .step-circle {
+            background: #0d6efd;
+            border-color: #0d6efd;
+            color: white;
+        }
+
+        .step-item.completed .step-circle {
+            background: #28a745;
+            border-color: #28a745;
+            color: white;
+        }
+
+        .step-label {
+            font-size: 0.875rem;
+            color: #666;
+        }
+
+        .step-item.active .step-label {
+            color: #0d6efd;
+            font-weight: 600;
+        }
+
+        .step-content {
+            display: none;
+        }
+
+        .step-content.active {
+            display: block;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        #map {
+            height: 400px;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+
+        .image-preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .image-preview-item {
+            position: relative;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .image-preview-item img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+        }
+
+        .image-preview-item .remove-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(220, 53, 69, 0.9);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+        }
+
+        .mountain-image-preview {
+            max-width: 200px;
+            max-height: 200px;
+            margin-top: 10px;
+            border-radius: 8px;
+        }
+    </style>
 @endpush

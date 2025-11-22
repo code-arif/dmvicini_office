@@ -11,10 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('investment_disclaimer', function (Blueprint $table) {
+        Schema::create('investment_disclaimers', function (Blueprint $table) {
             $table->id();
             $table->foreignId('investment_id')->nullable()->constrained()->cascadeOnDelete();
-            $table->string('title');
             $table->text('description')->nullable();
             $table->timestamps();
         });

@@ -12,7 +12,7 @@ class UserListController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $query = User::with(['profile.firm', 'accessRequest', 'complianceAcknowledgment'])
+            $query = User::with(['profile.firm', 'complianceAcknowledgment'])
                 ->where('role', '!=', 'admin')
                 ->latest('id');
 
@@ -93,20 +93,14 @@ class UserListController extends Controller
     {
         if ($user->is_active && $user->access_level === 'full') {
             return '<span class="badge bg-success py-3">Approved</span>';
-        } elseif ($user->access_level === 'provisional') {
-            return '<span class="badge bg-warning py-3">Provisional</span>';
-        } elseif ($user->access_level === 'review') {
-            return '<span class="badge bg-info py-3">Under Review</span>';
-        } elseif ($user->access_level === 'limited') {
-            return '<span class="badge bg-secondary py-3">Limited Access</span>';
         } else {
-            return '<span class="badge bg-danger py-3">Pending</span>';
+            return '<span class="badge bg-warning py-3">Provisional</span>';
         }
     }
 
     public function show($id)
     {
-        $user = User::with(['profile.firm', 'accessRequest', 'complianceAcknowledgment'])
+        $user = User::with(['profile.firm', 'complianceAcknowledgment'])
             ->findOrFail($id);
 
         return response()->json([
@@ -145,16 +139,6 @@ class UserListController extends Controller
                     'zip' => $user->profile->firm->zip,
                     'explanation_if_not_registered' => $user->profile->firm->explanation_if_not_registered,
                 ] : null,
-                'access_request' => $user->accessRequest ? [
-                    'status' => ucfirst($user->accessRequest->status),
-                    'verification_type' => $user->accessRequest->verification_type,
-                    'verified_at' => $user->accessRequest->verified_at
-                        ? $user->accessRequest->verified_at->format('M d, Y h:i A')
-                        : null,
-                    'admin_notes' => $user->accessRequest->admin_notes,
-                    'verifier_document' => $user->accessRequest->verifier_document,
-                    'verifier_reference' => $user->accessRequest->verifier_reference,
-                ] : null,
                 'compliance' => $user->complianceAcknowledgment ? [
                     'terms_agreed' => $user->complianceAcknowledgment->terms_agreed,
                     'terms_agreed_at' => $user->complianceAcknowledgment->terms_agreed_at
@@ -186,20 +170,11 @@ class UserListController extends Controller
             'id' => 'required|exists:users,id',
         ]);
 
-        $user = User::with('accessRequest')->findOrFail($request->id);
+        $user = User::findOrFail($request->id);
 
         $user->is_active = true;
         $user->access_level = 'full';
         $user->save();
-
-        if ($user->accessRequest) {
-            $user->accessRequest->update([
-                'status' => 'approved',
-                'verified_at' => now(),
-                'verified_by' => auth()->id(),
-                'admin_notes' => $request->admin_notes,
-            ]);
-        }
 
         return response()->json([
             'success' => true,
@@ -211,7 +186,7 @@ class UserListController extends Controller
     {
         $request->validate([
             'id' => 'required|exists:users,id',
-            'access_level' => 'required|in:full,provisional,limited,review',
+            'access_level' => 'required|in:full,provisional',
         ]);
 
         $user = User::findOrFail($request->id);

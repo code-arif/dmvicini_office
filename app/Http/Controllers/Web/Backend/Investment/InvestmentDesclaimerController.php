@@ -9,21 +9,24 @@ use App\Models\InvestmentDisclaimer;
 
 class InvestmentDesclaimerController extends Controller
 {
-    // store investment desclaimer
-    public function storeDisclaimer(Request $request, $investment_id)
+    /**
+     * Store or Update disclaimer (single disclaimer per investment)
+     */
+    public function storeOrUpdateDisclaimer(Request $request, $investment_id)
     {
-        $validated = $request->validate([
-            'title'       => 'required|string|max:255',
-            'description' => 'nullable|string',
+        $request->validate([
+            'description' => 'required|string'
         ]);
 
-        $disclaimer = InvestmentDisclaimer::create([
-            'investment_id' => $investment_id,
-            'title'         => $validated['title'],
-            'description'   => $validated['description'],
-        ]);
+        $disclaimer = InvestmentDisclaimer::updateOrCreate(
+            ['investment_id' => $investment_id],
+            ['description' => $request->description]
+        );
 
-        return response()->json(['success' => true, 'disclaimer' => $disclaimer]);
+        return response()->json([
+            'success' => true,
+            'disclaimer' => $disclaimer,
+            'message' => 'Disclaimer saved successfully!'
+        ]);
     }
-
 }

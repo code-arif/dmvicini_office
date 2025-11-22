@@ -11,7 +11,7 @@
                     </div>
                     <div class="ms-auto pageheader-btn">
                         <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="{{ route('get.investments') }}">Investments</a></li>
+                            <li class="breadcrumb-item"><a href="{{ route('investment.list') }}">Investments</a></li>
                             <li class="breadcrumb-item active">Create</li>
                         </ol>
                     </div>
@@ -69,7 +69,7 @@
                                         </div>
 
                                         <div class="row">
-                                            <div class="col-md-4 mb-3">
+                                            <div class="col-md-3 mb-3">
                                                 <label class="form-label">Asset Class</label>
                                                 <select name="asset_class_id" class="form-select">
                                                     <option value="">-- Select --</option>
@@ -78,7 +78,7 @@
                                                     @endforeach
                                                 </select>
                                             </div>
-                                            <div class="col-md-4 mb-3">
+                                            <div class="col-md-3 mb-3">
                                                 <label class="form-label">Investment Type</label>
                                                 <select name="investment_type_id" class="form-select">
                                                     <option value="">-- Select --</option>
@@ -87,11 +87,20 @@
                                                     @endforeach
                                                 </select>
                                             </div>
-                                            <div class="col-md-4 mb-3">
+                                            <div class="col-md-3 mb-3">
                                                 <label class="form-label">Investment Strategy</label>
                                                 <select name="investments_strategy_id" class="form-select">
                                                     <option value="">-- Select --</option>
                                                     @foreach ($strategies as $item)
+                                                        <option value="{{ $item->id }}">{{ $item->name }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                            <div class="col-md-3 mb-3">
+                                                <label class="form-label">Tax Strategy</label>
+                                                <select name="investments_strategy_id" class="form-select">
+                                                    <option value="">-- Select --</option>
+                                                    @foreach ($tax_strategies as $item)
                                                         <option value="{{ $item->id }}">{{ $item->name }}</option>
                                                     @endforeach
                                                 </select>
@@ -254,25 +263,16 @@
                                         <div id="imagePreviewGrid" class="image-preview-grid"></div>
                                     </div>
 
-                                    <!-- Step 6: Disclaimers -->
+
+                                    <!-- Step 6: Disclaimer (Single) -->
                                     <div class="step-content" data-step="6">
-                                        <h4 class="mb-4">Disclaimers</h4>
-                                        <div id="disclaimersList" class="mb-3"></div>
-                                        <div class="card bg-light">
-                                            <div class="card-body">
-                                                <div class="mb-3">
-                                                    <label class="form-label">Title <span
-                                                            class="text-danger">*</span></label>
-                                                    <input type="text" id="disclaimerTitle" class="form-control">
-                                                </div>
-                                                <div class="mb-3">
-                                                    <label class="form-label">Description</label>
-                                                    <textarea id="disclaimerDescription" class="form-control" rows="3"></textarea>
-                                                </div>
-                                                <button type="button" class="btn btn-primary" id="addDisclaimerBtn">
-                                                    <i class="fa fa-plus"></i> Add Disclaimer
-                                                </button>
-                                            </div>
+                                        <h4 class="mb-4">Investment Disclaimer</h4>
+
+                                        <div class="mb-3">
+                                            <label class="form-label">Disclaimer Content</label>
+                                            <textarea name="disclaimer_description" id="disclaimerDescription" class="form-control"></textarea>
+                                            <small class="text-muted">Add any legal disclaimers, risk warnings, or
+                                                important notices here.</small>
                                         </div>
                                     </div>
 
@@ -307,6 +307,7 @@
 
     <script>
         window.routes = {
+            basicStore: "{{ route('investment.basic.store') }}",
             highlightStore: "{{ route('investment.highlight.store', ':id') }}",
             documentStore: "{{ route('investment.document.store', ':id') }}",
             imagesStore: "{{ route('investment.images.store', ':id') }}",
@@ -324,19 +325,20 @@
         let disclaimers = [];
 
         $(document).ready(function() {
-            // Initialize Summernote
-            $('#investmentDetails, #overview, #investor_waterfall, #promoted_interest').summernote({
-                height: 200,
-                toolbar: [
-                    ['style', ['style']],
-                    ['font', ['bold', 'italic', 'underline', 'clear']],
-                    ['color', ['color']],
-                    ['para', ['ul', 'ol', 'paragraph']],
-                    ['table', ['table']],
-                    ['insert', ['link', 'picture']],
-                    ['view', ['fullscreen', 'codeview']]
-                ]
-            });
+            // Initialize Summernote for all rich text editors including disclaimer
+            $('#investmentDetails, #overview, #investor_waterfall, #promoted_interest, #disclaimerDescription')
+                .summernote({
+                    height: 200,
+                    toolbar: [
+                        ['style', ['style']],
+                        ['font', ['bold', 'italic', 'underline', 'clear']],
+                        ['color', ['color']],
+                        ['para', ['ul', 'ol', 'paragraph']],
+                        ['table', ['table']],
+                        ['insert', ['link', 'picture']],
+                        ['view', ['fullscreen', 'codeview']]
+                    ]
+                });
 
             // Initialize Google Map
             initMap();
@@ -626,6 +628,7 @@
             renderDisclaimers();
         }
 
+        // Update submitInvestment function
         function submitInvestment() {
             if (!investmentId) {
                 toastr.error('Please complete step 1 first');
@@ -634,7 +637,6 @@
 
             NProgress.start();
 
-            // Prepare all promises
             const promises = [];
 
             // 1. Save highlights
@@ -654,7 +656,7 @@
 
             promises.push(
                 $.ajax({
-                    url: window.routes.highlightStore.replace(':id', investmentId),
+                    url: window.routes.highlightStore,
                     type: "POST",
                     data: highlightData
                 })
@@ -669,7 +671,7 @@
 
                 promises.push(
                     $.ajax({
-                        url: window.routes.documentStore.replace(':id', investmentId),
+                        url: window.routes.documentStore,
                         type: "POST",
                         data: formData,
                         processData: false,
@@ -686,7 +688,7 @@
 
                 promises.push(
                     $.ajax({
-                        url: window.routes.imagesStore.replace(':id', investmentId),
+                        url: window.routes.imagesStore,
                         type: "POST",
                         data: imageFormData,
                         processData: false,
@@ -695,20 +697,20 @@
                 );
             }
 
-            // 4. Save disclaimers
-            disclaimers.forEach(disc => {
+            // 4. Save disclaimer (single)
+            const disclaimerContent = $('#disclaimerDescription').summernote('code');
+            if (disclaimerContent && disclaimerContent.trim() !== '') {
                 promises.push(
                     $.ajax({
-                        url: window.routes.disclaimerStore.replace(':id', investmentId),
+                        url: window.routes.disclaimerStore,
                         type: "POST",
                         data: {
-                            title: disc.title,
-                            description: disc.description,
+                            description: disclaimerContent,
                             _token: "{{ csrf_token() }}"
                         }
                     })
                 );
-            });
+            }
 
             // Execute all promises
             Promise.all(promises)
@@ -716,7 +718,7 @@
                     NProgress.done();
                     toastr.success('Investment created successfully!');
                     setTimeout(() => {
-                        window.location.href = "{{ route('get.investments') }}";
+                        window.location.href = "{{ route('investment.list') }}";
                     }, 1500);
                 })
                 .catch(err => {

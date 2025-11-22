@@ -121,7 +121,7 @@
                                     <i class="fa fa-check-circle text-success me-2"></i>
                                     Active Deals
                                 </h3>
-                                <a href="{{ route('get.investments') }}" class="btn btn-sm btn-primary">View All</a>
+                                <a href="{{ route('investment.list') }}" class="btn btn-sm btn-primary">View All</a>
                             </div>
                             <div class="card-body">
                                 <div class="table-responsive">
@@ -176,25 +176,6 @@
         </div>
     </div>
 
-    <!-- Investment Details Modal -->
-    <div class="modal fade" id="investmentModal" tabindex="-1">
-        <div class="modal-dialog modal-xl">
-            <div class="modal-content" style="padding: 0px 20px 20px 20px">
-                <div class="modal-header">
-                    <h5 class="modal-title">Investment Details</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal">&times;</button>
-                </div>
-                <div class="modal-body" id="investmentModalContent">
-                    <div class="text-center">
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- User Review Modal -->
     <div class="modal fade" id="userReviewModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
@@ -225,6 +206,12 @@
 @endsection
 
 @push('scripts')
+    <script>
+        window.routes = {
+            investmentShow: '{{ route('investment.show', ':id') }}'
+        };
+    </script>
+
     <script>
         $(document).ready(function() {
             let currentUserId = null;
@@ -283,19 +270,13 @@
                             </td>
                             <td><span class="badge bg-${deal.status === 'Active' ? 'success' : 'secondary'}">${deal.status}</span></td>
                             <td>
-                                <button class="btn btn-sm btn-primary view-details" data-id="${deal.id}">
+                                <a class="btn btn-sm btn-primary view-details" href="${window.routes.investmentShow.replace(':id', deal.id)}">
                                     View Details
-                                </button>
+                                </a>
                             </td>
                         </tr>
                     `;
                     tbody.append(row);
-                });
-
-                // Attach click event to view details buttons
-                $('.view-details').on('click', function() {
-                    const investmentId = $(this).data('id');
-                    viewInvestmentDetails(investmentId);
                 });
             }
 
@@ -405,17 +386,17 @@
                                                 </h5>
                                                 <p><strong>Firm Name:</strong> ${user.firm_name || 'N/A'}</p>
                                                 ${user.firm_info ? `
-                                                            <p><strong>Registered:</strong> ${user.firm_info.is_registered ? 'Yes' : 'No'}</p>
-                                                            ${user.firm_info.firm_crd ? `<p><strong>Firm CRD:</strong> ${user.firm_info.firm_crd}</p>` : ''}
-                                                            ${user.firm_info.individual_crd ? `<p><strong>Individual CRD:</strong> ${user.firm_info.individual_crd}</p>` : ''}
-                                                            ${user.firm_info.firm_aum ? `<p><strong>Firm AUM:</strong> ${user.firm_info.firm_aum}</p>` : ''}
-                                                            ${user.firm_info.address ? `
+                                                                        <p><strong>Registered:</strong> ${user.firm_info.is_registered ? 'Yes' : 'No'}</p>
+                                                                        ${user.firm_info.firm_crd ? `<p><strong>Firm CRD:</strong> ${user.firm_info.firm_crd}</p>` : ''}
+                                                                        ${user.firm_info.individual_crd ? `<p><strong>Individual CRD:</strong> ${user.firm_info.individual_crd}</p>` : ''}
+                                                                        ${user.firm_info.firm_aum ? `<p><strong>Firm AUM:</strong> ${user.firm_info.firm_aum}</p>` : ''}
+                                                                        ${user.firm_info.address ? `
                                                         <p><strong>Address:</strong><br>
                                                         ${user.firm_info.address}<br>
                                                         ${user.firm_info.city}, ${user.firm_info.state} ${user.firm_info.zip}
                                                         </p>
                                                     ` : ''}
-                                                        ` : '<p class="text-muted">No firm information available</p>'}
+                                                                    ` : '<p class="text-muted">No firm information available</p>'}
                                             </div>
                                         </div>
                                     </div>
@@ -435,32 +416,32 @@
 
                                     <!-- Compliance -->
                                     ${user.compliance ? `
-                                            <div class="col-12 mb-4">
-                                                <div class="card bg-light">
-                                                    <div class="card-body">
-                                                        <h5 class="card-title mb-3">
-                                                            <i class="fa fa-shield-alt me-2"></i>Compliance Acknowledgments
-                                                        </h5>
-                                                        <p>
-                                                            <i class="fa fa-${user.compliance.terms_agreed ? 'check-circle text-success' : 'times-circle text-danger'}"></i>
-                                                            Terms & Conditions ${user.compliance.terms_agreed_at ? `(${user.compliance.terms_agreed_at})` : ''}
-                                                        </p>
-                                                        <p>
-                                                            <i class="fa fa-${user.compliance.privacy_agreed ? 'check-circle text-success' : 'times-circle text-danger'}"></i>
-                                                            Privacy Policy ${user.compliance.privacy_agreed_at ? `(${user.compliance.privacy_agreed_at})` : ''}
-                                                        </p>
-                                                        <p>
-                                                            <i class="fa fa-${user.compliance.investor_acknowledgment ? 'check-circle text-success' : 'times-circle text-danger'}"></i>
-                                                            Investor Acknowledgment ${user.compliance.investor_acknowledgment_at ? `(${user.compliance.investor_acknowledgment_at})` : ''}
-                                                        </p>
-                                                        <p>
-                                                            <i class="fa fa-${user.compliance.confidentiality_agreed ? 'check-circle text-success' : 'times-circle text-danger'}"></i>
-                                                            Confidentiality Agreement ${user.compliance.confidentiality_agreed_at ? `(${user.compliance.confidentiality_agreed_at})` : ''}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            ` : ''}
+                                                        <div class="col-12 mb-4">
+                                                            <div class="card bg-light">
+                                                                <div class="card-body">
+                                                                    <h5 class="card-title mb-3">
+                                                                        <i class="fa fa-shield-alt me-2"></i>Compliance Acknowledgments
+                                                                    </h5>
+                                                                    <p>
+                                                                        <i class="fa fa-${user.compliance.terms_agreed ? 'check-circle text-success' : 'times-circle text-danger'}"></i>
+                                                                        Terms & Conditions ${user.compliance.terms_agreed_at ? `(${user.compliance.terms_agreed_at})` : ''}
+                                                                    </p>
+                                                                    <p>
+                                                                        <i class="fa fa-${user.compliance.privacy_agreed ? 'check-circle text-success' : 'times-circle text-danger'}"></i>
+                                                                        Privacy Policy ${user.compliance.privacy_agreed_at ? `(${user.compliance.privacy_agreed_at})` : ''}
+                                                                    </p>
+                                                                    <p>
+                                                                        <i class="fa fa-${user.compliance.investor_acknowledgment ? 'check-circle text-success' : 'times-circle text-danger'}"></i>
+                                                                        Investor Acknowledgment ${user.compliance.investor_acknowledgment_at ? `(${user.compliance.investor_acknowledgment_at})` : ''}
+                                                                    </p>
+                                                                    <p>
+                                                                        <i class="fa fa-${user.compliance.confidentiality_agreed ? 'check-circle text-success' : 'times-circle text-danger'}"></i>
+                                                                        Confidentiality Agreement ${user.compliance.confidentiality_agreed_at ? `(${user.compliance.confidentiality_agreed_at})` : ''}
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        ` : ''}
                                 </div>
                             `;
                             $('#userReviewModalContent').html(content);
@@ -530,65 +511,6 @@
                     }
                 });
             });
-
-            function viewInvestmentDetails(id) {
-                $('#investmentModal').modal('show');
-                $('#investmentModalContent').html(`
-                    <div class="text-center">
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
-                    </div>
-                `);
-
-                $.ajax({
-                    url: `/admin/investments/${id}/details`,
-                    type: "GET",
-                    success: function(response) {
-                        if (response.success) {
-                            const inv = response.data;
-                            const content = `
-                                <div class="row">
-                                    <div class="col-md-4 mb-3">
-                                        ${inv.thumbnail ? `<img src="${inv.thumbnail}" class="img-fluid" alt="${inv.title}">` : '<div class="bg-light rounded" style="height: 200px; display: flex; align-items: center; justify-content: center;"><i class="fa fa-image fa-3x text-muted"></i></div>'}
-                                    </div>
-                                    <div class="col-md-8">
-                                        <h4>${inv.title}</h4>
-                                        <p class="text-muted">${inv.summary || 'No summary available'}</p>
-
-                                        <div class="row mb-3">
-                                            <div class="col-6">
-                                                <strong>Investment:</strong> ${inv.min_investment || 'N/A'}
-                                            </div>
-                                            <div class="col-6">
-                                                <strong>Target IRR:</strong> ${inv.targeted_irr || 'N/A'}
-                                            </div>
-                                            <div class="col-6 mt-2">
-                                                <strong>Term:</strong> ${inv.term || 'N/A'}
-                                            </div>
-                                            <div class="col-6 mt-2">
-                                                <strong>Status:</strong> <span class="badge bg-success">${inv.status}</span>
-                                            </div>
-                                        </div>
-
-                                        ${inv.sponsor ? `<p><strong>Sponsor:</strong> ${inv.sponsor}</p>` : ''}
-                                        ${inv.fund_name ? `<p><strong>Fund:</strong> ${inv.fund_name}</p>` : ''}
-                                        ${inv.property_type ? `<p><strong>Property Type:</strong> ${inv.property_type}</p>` : ''}
-
-                                        ${inv.banker_email ? `<p><strong>Contact:</strong> ${inv.banker_email}</p>` : ''}
-                                    </div>
-                                </div>
-                            `;
-                            $('#investmentModalContent').html(content);
-                        }
-                    },
-                    error: function(xhr) {
-                        $('#investmentModalContent').html(
-                            '<p class="text-danger">Failed to load details</p>');
-                        toastr.error('Failed to load investment details');
-                    }
-                });
-            }
 
             // Refresh every 5 minutes
             setInterval(loadDashboardStats, 300000);

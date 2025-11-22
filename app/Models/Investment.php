@@ -64,7 +64,7 @@ class Investment extends Model
     }
 
 
-    public function risks()
+    public function disclaimers()
     {
         return $this->hasOne(InvestmentDisclaimer::class);
     }

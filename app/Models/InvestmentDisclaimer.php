@@ -6,5 +6,5 @@ use Illuminate\Database\Eloquent\Model;
 
 class InvestmentDisclaimer extends Model
 {
-    protected $fillable = ["description", "title", "investment_id"];
+    protected $fillable = ["description", "investment_id"];
 }

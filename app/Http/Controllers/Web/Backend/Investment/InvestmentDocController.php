@@ -11,7 +11,7 @@ use App\Http\Controllers\Controller;
 class InvestmentDocController extends Controller
 {
     /**
-     * Store investment media (documents + images)
+     * Store investment document
      */
     public function uploadDocument(Request $request, $investment_id)
     {
@@ -36,23 +36,35 @@ class InvestmentDocController extends Controller
     }
 
     /**
-     * delete document
+     * Delete document
      */
     public function deleteDocument($id)
     {
-        $doc = InvestmentDocument::findOrFail($id);
-        if ($doc->file_path && file_exists(public_path($doc->file_path))) {
-            @unlink(public_path($doc->file_path));
-        }
-        $doc->delete();
+        try {
+            $doc = InvestmentDocument::findOrFail($id);
 
-        return response()->json(['success' => true, 'message' => 'Document deleted']);
+            // Delete file from storage
+            if ($doc->file_path && file_exists(public_path($doc->file_path))) {
+                @unlink(public_path($doc->file_path));
+            }
+
+            $doc->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Document deleted successfully'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete document'
+            ], 500);
+        }
     }
 
     /**
-     * upload investment images
+     * Upload investment images
      */
-    // ====================== 4. Gallery Images ======================
     public function uploadImage(Request $request, $investment_id)
     {
         $request->validate([
@@ -76,15 +88,29 @@ class InvestmentDocController extends Controller
     }
 
     /**
-     * Delete investment images
+     * Delete investment image
      */
     public function deleteImage($id)
     {
-        $img = InvestmentImage::findOrFail($id);
-        if ($img->image_url && file_exists(public_path($img->image_url))) {
-            @unlink(public_path($img->image_url));
+        try {
+            $img = InvestmentImage::findOrFail($id);
+
+            // Delete file from storage
+            if ($img->image_url && file_exists(public_path($img->image_url))) {
+                @unlink(public_path($img->image_url));
+            }
+
+            $img->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Image deleted successfully'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete image'
+            ], 500);
         }
-        $img->delete();
-        return response()->json(['success' => true]);
     }
 }

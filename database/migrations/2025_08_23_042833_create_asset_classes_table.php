@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('name')->nullable();
             $table->string('asset_type')->nullable();
             $table->text('description')->nullable();
+            $table->integer('order')->default(0);
             $table->timestamps();
         });
     }

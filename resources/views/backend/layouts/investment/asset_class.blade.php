@@ -3,14 +3,58 @@
 
 @push('styles')
     <link href="{{ asset('default/datatable.css') }}" rel="stylesheet" />
+    <style>
+        .sortable-row {
+            cursor: move;
+            transition: background-color 0.2s;
+        }
+
+        .sortable-row:hover {
+            background-color: #f8f9fa;
+        }
+
+        .sortable-ghost {
+            opacity: 0.4;
+            background: #e9ecef;
+        }
+
+        .sortable-chosen {
+            background: #fff3cd;
+        }
+
+        .drag-handle {
+            cursor: grab;
+            color: #6c757d;
+            font-size: 1.2rem;
+            padding: 0 10px;
+        }
+
+        .drag-handle:active {
+            cursor: grabbing;
+        }
+
+        .order-badge {
+            background: #0d6efd;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .alert-info-custom {
+            background: #cfe2ff;
+            border-left: 4px solid #0d6efd;
+            padding: 12px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+    </style>
 @endpush
 
 @section('content')
-    <!--app-content open-->
     <div class="app-content main-content mt-0">
         <div class="side-app">
-
-            <!-- CONTAINER -->
             <div class="main-container container-fluid">
 
                 <!-- PAGE-HEADER -->
@@ -25,109 +69,119 @@
                         </ol>
                     </div>
                 </div>
-                <!-- PAGE-HEADER END -->
 
-                <!-- ROW-4 -->
+                <!-- INFO ALERT -->
+                <div class="alert-info-custom">
+                    <i class="fa fa-info-circle me-2"></i>
+                    <strong>Tip:</strong> Drag and drop rows using the <i class="fas fa-grip-vertical"></i> icon to reorder
+                    asset classes.
+                </div>
+
+                <!-- DATA TABLE -->
                 <div class="row">
-                    <div class="col-12 col-sm-12">
+                    <div class="col-12">
                         <div class="card product-sales-main">
                             <div class="card-header border-bottom">
                                 <h3 class="card-title mb-0">Asset Classes List</h3>
                                 <div class="card-options ms-auto">
                                     <button class="btn btn-primary btn-sm" data-bs-toggle="modal"
-                                        data-bs-target="#createClassModal">Add Class</button>
+                                        data-bs-target="#createClassModal">
+                                        <i class="fa fa-plus"></i> Add Class
+                                    </button>
                                 </div>
                             </div>
                             <div class="card-body">
-                                <div class="tabel-responsive">
+                                <div class="table-responsive">
                                     <table class="table text-nowrap mb-0 table-bordered" id="datatable">
                                         <thead>
                                             <tr>
-                                                <th class="bg-transparent border-bottom-0">#</th>
+                                                <th class="bg-transparent border-bottom-0" style="width: 50px;">Order</th>
+                                                <th class="bg-transparent border-bottom-0" style="width: 60px;"></th>
                                                 <th class="bg-transparent border-bottom-0">Name</th>
+                                                <th class="bg-transparent border-bottom-0">Asset Type</th>
                                                 <th class="bg-transparent border-bottom-0">Description</th>
                                                 <th class="bg-transparent border-bottom-0">Created</th>
                                                 <th class="bg-transparent border-bottom-0">Action</th>
                                             </tr>
                                         </thead>
-                                        <tbody>
+                                        <tbody id="sortable-tbody">
+                                            <!-- Data will be loaded here -->
                                         </tbody>
                                     </table>
                                 </div>
                             </div>
                         </div>
-                    </div><!-- COL END -->
+                    </div>
                 </div>
-                <!-- ROW-4 END -->
-
             </div>
         </div>
     </div>
-    <!-- CONTAINER CLOSED -->
 
-    <!-- Create Class Modal -->
-    <div class="modal fade" id="createClassModal" tabindex="-1" aria-labelledby="createClassModalLabel"
-        aria-hidden="true">
+    <!-- Create Modal -->
+    <div class="modal fade" id="createClassModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <form id="createClassForm" method="post">
+                <form id="createClassForm">
                     @csrf
                     <div class="modal-header">
-                        <h5 class="modal-title" id="createClassModalLabel">Create Class</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <h5 class="modal-title">Create Asset Class</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
-                        <div class="form-group mb-2">
-                            <label for="createName" class="form-label">Name</label>
-                            <input type="text" class="form-control" name="name" id="createName"
-                                placeholder="Enter Class Name">
-                            <span class="text-danger error-text name_error"></span>
+                        <div class="mb-3">
+                            <label class="form-label">Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="name" required>
                         </div>
-
-                        <div class="form-group mb-2">
-                            <label for="createDescription" class="form-label">Description</label>
-                            <textarea class="form-control" name="description" id="createDescription" rows="8" placeholder="Enter description"></textarea>
-                            <span class="text-danger error-text description_error"></span>
+                        <div class="mb-3">
+                            <label class="form-label">Asset Type</label>
+                            <input type="text" class="form-control" name="asset_type">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea class="form-control" name="description" rows="4"></textarea>
                         </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" id="createSubmitBtn" class="btn btn-primary">Save</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa fa-save"></i> Save
+                        </button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 
-    <!-- Edit Category Modal -->
-    <div class="modal fade" id="editClassModal" tabindex="-1" aria-labelledby="editClassModalLabel"
-        aria-hidden="true">
+    <!-- Edit Modal -->
+    <div class="modal fade" id="editClassModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <form id="editClassForm" method="post">
+                <form id="editClassForm">
                     @csrf
-                    @method('POST')
                     <input type="hidden" name="id" id="editID">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="editClassModalLabel">Edit Class</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <h5 class="modal-title">Edit Asset Class</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                     </div>
                     <div class="modal-body">
-                        <div class="form-group mb-2">
-                            <label for="editName" class="form-label">Name</label>
-                            <input type="text" class="form-control" name="name" id="editName">
-                            <span class="text-danger error-text name_error"></span>
+                        <div class="mb-3">
+                            <label class="form-label">Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" name="name" id="editName" required>
                         </div>
-
-                        <div class="form-group mb-2">
-                            <label for="editDescription" class="form-label">Description</label>
-                            <textarea class="form-control" name="description" id="editDescription" rows="8"></textarea>
-                            <span class="text-danger error-text description_error"></span>
+                        <div class="mb-3">
+                            <label class="form-label">Asset Type</label>
+                            <input type="text" class="form-control" name="asset_type" id="editType">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea class="form-control" name="description" id="editDescription" rows="4"></textarea>
                         </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" id="editSubmitBtn" class="btn btn-primary">Update</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa fa-save"></i> Update
+                        </button>
                     </div>
                 </form>
             </div>
@@ -136,6 +190,9 @@
 @endsection
 
 @push('scripts')
+    <!-- SortableJS CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+
     <script>
         $(document).ready(function() {
             $.ajaxSetup({
@@ -144,128 +201,194 @@
                 }
             });
 
-            let dTable = $('#datatable').DataTable({
-                order: [],
-                processing: true,
-                serverSide: true,
-                ajax: {
-                    url: "{{ route('show.asset.class.list') }}",
-                    type: "GET",
-                },
-                columns: [{
-                        data: 'DT_RowIndex',
-                        name: 'DT_RowIndex',
-                        orderable: false,
-                        searchable: false
-                    },
-                    {
-                        data: 'name',
-                        name: 'name'
-                    },
-                    {
-                        data: 'description',
-                        name: 'description'
-                    },
-                    {
-                        data: 'created_at',
-                        name: 'created_at'
-                    },
-                    {
-                        data: 'action',
-                        name: 'action',
-                        orderable: false,
-                        searchable: false
-                    }
-                ]
-            });
+            // Load Data
+            loadAssetClasses();
 
-            // CREATE
+            // Initialize Sortable after data loads
+            function initSortable() {
+                const tbody = document.getElementById('sortable-tbody');
+                if (tbody) {
+                    Sortable.create(tbody, {
+                        animation: 150,
+                        handle: '.drag-handle',
+                        ghostClass: 'sortable-ghost',
+                        chosenClass: 'sortable-chosen',
+                        dragClass: 'sortable-drag',
+                        onEnd: function(evt) {
+                            updateOrder();
+                        }
+                    });
+                }
+            }
+
+            // Load asset classes
+            function loadAssetClasses() {
+                NProgress.start();
+                $.ajax({
+                    url: "{{ route('asset.class.get.all') }}",
+                    type: "GET",
+                    success: function(res) {
+                        NProgress.done();
+                        if (res.success) {
+                            renderTable(res.data);
+                            initSortable();
+                        }
+                    },
+                    error: function() {
+                        NProgress.done();
+                        toastr.error("Failed to load data");
+                    }
+                });
+            }
+
+            // Render table
+            function renderTable(data) {
+                let html = '';
+                data.forEach((item, index) => {
+                    html += `
+                        <tr class="sortable-row" data-id="${item.id}">
+                            <td class="text-center">
+                                <span class="order-badge">${index + 1}</span>
+                            </td>
+                            <td class="text-center">
+                                <i class="fas fa-grip-vertical drag-handle"></i>
+                            </td>
+                            <td><strong>${item.name}</strong></td>
+                            <td>${item.asset_type || '<span class="text-muted">N/A</span>'}</td>
+                            <td>${item.description ? (item.description.length > 50 ? item.description.substring(0, 50) + '...' : item.description) : '<span class="text-muted">No description</span>'}</td>
+                            <td>${formatDate(item.created_at)}</td>
+                            <td>
+                                <button class="btn btn-sm btn-primary editBtn"
+                                    data-id="${item.id}"
+                                    data-name="${item.name}"
+                                    data-type="${item.asset_type || ''}"
+                                    data-description="${item.description || ''}">
+                                    <i class="fa fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger deleteBtn" onclick="showDeleteConfirm(${item.id})">
+                                    <i class="fa fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                $('#sortable-tbody').html(html);
+            }
+
+            // Format date
+            function formatDate(dateString) {
+                const date = new Date(dateString);
+                return date.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            }
+
+            // Update order after drag & drop
+            function updateOrder() {
+                const rows = document.querySelectorAll('#sortable-tbody tr');
+                const orderData = [];
+
+                rows.forEach((row, index) => {
+                    orderData.push({
+                        id: row.getAttribute('data-id'),
+                        order: index + 1
+                    });
+                });
+
+                NProgress.start();
+                $.ajax({
+                    url: "{{ route('asset.class.update.order') }}",
+                    type: "POST",
+                    data: {
+                        order_data: orderData,
+                        _token: "{{ csrf_token() }}"
+                    },
+                    success: function(res) {
+                        NProgress.done();
+                        if (res.success) {
+                            toastr.success('Order updated successfully!');
+                            loadAssetClasses(); // Reload to show updated order badges
+                        }
+                    },
+                    error: function() {
+                        NProgress.done();
+                        toastr.error("Failed to update order");
+                    }
+                });
+            }
+
+            // Create
             $('#createClassForm').on('submit', function(e) {
                 e.preventDefault();
-                let formData = new FormData(this);
+                NProgress.start();
                 $.ajax({
                     url: "{{ route('asset.class.store') }}",
                     method: "POST",
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    beforeSend: function() {
-                        $('#createSubmitBtn').prop('disabled', true).text('Saving...');
-                    },
+                    data: $(this).serialize(),
                     success: function(res) {
+                        NProgress.done();
                         if (res.success) {
                             $('#createClassModal').modal('hide');
                             $('#createClassForm')[0].reset();
-                            dTable.ajax.reload();
+                            loadAssetClasses();
                             toastr.success(res.message);
-                        } else {
-                            toastr.error(res.message);
                         }
-                        $('#createSubmitBtn').prop('disabled', false).text('Save');
                     },
                     error: function() {
-                        toastr.error("Something went wrong!");
-                        $('#createSubmitBtn').prop('disabled', false).text('Save');
+                        NProgress.done();
+                        toastr.error("Failed to create");
                     }
                 });
             });
 
-            // OPEN EDIT MODAL
+            // Open edit modal
             $(document).on('click', '.editBtn', function() {
-                let id = $(this).data('id');
-                let name = $(this).data('name');
-                let description = $(this).data('description');
-
-                $('#editID').val(id);
-                $('#editName').val(name);
-                $('#editDescription').val(description);
+                $('#editID').val($(this).data('id'));
+                $('#editName').val($(this).data('name'));
+                $('#editType').val($(this).data('type'));
+                $('#editDescription').val($(this).data('description'));
                 $('#editClassModal').modal('show');
             });
 
-            // UPDATE
+            // Update
             $('#editClassForm').on('submit', function(e) {
                 e.preventDefault();
-                let id = $('#editID').val();
-                let formData = new FormData(this);
+                const id = $('#editID').val();
+                NProgress.start();
                 $.ajax({
                     url: "{{ route('asset.class.update', ':id') }}".replace(':id', id),
                     method: "POST",
-                    data: formData,
-                    processData: false,
-                    contentType: false,
-                    beforeSend: function() {
-                        $('#editSubmitBtn').prop('disabled', true).text('Updating...');
-                    },
+                    data: $(this).serialize(),
                     success: function(res) {
+                        NProgress.done();
                         if (res.success) {
                             $('#editClassModal').modal('hide');
-                            dTable.ajax.reload();
+                            loadAssetClasses();
                             toastr.success(res.message);
-                        } else {
-                            toastr.error(res.message);
                         }
-                        $('#editSubmitBtn').prop('disabled', false).text('Update');
                     },
                     error: function() {
-                        toastr.error("Something went wrong!");
-                        $('#editSubmitBtn').prop('disabled', false).text('Update');
+                        NProgress.done();
+                        toastr.error("Failed to update");
                     }
                 });
             });
         });
 
-
-        // delete Confirm
+        // Delete
         function showDeleteConfirm(id) {
-            event.preventDefault();
             Swal.fire({
-                title: 'Are you sure you want to delete this class?',
-                text: 'If you delete this, it will be gone forever.',
+                title: 'Are you sure?',
+                text: 'This asset class will be deleted permanently!',
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
                 cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, delete it!',
+                confirmButtonText: 'Yes, delete it!'
             }).then((result) => {
                 if (result.isConfirmed) {
                     deleteItem(id);
@@ -273,25 +396,24 @@
             });
         }
 
-        // Delete Button
         function deleteItem(id) {
             NProgress.start();
-            let url = "{{ route('asset.class.delete', ':id') }}";
-            let csrfToken = '{{ csrf_token() }}';
             $.ajax({
                 type: "DELETE",
-                url: url.replace(':id', id),
+                url: "{{ route('asset.class.delete', ':id') }}".replace(':id', id),
                 headers: {
-                    'X-CSRF-TOKEN': csrfToken
+                    'X-CSRF-TOKEN': "{{ csrf_token() }}"
                 },
-                success: function(resp) {
+                success: function(res) {
                     NProgress.done();
-                    toastr.success(resp.message);
-                    $('#datatable').DataTable().ajax.reload();
+                    if (res.success) {
+                        toastr.success(res.message);
+                        location.reload(); // Reload to refresh order
+                    }
                 },
-                error: function(error) {
+                error: function() {
                     NProgress.done();
-                    toastr.error(error.responseJSON.message);
+                    toastr.error("Failed to delete");
                 }
             });
         }

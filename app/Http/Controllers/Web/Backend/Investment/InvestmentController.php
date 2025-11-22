@@ -11,21 +11,45 @@ use App\Models\InvestmentTypes;
 use App\Models\InvestmentStrategy;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use App\Models\TaxStrategy;
 use Yajra\DataTables\Facades\DataTables;
 
 class InvestmentController extends Controller
 {
     /**
-     * Show investments data in datatable
+     * Show investments data in datatable with filtering
      */
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $investments = Investment::with([
+            $query = Investment::with([
                 'assetClass:id,name',
                 'investmentType:id,name',
                 'strategy:id,name'
-            ])->latest('id')->get();
+            ]);
+
+            // Apply filters
+            if ($request->filled('search_text')) {
+                $query->where('title', 'like', '%' . $request->search_text . '%');
+            }
+
+            if ($request->filled('status')) {
+                $query->where('status', $request->status);
+            }
+
+            if ($request->filled('asset_class')) {
+                $query->where('asset_class_id', $request->asset_class);
+            }
+
+            if ($request->filled('investment_type')) {
+                $query->where('investment_type_id', $request->investment_type);
+            }
+
+            if ($request->filled('strategy')) {
+                $query->where('investments_strategy_id', $request->strategy);
+            }
+
+            $investments = $query->latest('id')->get();
 
             return DataTables::of($investments)
                 ->addIndexColumn()
@@ -34,26 +58,39 @@ class InvestmentController extends Controller
                         ? substr($item->title, 0, 40) . '...'
                         : $item->title;
                 })
+                ->addColumn('asset_class', function ($item) {
+                    return $item->assetClass ? $item->assetClass->name : '<span class="badge bg-secondary">N/A</span>';
+                })
+                ->addColumn('investment_type', function ($item) {
+                    return $item->investmentType ? $item->investmentType->name : '<span class="badge bg-secondary">N/A</span>';
+                })
                 ->addColumn('location', function ($item) {
-                    return implode(', ', array_filter([$item->city, $item->state, $item->country]));
+                    $location = array_filter([$item->city, $item->state, $item->country]);
+                    return !empty($location) ? implode(', ', $location) : '<span class="text-muted">N/A</span>';
                 })
                 ->addColumn('status', function ($item) {
                     $statuses = ['draft', 'active', 'closed'];
+                    $statusColors = [
+                        'draft' => 'secondary',
+                        'active' => 'success',
+                        'closed' => 'danger'
+                    ];
+
                     $html = '<div class="dropdown">
-                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">'
+                            <button class="btn btn-sm btn-outline-' . $statusColors[$item->status] . ' dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">'
                         . ucfirst($item->status) .
                         '</button>
-                                <ul class="dropdown-menu">';
+                            <ul class="dropdown-menu">';
 
                     foreach ($statuses as $status) {
                         $activeClass = $item->status === $status ? 'active' : '';
                         $html .= '<li>
-                                    <a class="dropdown-item changeStatus ' . $activeClass . '"
-                                    href="javascript:void(0)"
-                                    data-id="' . $item->id . '"
-                                    data-status="' . $status . '">'
+                                <a class="dropdown-item changeStatus ' . $activeClass . '"
+                                href="javascript:void(0)"
+                                data-id="' . $item->id . '"
+                                data-status="' . $status . '">'
                             . ucfirst($status) . '</a>
-                                </li>';
+                            </li>';
                     }
 
                     $html .= '</ul></div>';
@@ -62,22 +99,35 @@ class InvestmentController extends Controller
                 ->addColumn('created_at', fn($item) => $item->created_at->format('Y-m-d h:i A'))
                 ->addColumn('action', function ($item) {
                     return '
-                    <div class="d-flex justify-content-start gap-2">
-                        <a href="' . route('investment.edit', $item->id) . '"
-                            class="btn btn-sm btn-primary">
-                            <i class="fa fa-pen"></i> Edit
-                        </a>
-                        <button type="button" class="btn btn-sm btn-danger deleteBtn"
-                            onclick="showDeleteConfirm(' . $item->id . ')">
-                            <i class="fa fa-trash"></i> Delete
-                        </button>
-                    </div>';
+                <div class="d-flex justify-content-start gap-2">
+                    <a href="' . route('investment.show', $item->id) . '"
+                        class="btn btn-sm btn-info" title="View Details">
+                        <i class="fa fa-eye"></i>
+                    </a>
+                    <a href="' . route('investment.edit', $item->id) . '"
+                        class="btn btn-sm btn-primary" title="Edit">
+                        <i class="fa fa-pen"></i>
+                    </a>
+                    <button type="button" class="btn btn-sm btn-danger deleteBtn"
+                        onclick="showDeleteConfirm(' . $item->id . ')" title="Delete">
+                        <i class="fa fa-trash"></i>
+                    </button>
+                </div>';
                 })
-                ->rawColumns(['title', 'status', 'action'])
+                ->rawColumns(['title', 'asset_class', 'investment_type', 'location', 'status', 'action'])
                 ->make(true);
         }
 
-        return view("backend.layouts.investment.investment");
+        // For the view
+        $asset_classes = AssetClass::latest('id')->get();
+        $investment_types = InvestmentTypes::latest('id')->get();
+        $strategies = InvestmentStrategy::latest('id')->get();
+
+        return view("backend.layouts.investment.investment", compact([
+            'asset_classes',
+            'investment_types',
+            'strategies'
+        ]));
     }
 
     /**
@@ -88,11 +138,13 @@ class InvestmentController extends Controller
         $asset_classes = AssetClass::latest('id')->get();
         $investment_types = InvestmentTypes::latest('id')->get();
         $strategies = InvestmentStrategy::latest('id')->get();
+        $tax_strategies = TaxStrategy::latest('id')->get();
 
         return view('backend.layouts.investment.create_investment', compact([
             'asset_classes',
             'investment_types',
-            'strategies'
+            'strategies',
+            'tax_strategies'
         ]));
     }
 
@@ -337,5 +389,25 @@ class InvestmentController extends Controller
                 'error' => $e->getMessage()
             ], 404);
         }
+    }
+
+    /**
+     * Show investment details page
+     */
+    public function show($id)
+    {
+        $investment = Investment::with([
+            'assetClass',
+            'investmentType',
+            'strategy',
+            'highlight',
+            'documents',
+            'images',
+            'disclaimers'
+        ])->findOrFail($id);
+
+        // return $investment;exit();
+
+        return view('backend.layouts.investment.show_investment', compact('investment'));
     }
 }

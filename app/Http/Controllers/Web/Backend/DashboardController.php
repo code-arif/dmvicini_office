@@ -2,13 +2,9 @@
 
 namespace App\Http\Controllers\Web\Backend;
 
-use App\Models\Post;
 use App\Models\User;
-use App\Models\Event;
-use App\Models\Venue;
 use App\Models\Investment;
 use Illuminate\Http\Request;
-use App\Models\InvestmentDocument;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 
@@ -33,25 +29,8 @@ class DashboardController extends Controller
             $totalInvested = Investment::where('status', '!=', 'draft')
                 ->sum(DB::raw('CAST(REPLACE(REPLACE(min_investment, ",", ""), "$", "") AS DECIMAL(20,2))'));
 
-            // Total Returns (calculated from targeted_irr)
-            $totalReturns = Investment::where('status', '!=', 'draft')
-                ->get()
-                ->sum(function ($investment) {
-                    $minInvestment = (float) str_replace([',', '$'], '', $investment->min_investment ?? 0);
-                    $irrPercent = (float) str_replace(['%', ' '], '', $investment->targeted_irr ?? 0);
-                    return ($minInvestment * $irrPercent) / 100;
-                });
-
             // Active Deals Count
             $activeDeals = Investment::where('status', 'active')->count();
-
-            // Average ROI (average of all targeted_irr)
-            $avgROI = Investment::where('status', '!=', 'draft')
-                ->whereNotNull('targeted_irr')
-                ->get()
-                ->avg(function ($investment) {
-                    return (float) str_replace(['%', ' '], '', $investment->targeted_irr ?? 0);
-                });
 
             // Approved Deals (active and completed)
             $approvedDeals = Investment::with(['assetClass', 'investmentType', 'strategy'])
@@ -79,7 +58,7 @@ class DashboardController extends Controller
                 });
 
             // Pending Approval Users (email verified but not approved by admin)
-            $pendingUsers = User::with(['profile', 'accessRequests'])
+            $pendingUsers = User::with(['profile'])
                 ->whereNotNull('email_verified_at')
                 ->where('access_level', 'provisional')
                 ->where('is_active', false)
@@ -106,17 +85,9 @@ class DashboardController extends Controller
                         'value' => '$' . number_format($totalInvested, 0),
                         'raw' => $totalInvested,
                     ],
-                    'total_returns' => [
-                        'value' => '$' . number_format($totalReturns, 0),
-                        'raw' => $totalReturns,
-                    ],
                     'active_deals' => [
                         'value' => $activeDeals,
                         'raw' => $activeDeals,
-                    ],
-                    'average_roi' => [
-                        'value' => number_format($avgROI, 1) . '%',
-                        'raw' => $avgROI,
                     ],
                     'approved_deals' => $approvedDeals,
                     'pending_users' => $pendingUsers,
@@ -141,7 +112,6 @@ class DashboardController extends Controller
             $user = User::with([
                 'profile',
                 'profile.firm',
-                'accessRequest',
                 'complianceAcknowledgment'
             ])->find($id);
 
@@ -232,7 +202,7 @@ class DashboardController extends Controller
     public function approveUser(Request $request, $id)
     {
         try {
-            $user = User::with('accessRequest')->find($id);
+            $user = User::find($id);
 
             if (!$user) {
                 return response()->json([
@@ -246,16 +216,6 @@ class DashboardController extends Controller
                 'access_level' => 'full',
                 'is_active' => true,
             ]);
-
-            // Update access request if exists
-            if ($user->accessRequest) {
-                $user->accessRequest->update([
-                    'status' => 'approved',
-                    'verified_at' => now(),
-                    'verified_by' => auth()->id(),
-                    'admin_notes' => $request->input('notes', null),
-                ]);
-            }
 
             return response()->json([
                 'success' => true,

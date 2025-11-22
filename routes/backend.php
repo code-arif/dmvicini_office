@@ -22,6 +22,7 @@ use App\Http\Controllers\Web\Backend\Investment\InvestmentDocController;
 use App\Http\Controllers\Web\Backend\Investment\InvestmentTypeController;
 use App\Http\Controllers\Web\Backend\Investment\InvestmentStrategyController;
 use App\Http\Controllers\Web\Backend\Investment\InvestmentHightlightController;
+use App\Http\Controllers\Web\Backend\Investment\InvestTaxStrategyController;
 
 Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard'); // working
@@ -85,12 +86,14 @@ Route::middleware(['auth', 'admin'])->group(function () {
         Route::post('/pin/{edu_id}', [EducationController::class, 'togglePinned'])->name('pinned.education');
     });
 
-    //investment manage
+    //investment tags
     Route::group(['prefix' => 'investment'], function () {
-        //asset class
+        // Asset Class Routes
         Route::get('/asset-class', [AssetClassController::class, 'index'])->name('show.asset.class.list');
+        Route::get('/asset-class/get-all', [AssetClassController::class, 'getAllClasses'])->name('asset.class.get.all');
         Route::post('/asset-class/store', [AssetClassController::class, 'store'])->name('asset.class.store');
         Route::post('/asset-class/update/{id}', [AssetClassController::class, 'update'])->name('asset.class.update');
+        Route::post('/asset-class/update-order', [AssetClassController::class, 'updateOrder'])->name('asset.class.update.order');
         Route::delete('/asset-class/delete/{id}', [AssetClassController::class, 'destroy'])->name('asset.class.delete');
 
         //inventment type
@@ -105,25 +108,36 @@ Route::middleware(['auth', 'admin'])->group(function () {
         Route::post('/strategy/update/{id}', [InvestmentStrategyController::class, 'update'])->name('investment.strategy.update');
         Route::delete('/strategy/delete/{id}', [InvestmentStrategyController::class, 'destroy'])->name('investment.strategy.delete');
 
-        //investment
-        Route::get('/', [InvestmentController::class, 'index'])->name('get.investments');
+        //tax strategy
+        Route::get('/tax/strategy', [InvestTaxStrategyController::class, 'index'])->name('show.tax.strategy.list');
+        Route::post('/tax/strategy/store', [InvestTaxStrategyController::class, 'store'])->name('tax.strategy.store');
+        Route::post('/tax/strategy/update/{id}', [InvestTaxStrategyController::class, 'update'])->name('tax.strategy.update');
+        Route::delete('/tax/strategy/delete/{id}', [InvestTaxStrategyController::class, 'destroy'])->name('tax.strategy.delete');
     });
 
-    Route::prefix('investment')->name('investment.')->group(function () {
-        Route::get('/list', [InvestmentController::class, 'index'])->name('list'); // working
+    Route::prefix('deal')->name('investment.')->group(function () {
+        Route::get('/list', [InvestmentController::class, 'index'])->name('list');
         Route::get('/create', [InvestmentController::class, 'create'])->name('create');
         Route::post('/store/basic', [InvestmentController::class, 'storeBasic'])->name('basic.store');
         Route::get('/edit/{id}', [InvestmentController::class, 'edit'])->name('edit');
         Route::post('/update/{id}', [InvestmentController::class, 'updateBasic'])->name('update');
         Route::delete('/delete/{id}', [InvestmentController::class, 'destroy'])->name('destroy');
         Route::post('/status/update', [InvestmentController::class, 'updateStatus'])->name('status.update');
-        Route::get('/show/{id}', [InvestmentController::class, 'getInvestment'])->name('show.investment');
+        Route::get('/show/{id}', [InvestmentController::class, 'show'])->name('show'); // Changed from getInvestment
 
-        // investment highlight
+        // Investment highlight
         Route::post('/{id}/highlight', [InvestmentHightlightController::class, 'storeOrUpdateHighlight'])->name('highlight.store');
+
+        // Investment documents
         Route::post('/{id}/document', [InvestmentDocController::class, 'uploadDocument'])->name('document.store');
+        Route::delete('/document/{id}', [InvestmentDocController::class, 'deleteDocument'])->name('document.delete');
+
+        // Investment images
         Route::post('/{id}/images', [InvestmentDocController::class, 'uploadImage'])->name('images.store');
-        Route::post('/{id}/desclaimer', [InvestmentDesclaimerController::class, 'storeDisclaimer'])->name('disclaimer.store');
+        Route::delete('/image/{id}', [InvestmentDocController::class, 'deleteImage'])->name('image.delete');
+
+        // Investment disclaimers
+        Route::post('/{id}/disclaimer', [InvestmentDesclaimerController::class, 'storeOrUpdateDisclaimer'])->name('disclaimer.store');
     });
 
 
