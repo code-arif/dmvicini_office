@@ -11,87 +11,101 @@ use Illuminate\Http\JsonResponse;
 
 class FaqController extends Controller
 {
-    public function index(Request $request) {
+    public function index(Request $request)
+    {
         if ($request->ajax()) {
             $data = Faq::latest();
 
             return DataTables::of($data)
                 ->addIndexColumn()
+                ->addColumn('question', function ($data) {
+                    return '<strong>' . e($data->question) . '</strong>';
+                })
+                ->addColumn('answer', function ($data) {
+                    $text = strip_tags($data->answer);
+                    return strlen($text) > 50 ? substr($text, 0, 50) . '...' : $text;
+                })
                 ->addColumn('status', function ($data) {
-                    $backgroundColor = $data->status == "active" ? '#1e53a4' : '#ccc';
-                    $sliderTranslateX = $data->status == "active" ? '26px' : '2px';
-                    $sliderStyles = "position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; background-color: white; border-radius: 50%; transition: transform 0.3s ease; transform: translateX($sliderTranslateX);";
-
-                    $status = '<div class="form-check form-switch" style="margin-left:40px; position: relative; width: 50px; height: 24px; background-color: ' . $backgroundColor . '; border-radius: 12px; transition: background-color 0.3s ease; cursor: pointer;">';
-                    $status .= '<input onclick="showStatusChangeAlert(' . $data->id . ')" type="checkbox" class="form-check-input" id="customSwitch' . $data->id . '" getAreaid="' . $data->id . '" name="status" style="position: absolute; width: 100%; height: 100%; opacity: 0; z-index: 2; cursor: pointer;">';
-                    $status .= '<span style="' . $sliderStyles . '"></span>';
-                    $status .= '<label for="customSwitch' . $data->id . '" class="form-check-label" style="margin-left: 10px;"></label>';
-                    $status .= '</div>';
-
-                    return $status;
+                    $checked = $data->status == 'active' ? 'checked' : '';
+                    return '<div class="form-check form-switch d-flex justify-content-center">
+                        <input onclick="showStatusChangeAlert(' . $data->id . ')"
+                        type="checkbox"
+                        class="form-check-input"
+                        role="switch"
+                        style="cursor: pointer; width: 50px; height: 24px;"
+                        ' . $checked . '>
+                    </div>';
                 })
-
                 ->addColumn('action', function ($data) {
-                    return '<div class="btn-group btn-group-sm" role="group" aria-label="Basic example">
-                              <a href="' . route('admin.faq.edit', ['id' => $data->id]) . '" class="btn btn-primary text-white" title="Edit">
-                              <i class="bi bi-pencil"></i>
-                              </a>
-                              <a href="#" onclick="showDeleteConfirm(' . $data->id . ')" type="button" class="btn btn-danger text-white" title="Delete">
-                              <i class="bi bi-trash"></i>
-                            </a>
-                            </div>';
+                    return '<div class="d-flex justify-content-start gap-2">
+                        <button type="button" class="btn btn-sm btn-primary editBtn"
+                            data-id="' . $data->id . '"
+                            data-question="' . e($data->question) . '"
+                            data-answer="' . e($data->answer) . '">
+                            <i class="fa fa-edit"></i>
+                        </button>
+                        <button type="button" class="btn btn-sm btn-danger" onclick="showDeleteConfirm(' . $data->id . ')">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </div>';
                 })
-                ->rawColumns(['status', 'action', 'status'])
+                ->rawColumns(['question', 'answer', 'status', 'action'])
                 ->make(true);
         }
         return view('backend.layouts.faq.index');
     }
 
-    public function create() {
-        return view('backend.layouts.faq.create');
-    }
-
-    public function store(Request $request) {
-        $validate = $request->validate([
-            'question' => 'required',
-            'answer' => 'required',
-            'faq_type' => 'nullable',
-        ]);
-
+    public function store(Request $request)
+    {
         try {
-            Faq::create($validate);
-            session()->put('t-success', 'FAQ created successfully');
+            $validated = $request->validate([
+                'question' => 'required|string|max:500',
+                'answer' => 'required|string',
+            ]);
+
+            $validated['status'] = 'active';
+
+            Faq::create($validated);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'FAQ created successfully!',
+            ], 201);
         } catch (Exception $e) {
-            session()->put('t-error', $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error creating FAQ!',
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        return redirect()->route('admin.faq.index')->with('success', 'FAQ created successfully');
     }
 
-    public function edit($id) {
-        $data = Faq::findOrFail($id);
-        return view('backend.layouts.faq.edit', compact('data'));
-    }
-
-    public function update(Request $request, int $id) {
-        $validate = $request->validate([
-            'question' => 'required',
-            'answer' => 'required',
-            'faq_type' => 'nullable',
-        ]);
-
+    public function update(Request $request, int $id)
+    {
         try {
+            $validated = $request->validate([
+                'question' => 'required|string|max:500',
+                'answer' => 'required|string',
+            ]);
+
             $faq = Faq::findOrFail($id);
-            $faq->update($validate);
-            session()->put('t-success', 'FAQ updated successfully');
-        } catch (Exception $e) {
-            session()->put('t-error', $e->getMessage());
-        }
+            $faq->update($validated);
 
-        return redirect()->route('admin.faq.index');
+            return response()->json([
+                'success' => true,
+                'message' => 'FAQ updated successfully!',
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error updating FAQ!',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
-    public function status(int $id): JsonResponse {
+    public function status(int $id): JsonResponse
+    {
         $data = Faq::findOrFail($id);
 
         if (!$data) {
@@ -100,16 +114,20 @@ class FaqController extends Controller
                 'message' => 'FAQ not found.',
             ]);
         }
+
         $data->status = $data->status === 'active' ? 'inactive' : 'active';
         $data->save();
+
         return response()->json([
             'status' => 'success',
             'message' => 'FAQ Status Changed successfully!',
         ]);
     }
 
-    public function destroy(int $id): JsonResponse {
+    public function destroy(int $id): JsonResponse
+    {
         $data = Faq::findOrFail($id);
+
         if (empty($data)) {
             return response()->json([
                 'success' => false,

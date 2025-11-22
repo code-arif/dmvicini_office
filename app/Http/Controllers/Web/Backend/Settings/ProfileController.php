@@ -5,44 +5,68 @@ namespace App\Http\Controllers\Web\Backend\Settings;
 use Exception;
 use App\Models\User;
 use App\Helper\Helper;
-use Illuminate\View\View;
+use App\Models\Profiles;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Validator;
 
 class ProfileController extends Controller
 {
     public function index(Request $request)
     {
-        $user = User::find($request->id);
+        $user = User::with('profile')->find($request->id);
         return view('backend.layouts.settings.profile_settings', compact('user'));
     }
 
+    //update admin profile
     public function UpdateProfile(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name'  => 'nullable|max:100|min:2',
-            'email' => 'nullable|email|unique:users,email,' . auth()->user()->id,
+            'first_name' => 'required|string|max:100|min:2',
+            'last_name'  => 'nullable|string|max:100|min:2',
+            'email'      => 'required|email|unique:users,email,' . auth()->id(),
         ]);
 
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
-        try {
-            $user        = User::find(auth()->user()->id);
-            $user->name  = $request->name;
-            $user->email = $request->email;
 
+        try {
+            DB::beginTransaction();
+
+            $user = User::findOrFail(auth()->id());
+
+            // Update email
+            $user->email = $request->email;
             $user->save();
+
+            // make dummy profile
+            $profile = Profiles::firstOrCreate(
+                ['user_id' => $user->id],
+                ['first_name' => 'David', 'last_name' => 'Vicini'] // default value
+            );
+
+            $profile->first_name = $request->first_name;
+            $profile->last_name  = $request->last_name ?? '';
+            $profile->save();
+
+            DB::commit();
+
             session()->put('t-success', 'Profile updated successfully');
-        } catch (Exception) {
-            session()->put('t-error', 'Something went wrong');
+            return redirect()->back();
+        } catch (Exception $e) {
+            DB::rollBack();
+            session()->put('t-error', 'Something went wrong!');
+            Log::error('Profile Update Error: ' . $e->getMessage());
+            return redirect()->back()->withInput();
         }
-        return redirect()->back();
     }
+
+    // update admin password
     public function UpdatePassword(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -67,6 +91,8 @@ class ProfileController extends Controller
             return redirect()->back()->with('t-error', 'Something went wrong');
         }
     }
+
+    // update admin profile picture
     public function UpdateProfilePicture(Request $request)
     {
         $request->validate([

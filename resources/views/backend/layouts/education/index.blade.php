@@ -39,7 +39,7 @@
                                 <div class="card-options ms-auto">
                                     <button class="btn btn-primary btn-sm" data-bs-toggle="modal"
                                         data-bs-target="#createEducationModal">
-                                        Add Education
+                                        <i class="fa fa-plus"></i> Add Education
                                     </button>
                                 </div>
                             </div>
@@ -54,7 +54,7 @@
                                                 <th>Sub Title</th>
                                                 <th>Category</th>
                                                 <th>Created</th>
-                                                <th>Vabluable</th>
+                                                <th>Status – Active</th>
                                                 <th>Action</th>
                                             </tr>
                                         </thead>
@@ -72,7 +72,7 @@
 
     <!-- CREATE EDUCATION MODAL -->
     <div class="modal fade" id="createEducationModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <form id="createEducationForm" method="post" enctype="multipart/form-data">
                     @csrf
@@ -83,46 +83,53 @@
                     <div class="modal-body">
 
                         <div class="row">
-                            <div class="col-md-6 mb-2">
-                                <label class="form-label">Title</label>
-                                <input type="text" name="title" class="form-control">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Title <span class="text-danger">*</span></label>
+                                <input type="text" name="title" class="form-control" required>
                                 <span class="text-danger error-text title_error"></span>
                             </div>
-                            <div class="col-md-6 mb-2">
+                            <div class="col-md-6 mb-3">
                                 <label class="form-label">Sub Title</label>
                                 <input type="text" name="sub_title" class="form-control">
                                 <span class="text-danger error-text sub_title_error"></span>
                             </div>
                         </div>
 
-                        <div class="mb-2 p-2 rounded-2 bg-light">
-                            <label class="form-label">Category</label>
-                            <select name="category_id" class="form-control">
+                        <div class="mb-3">
+                            <label class="form-label">Category <span class="text-danger">*</span></label>
+                            <select name="category_id" class="form-control" required>
                                 <option value="">-- Select Category --</option>
                                 @foreach ($categories as $category)
                                     <option value="{{ $category->id }}">{{ $category->title }}</option>
                                 @endforeach
                             </select>
-                            <span class="text-muted">Or type new category below</span>
-                            <input type="text" name="category_name" class="form-control mt-1" placeholder="New Category">
+                            <span class="text-danger error-text category_id_error"></span>
                         </div>
 
-                        <div class="mb-2">
+                        <div class="mb-3">
                             <label class="form-label">Description</label>
-                            <textarea name="description" rows="4" class="form-control description"></textarea>
+                            <textarea name="description" id="createDescription" rows="4" class="form-control"></textarea>
                             <span class="text-danger error-text description_error"></span>
                         </div>
 
-                        <div class="mb-2">
+                        <div class="mb-3">
                             <label class="form-label">Image</label>
-                            <input type="file" name="image" class="form-control" accept="image/*">
+                            <input type="file" name="image" id="createImageInput" class="form-control"
+                                accept="image/*">
                             <span class="text-danger error-text image_error"></span>
+                            <!-- Create Preview -->
+                            <div id="createImagePreview" class="mt-3" style="display: none;">
+                                <img src="" alt="Preview" class="border"
+                                    style="max-width: 200px; max-height: 200px;">
+                            </div>
                         </div>
 
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Save</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa fa-save"></i> Save
+                        </button>
                     </div>
                 </form>
             </div>
@@ -144,49 +151,58 @@
                     <div class="modal-body">
 
                         <div class="row">
-                            <div class="col-md-6 mb-2">
-                                <label class="form-label">Title</label>
-                                <input type="text" name="title" id="editTitle" class="form-control">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Title <span class="text-danger">*</span></label>
+                                <input type="text" name="title" id="editTitle" class="form-control" required>
                                 <span class="text-danger error-text title_error"></span>
                             </div>
-                            <div class="col-md-6 mb-2">
+                            <div class="col-md-6 mb-3">
                                 <label class="form-label">Sub Title</label>
                                 <input type="text" name="sub_title" id="editSubTitle" class="form-control">
                                 <span class="text-danger error-text sub_title_error"></span>
                             </div>
                         </div>
 
-                        <div class="mb-2 p-3 rounded-2 bg-light">
-                            <label class="form-label">Category</label>
-                            <select name="category_id" id="editCategoryId" class="form-control">
+                        <div class="mb-3">
+                            <label class="form-label">Category <span class="text-danger">*</span></label>
+                            <select name="category_id" id="editCategoryId" class="form-control" required>
                                 <option value="">-- Select Category --</option>
                                 @foreach ($categories as $category)
                                     <option value="{{ $category->id }}">{{ $category->title }}</option>
                                 @endforeach
                             </select>
-                            <span class="text-muted">Or type new category below</span>
-                            <input type="text" name="category_name" id="editManualCategory" class="form-control mt-1"
-                                placeholder="New Category">
+                            <span class="text-danger error-text category_id_error"></span>
                         </div>
 
-
-                        <div class="mb-2">
+                        <div class="mb-3">
                             <label class="form-label">Description</label>
-                            <textarea name="description" id="editDescription" rows="4" style="display: none"></textarea>
+                            <textarea name="description" id="editDescription" rows="4" class="form-control"></textarea>
                             <span class="text-danger error-text description_error"></span>
                         </div>
 
-                        <div class="mb-2">
+                        <div class="mb-3">
                             <label class="form-label">Image</label>
-                            <input type="file" name="image" id="editImage" class="form-control" accept="image/*">
+                            <input type="file" name="image" id="editImageInput" class="form-control"
+                                accept="image/*">
                             <span class="text-danger error-text image_error"></span>
-                            <div id="currentImage" class="mt-2"></div>
+                            <!-- Edit Preview -->
+                            <div id="editImagePreview" class="mt-3" style="display: none;">
+                                <div class="d-flex align-items-center gap-2">
+                                    <img src="" alt="Preview" class="border"
+                                        style="max-width: 200px; max-height: 200px;">
+                                    <button type="button" class="btn btn-sm btn-danger" id="removeEditImage">
+                                        <i class="fa fa-times"></i> Remove
+                                    </button>
+                                </div>
+                            </div>
                         </div>
 
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Update</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa fa-save"></i> Update
+                        </button>
                     </div>
                 </form>
             </div>
@@ -198,14 +214,51 @@
     <script>
         $(document).ready(function() {
 
-            // Initialize Summernote once
-            $('#editDescription').summernote({
-                height: 200,
+            // Initialize Summernote for both modals with same height
+            $('#createDescription, #editDescription').summernote({
+                height: 250,
                 toolbar: [
                     ['style', ['bold', 'italic', 'underline', 'clear']],
+                    ['font', ['strikethrough', 'superscript', 'subscript']],
                     ['para', ['ul', 'ol', 'paragraph']],
                     ['insert', ['link', 'picture']],
                 ]
+            });
+
+            // ===== IMAGE PREVIEW FUNCTIONALITY =====
+
+            // Create Modal - Image Preview
+            $('#createImageInput').on('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        $('#createImagePreview').show();
+                        $('#createImagePreview img').attr('src', e.target.result);
+                    }
+                    reader.readAsDataURL(file);
+                } else {
+                    $('#createImagePreview').hide();
+                }
+            });
+
+            // Edit Modal - Image Preview (New Upload)
+            $('#editImageInput').on('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        $('#editImagePreview').show();
+                        $('#editImagePreview img').attr('src', e.target.result);
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            // Remove Edit Image Preview
+            $('#removeEditImage').on('click', function() {
+                $('#editImageInput').val('');
+                $('#editImagePreview').hide();
             });
 
             $.ajaxSetup({
@@ -225,6 +278,12 @@
                         searchable: false
                     },
                     {
+                        data: 'image',
+                        name: 'image',
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
                         data: 'title',
                         name: 'title'
                     },
@@ -239,18 +298,14 @@
                         searchable: false
                     },
                     {
-                        data: 'image',
-                        name: 'image',
-                        orderable: false,
-                        searchable: false
-                    },
-                    {
                         data: 'created_at',
                         name: 'created_at'
                     },
                     {
                         data: 'status',
                         name: 'status',
+                        orderable: false,
+                        searchable: false
                     },
                     {
                         data: 'action',
@@ -258,14 +313,15 @@
                         orderable: false,
                         searchable: false
                     },
-                ],
-                rawColumns: ['description', 'image', 'action']
+                ]
             });
 
             // CREATE
             $('#createEducationForm').on('submit', function(e) {
                 e.preventDefault();
                 let formData = new FormData(this);
+
+                NProgress.start();
                 $.ajax({
                     url: "{{ route('education.store') }}",
                     method: "POST",
@@ -273,13 +329,26 @@
                     processData: false,
                     contentType: false,
                     success: function(res) {
+                        NProgress.done();
                         if (res.success) {
                             $('#createEducationModal').modal('hide');
                             $('#createEducationForm')[0].reset();
+                            $('#createDescription').summernote('reset');
                             dTable.ajax.reload();
                             toastr.success(res.message);
                         } else {
                             toastr.error(res.message);
+                        }
+                    },
+                    error: function(xhr) {
+                        NProgress.done();
+                        if (xhr.status === 422) {
+                            let errors = xhr.responseJSON.errors;
+                            Object.keys(errors).forEach(key => {
+                                toastr.error(errors[key][0]);
+                            });
+                        } else {
+                            toastr.error('Something went wrong!');
                         }
                     }
                 });
@@ -292,30 +361,31 @@
                 $('#editTitle').val(e.data('title'));
                 $('#editSubTitle').val(e.data('sub_title'));
                 $('#editCategoryId').val(e.data('category_id'));
-                $('#editManualCategory').val('');
 
-                let desc = e.data('description');
+                let desc = e.data('description') || '';
+                $('#editDescription').summernote('code', desc);
 
-                // Destroy old Summernote content before setting
-                $('#editDescription').summernote('reset');
-                $('#editDescription').summernote('code', desc); // set old description
-
+                // Show existing image if available
                 if (e.data('image')) {
-                    $('#currentImage').html('<img src="{{ asset('') }}/' + e.data('image') +
-                        '" width="80">');
+                    $('#editImagePreview').show();
+                    $('#editImagePreview img').attr('src', '{{ asset('') }}/' + e.data('image'));
                 } else {
-                    $('#currentImage').html('');
+                    $('#editImagePreview').hide();
                 }
+
+                // Clear file input
+                $('#editImageInput').val('');
 
                 $('#editEducationModal').modal('show');
             });
-
 
             // UPDATE
             $('#editEducationForm').on('submit', function(e) {
                 e.preventDefault();
                 let id = $('#editID').val();
                 let formData = new FormData(this);
+
+                NProgress.start();
                 $.ajax({
                     url: "{{ route('education.update', ':id') }}".replace(':id', id),
                     method: "POST",
@@ -323,6 +393,7 @@
                     processData: false,
                     contentType: false,
                     success: function(res) {
+                        NProgress.done();
                         if (res.success) {
                             $('#editEducationModal').modal('hide');
                             dTable.ajax.reload();
@@ -330,17 +401,38 @@
                         } else {
                             toastr.error(res.message);
                         }
+                    },
+                    error: function(xhr) {
+                        NProgress.done();
+                        if (xhr.status === 422) {
+                            let errors = xhr.responseJSON.errors;
+                            Object.keys(errors).forEach(key => {
+                                toastr.error(errors[key][0]);
+                            });
+                        } else {
+                            toastr.error('Something went wrong!');
+                        }
                     }
                 });
             });
+
+            // Reset Summernote when modals are closed
+            $('#createEducationModal, #editEducationModal').on('hidden.bs.modal', function() {
+                $(this).find('form')[0].reset();
+                $(this).find('.summernote').summernote('reset');
+
+                // Hide image previews
+                $('#createImagePreview').hide();
+                $('#editImagePreview').hide();
+            });
         });
 
-        // delete Confirm
+        // Delete Confirm
         function showDeleteConfirm(id) {
             event.preventDefault();
             Swal.fire({
-                title: 'Are you sure you want to delete this education?',
-                text: 'If you delete this, it will be gone forever.',
+                title: 'Are you sure?',
+                text: 'This education will be deleted permanently!',
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
@@ -353,7 +445,7 @@
             });
         }
 
-        // Delete Button
+        // Delete Item
         function deleteItem(id) {
             NProgress.start();
             let url = "{{ route('education.delete', ':id') }}";
@@ -376,28 +468,10 @@
             });
         }
 
-
-        // toggle pinned confirm alert
+        // Toggle Pin (Only one can be pinned at a time)
         function togglePin(id) {
             event.preventDefault();
-            Swal.fire({
-                title: 'Are you sure you want to pinned the education?',
-                text: 'If you pinned this, It will show on the education screen!',
-                icon: 'success',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, Pin It!',
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    pinnedItem(id);
-                }
-            });
-        }
 
-        // Delete Button
-        function pinnedItem(id) {
-            // alert('file deleted');
             NProgress.start();
             let url = "{{ route('pinned.education', ':id') }}";
             let csrfToken = '{{ csrf_token() }}';
@@ -409,12 +483,17 @@
                 },
                 success: function(resp) {
                     NProgress.done();
-                    toastr.success(resp.message);
+                    if (resp.success) {
+                        toastr.success(resp.message);
+                    } else {
+                        toastr.info(resp.message);
+                    }
                     $('#datatable').DataTable().ajax.reload();
                 },
                 error: function(error) {
                     NProgress.done();
-                    toastr.error(error.responseJSON.message);
+                    toastr.error('Failed to update pin status');
+                    $('#datatable').DataTable().ajax.reload();
                 }
             });
         }

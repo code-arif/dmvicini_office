@@ -34,7 +34,7 @@
         }
 
         .order-badge {
-            background: #0d6efd;
+            background: #1e53a4;
             color: white;
             padding: 4px 10px;
             border-radius: 12px;
@@ -44,7 +44,7 @@
 
         .alert-info-custom {
             background: #cfe2ff;
-            border-left: 4px solid #0d6efd;
+            border-left: 4px solid #1e53a4;
             padding: 12px;
             margin-bottom: 20px;
             border-radius: 4px;
@@ -96,7 +96,7 @@
                                         <thead>
                                             <tr>
                                                 <th class="bg-transparent border-bottom-0" style="width: 50px;">Order</th>
-                                                <th class="bg-transparent border-bottom-0" style="width: 60px;"></th>
+                                                <th class="bg-transparent border-bottom-0" style="width: 60px;">Drag</th>
                                                 <th class="bg-transparent border-bottom-0">Name</th>
                                                 <th class="bg-transparent border-bottom-0">Asset Type</th>
                                                 <th class="bg-transparent border-bottom-0">Description</th>
@@ -247,7 +247,7 @@
                 data.forEach((item, index) => {
                     html += `
                         <tr class="sortable-row" data-id="${item.id}">
-                            <td class="text-center">
+                            <td class="text-center bg-light">
                                 <span class="order-badge">${index + 1}</span>
                             </td>
                             <td class="text-center">

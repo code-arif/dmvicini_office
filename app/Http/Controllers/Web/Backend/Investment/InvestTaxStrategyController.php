@@ -5,87 +5,73 @@ namespace App\Http\Controllers\Web\Backend\Investment;
 use Exception;
 use App\Models\TaxStrategy;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
-use Yajra\DataTables\Facades\DataTables;
 
 class InvestTaxStrategyController extends Controller
 {
-    /*
-    * show tax strategy in datatable
-    */
-    public function index(Request $request)
+    /**
+     * Show tax strategy page
+     */
+    public function index()
     {
-        if ($request->ajax()) {
-            $strategies = TaxStrategy::latest('id')->get();
-
-            return DataTables::of($strategies)
-                ->addIndexColumn()
-
-                ->addColumn('name', fn($item) => $item->name)
-
-                ->addColumn('description', function ($item) {
-                    $text = strip_tags($item->description); // remove HTML tags
-                    return strlen($text) > 50
-                        ? substr($text, 0, 50) . '...'
-                        : $text;
-                })
-
-                ->addColumn('created_at', fn($item) => $item->created_at->format('Y-m-d h:i A'))
-
-                ->addColumn('action', function ($item) {
-                    return '
-
-
-                     <button type="button" class="btn btn-sm btn-primary editBtn"
-                            data-id="' . $item->id . '"
-                            data-name="' . e($item->name) . '"
-                            data-description="' . e($item->description) . '">
-                            <i class="fas fa-edit"></i> Edit
-                    </button>
-
-                     <button type="button" class="btn btn-sm btn-danger deleteBtn" onclick="showDeleteConfirm(' . $item->id . ')">
-                        <i class="fa fa-trash"></i> Delete
-                    </button>
-                    ';
-                })
-
-
-                ->rawColumns(['description', 'action'])
-                ->make();
-        }
-
         return view("backend.layouts.investment.tax_strategy");
     }
 
     /**
-     * Investment strategy store
+     * Get all tax strategies ordered by 'order' column
+     */
+    public function getAllTaxStrategies()
+    {
+        try {
+            $strategies = TaxStrategy::orderBy('order', 'ASC')
+                ->orderBy('id', 'ASC')
+                ->get();
+
+            return response()->json([
+                'success' => true,
+                'data' => $strategies
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to load data'
+            ], 500);
+        }
+    }
+
+    /**
+     * Store new tax strategy
      */
     public function store(Request $request)
     {
-        // dd($request->all());
         try {
             $validated_data = $request->validate([
                 'name' => 'required|max:100|string',
                 'description' => 'nullable|string|max:5000'
             ]);
 
+            // Get the max order and add 1
+            $maxOrder = TaxStrategy::max('order') ?? 0;
+            $validated_data['order'] = $maxOrder + 1;
+
             TaxStrategy::create($validated_data);
 
             return response()->json([
                 'success' => true,
-                'message' => 'Strategy added successfully!',
+                'message' => 'Tax strategy added successfully!',
             ], 201);
         } catch (Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error creating stragegy!',
-            ], status: 200);
+                'message' => 'Error creating tax strategy!',
+            ], 500);
         }
     }
 
-    /*
-    * Update tax strategy
-    */
+    /**
+     * Update tax strategy
+     */
     public function update(Request $request, $id)
     {
         try {
@@ -94,34 +80,75 @@ class InvestTaxStrategyController extends Controller
                 'description' => 'nullable|string|max:5000'
             ]);
 
-            $item = TaxStrategy::findOrFail($id);
-            $item->update($validated_data);
+            $strategy = TaxStrategy::findOrFail($id);
+            $strategy->update($validated_data);
 
             return response()->json([
                 'success' => true,
-                'message' => 'Item updated successfully!',
+                'message' => 'Tax strategy updated successfully!',
             ], 200);
         } catch (Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error updating item!',
-            ], 200);
+                'message' => 'Error updating tax strategy!',
+            ], 500);
         }
     }
 
     /**
-     * Delete class
-     **/
+     * Update order of tax strategies
+     */
+    public function updateOrder(Request $request)
+    {
+        try {
+            $orderData = $request->order_data;
+
+            DB::beginTransaction();
+
+            foreach ($orderData as $item) {
+                TaxStrategy::where('id', $item['id'])
+                    ->update(['order' => $item['order']]);
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Order updated successfully!'
+            ]);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update order!'
+            ], 500);
+        }
+    }
+
+    /**
+     * Delete tax strategy
+     */
     public function destroy($id)
     {
-        $item = TaxStrategy::find($id);
+        try {
+            $item = TaxStrategy::findOrFail($id);
+            $deletedOrder = $item->order;
 
-        if (!$item) {
-            return response()->json(['success' => false, 'message' => 'Type not found'], 404);
+            $item->delete();
+
+            // Reorder remaining items
+            TaxStrategy::where('order', '>', $deletedOrder)
+                ->decrement('order');
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Tax strategy deleted successfully'
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error deleting tax strategy'
+            ], 500);
         }
-
-        $item->delete();
-
-        return response()->json(['success' => true, 'message' => 'Type deleted successfully']);
     }
 }

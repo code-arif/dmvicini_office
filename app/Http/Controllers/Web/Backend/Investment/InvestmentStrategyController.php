@@ -5,69 +5,55 @@ namespace App\Http\Controllers\Web\Backend\Investment;
 use Exception;
 use Illuminate\Http\Request;
 use App\Models\InvestmentStrategy;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
-use Yajra\DataTables\Facades\DataTables;
 
 class InvestmentStrategyController extends Controller
 {
-    /*
-    * show investment strategy in datatable
-    */
-    public function index(Request $request)
+    /**
+     * Show investment strategy page
+     */
+    public function index()
     {
-        if ($request->ajax()) {
-            $strategies = InvestmentStrategy::latest('id')->get();
-
-            return DataTables::of($strategies)
-                ->addIndexColumn()
-
-                ->addColumn('name', fn($item) => $item->name)
-
-                ->addColumn('description', function ($item) {
-                    $text = strip_tags($item->description); // remove HTML tags
-                    return strlen($text) > 50
-                        ? substr($text, 0, 50) . '...'
-                        : $text;
-                })
-
-                ->addColumn('created_at', fn($item) => $item->created_at->format('Y-m-d h:i A'))
-
-                ->addColumn('action', function ($item) {
-                    return '
-
-
-                     <button type="button" class="btn btn-sm btn-primary editBtn"
-                            data-id="' . $item->id . '"
-                            data-name="' . e($item->name) . '"
-                            data-description="' . e($item->description) . '">
-                            <i class="fas fa-edit"></i> Edit
-                    </button>
-
-                     <button type="button" class="btn btn-sm btn-danger deleteBtn" onclick="showDeleteConfirm(' . $item->id . ')">
-                        <i class="fa fa-trash"></i> Delete
-                    </button>
-                    ';
-                })
-
-
-                ->rawColumns(['description', 'action'])
-                ->make();
-        }
-
         return view("backend.layouts.investment.investment_strategy");
     }
 
     /**
-     * Investment strategy store
+     * Get all investment strategies ordered by 'order' column
+     */
+    public function getAllStrategies()
+    {
+        try {
+            $strategies = InvestmentStrategy::orderBy('order', 'ASC')
+                ->orderBy('id', 'ASC')
+                ->get();
+
+            return response()->json([
+                'success' => true,
+                'data' => $strategies
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to load data'
+            ], 500);
+        }
+    }
+
+    /**
+     * Store new investment strategy
      */
     public function store(Request $request)
     {
-        // dd($request->all());
         try {
             $validated_data = $request->validate([
                 'name' => 'required|max:100|string',
                 'description' => 'nullable|string|max:5000'
             ]);
+
+            // Get the max order and add 1
+            $maxOrder = InvestmentStrategy::max('order') ?? 0;
+            $validated_data['order'] = $maxOrder + 1;
 
             InvestmentStrategy::create($validated_data);
 
@@ -78,14 +64,14 @@ class InvestmentStrategyController extends Controller
         } catch (Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error creating stragegy!',
-            ], status: 200);
+                'message' => 'Error creating strategy!',
+            ], 500);
         }
     }
 
-    /*
-    * Update investment type
-    */
+    /**
+     * Update investment strategy
+     */
     public function update(Request $request, $id)
     {
         try {
@@ -94,34 +80,75 @@ class InvestmentStrategyController extends Controller
                 'description' => 'nullable|string|max:5000'
             ]);
 
-            $item = InvestmentStrategy::findOrFail($id);
-            $item->update($validated_data);
+            $strategy = InvestmentStrategy::findOrFail($id);
+            $strategy->update($validated_data);
 
             return response()->json([
                 'success' => true,
-                'message' => 'Item updated successfully!',
+                'message' => 'Strategy updated successfully!',
             ], 200);
         } catch (Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error updating item!',
-            ], 200);
+                'message' => 'Error updating strategy!',
+            ], 500);
         }
     }
 
     /**
-     * Delete class
-     **/
+     * Update order of investment strategies
+     */
+    public function updateOrder(Request $request)
+    {
+        try {
+            $orderData = $request->order_data;
+
+            DB::beginTransaction();
+
+            foreach ($orderData as $item) {
+                InvestmentStrategy::where('id', $item['id'])
+                    ->update(['order' => $item['order']]);
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Order updated successfully!'
+            ]);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update order!'
+            ], 500);
+        }
+    }
+
+    /**
+     * Delete investment strategy
+     */
     public function destroy($id)
     {
-        $item = InvestmentStrategy::find($id);
+        try {
+            $item = InvestmentStrategy::findOrFail($id);
+            $deletedOrder = $item->order;
 
-        if (!$item) {
-            return response()->json(['success' => false, 'message' => 'Type not found'], 404);
+            $item->delete();
+
+            // Reorder remaining items
+            InvestmentStrategy::where('order', '>', $deletedOrder)
+                ->decrement('order');
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Strategy deleted successfully'
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error deleting strategy'
+            ], 500);
         }
-
-        $item->delete();
-
-        return response()->json(['success' => true, 'message' => 'Type deleted successfully']);
     }
 }

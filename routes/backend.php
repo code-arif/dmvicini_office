@@ -98,20 +98,26 @@ Route::middleware(['auth', 'admin'])->group(function () {
 
         //inventment type
         Route::get('/type', [InvestmentTypeController::class, 'index'])->name('show.investment.type.list');
+        Route::get('/type/get-all', [InvestmentTypeController::class, 'getAllClasses'])->name('investment.type.all');
         Route::post('/type/store', [InvestmentTypeController::class, 'store'])->name('investment.type.store');
         Route::post('/type/update/{id}', [InvestmentTypeController::class, 'update'])->name('investment.type.update');
+        Route::post('/type/update-order', [InvestmentTypeController::class, 'updateOrder'])->name('investment.type.update.order');
         Route::delete('/type/delete/{id}', [InvestmentTypeController::class, 'destroy'])->name('investment.type.delete');
 
-        //investment strategy
+        // Investment Strategy
         Route::get('/strategy', [InvestmentStrategyController::class, 'index'])->name('show.investment.strategy.list');
+        Route::get('/strategy/get-all', [InvestmentStrategyController::class, 'getAllStrategies'])->name('investment.strategy.all');
         Route::post('/strategy/store', [InvestmentStrategyController::class, 'store'])->name('investment.strategy.store');
         Route::post('/strategy/update/{id}', [InvestmentStrategyController::class, 'update'])->name('investment.strategy.update');
+        Route::post('/strategy/update-order', [InvestmentStrategyController::class, 'updateOrder'])->name('investment.strategy.update.order');
         Route::delete('/strategy/delete/{id}', [InvestmentStrategyController::class, 'destroy'])->name('investment.strategy.delete');
 
-        //tax strategy
+        // Tax Strategy
         Route::get('/tax/strategy', [InvestTaxStrategyController::class, 'index'])->name('show.tax.strategy.list');
+        Route::get('/tax/strategy/get-all', [InvestTaxStrategyController::class, 'getAllTaxStrategies'])->name('tax.strategy.all');
         Route::post('/tax/strategy/store', [InvestTaxStrategyController::class, 'store'])->name('tax.strategy.store');
         Route::post('/tax/strategy/update/{id}', [InvestTaxStrategyController::class, 'update'])->name('tax.strategy.update');
+        Route::post('/tax/strategy/update-order', [InvestTaxStrategyController::class, 'updateOrder'])->name('tax.strategy.update.order');
         Route::delete('/tax/strategy/delete/{id}', [InvestTaxStrategyController::class, 'destroy'])->name('tax.strategy.delete');
     });
 
@@ -157,23 +163,11 @@ Route::middleware(['auth', 'admin'])->group(function () {
 
 Route::controller(FaqController::class)->group(function () {
     Route::get('/faq', 'index')->name('admin.faq.index');
-    Route::get('/faq/create', 'create')->name('admin.faq.create');
-    Route::post('/faq', 'store')->name('admin.faq.store');
-    Route::get('/faq/edit/{id}', 'edit')->name('admin.faq.edit');
-    Route::put('/faq/{id}', 'update')->name('admin.faq.update');
+    Route::post('/faq/store', 'store')->name('admin.faq.store'); // Changed
+    Route::put('/faq/update/{id}', 'update')->name('admin.faq.update'); // Changed
     Route::post('/faq/status/{id}', 'status')->name('admin.faq.status');
-    Route::delete('/faq/{id}', 'destroy')->name('admin.faq.destroy');
+    Route::delete('/faq/destroy/{id}', 'destroy')->name('admin.faq.destroy'); // Changed
 });
-
-
-//! Route for Profile Settings
-Route::controller(ProfileController::class)->group(function () {
-    Route::get('setting/profile', 'index')->name('setting.profile.index');
-    Route::put('setting/profile/update', 'UpdateProfile')->name('setting.profile.update');
-    Route::put('setting/profile/update/Password', 'UpdatePassword')->name('setting.profile.update.Password');
-    Route::post('setting/profile/update/Picture', 'UpdateProfilePicture')->name('update.profile.picture');
-});
-
 
 Route::controller(DynamicPageController::class)->group(function () {
     Route::get('/dynamic-page', 'index')->name('admin.dynamic_page.index');
@@ -188,10 +182,10 @@ Route::controller(DynamicPageController::class)->group(function () {
 
 //! Route for Profile Settings
 Route::controller(ProfileController::class)->group(function () {
-    Route::get('setting/profile', 'index')->name('setting.profile.index');
-    Route::put('setting/profile/update', 'UpdateProfile')->name('setting.profile.update');
-    Route::put('setting/profile/update/Password', 'UpdatePassword')->name('setting.profile.update.Password');
-    Route::post('setting/profile/update/Picture', 'UpdateProfilePicture')->name('update.profile.picture');
+    Route::get('setting/profile', 'index')->name('setting.admin.profile.index');
+    Route::post('setting/profile/update', 'UpdateProfile')->name('setting.admin.profile.update');
+    Route::post('setting/profile/update/password', 'UpdatePassword')->name('setting.admin.rofile.update.password');
+    Route::post('setting/profile/update/picture', 'UpdateProfilePicture')->name('update.admin.profile.picture');
 });
 
 

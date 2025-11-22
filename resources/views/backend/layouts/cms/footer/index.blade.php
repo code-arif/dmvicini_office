@@ -5,6 +5,7 @@
         <div class="side-app">
             <div class="main-container container-fluid">
 
+                <!-- PAGE HEADER -->
                 <div class="page-header">
                     <div>
                         <h1 class="page-title">Footer Management</h1>
@@ -17,11 +18,18 @@
                     </div>
                 </div>
 
+                <!-- ALERTS -->
                 @if (session('success'))
-                    <div class="alert alert-success">{{ session('success') }}</div>
+                    <div class="alert alert-success alert-dismissible fade show">
+                        {{ session('success') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
                 @endif
                 @if (session('error'))
-                    <div class="alert alert-danger">{{ session('error') }}</div>
+                    <div class="alert alert-danger alert-dismissible fade show">
+                        {{ session('error') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
                 @endif
 
                 <form action="{{ route('cms.footer.update') }}" method="POST" enctype="multipart/form-data">
@@ -29,7 +37,7 @@
 
                     <div class="row">
                         <!-- Left Column -->
-                        <div class="col-lg-8">
+                        <div class="col-lg-7">
                             <!-- Logo & Slogan -->
                             <div class="card">
                                 <div class="card-header">
@@ -37,25 +45,29 @@
                                 </div>
                                 <div class="card-body">
                                     <div class="row">
-                                        <div class="col-md-4">
-                                            <label>Logo</label>
-                                            <input type="file" name="logo" class="form-control" accept="image/*">
-                                            @if ($data->logo)
-                                                <div class="mt-2">
-                                                    <img src="{{ asset('/' . $data->logo) }}" class="img-thumbnail"
-                                                        width="80">
-                                                </div>
-                                            @endif
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Logo</label>
+                                            <input type="file" name="logo" id="logoInput" class="form-control"
+                                                accept="image/*">
+                                            @error('logo')
+                                                <span class="text-danger">{{ $message }}</span>
+                                            @enderror
+                                            <!-- Logo Preview -->
+                                            <div id="logoPreview" class="mt-3"
+                                                @if (!$data->logo) style="display: none;" @endif>
+                                                <img src="{{ $data->logo ? asset('/' . $data->logo) : '' }}"
+                                                    alt="Logo Preview" class="img-thumbnail border"
+                                                    style="max-width: 150px; max-height: 150px;">
+                                            </div>
                                         </div>
-                                        <div class="col-md-4">
-                                            <label>Slogan Line 1</label>
-                                            <input type="text" name="slogan_line1"
-                                                value="{{ old('slogan_line1', $data->slogan_line1) }}" class="form-control">
-                                        </div>
-                                        <div class="col-md-4">
-                                            <label>Slogan Line 2</label>
-                                            <input type="text" name="slogan_line2"
-                                                value="{{ old('slogan_line2', $data->slogan_line2) }}" class="form-control">
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">Slogan</label>
+                                            <input type="text" name="slogan_line"
+                                                value="{{ old('slogan_line', $data->slogan_line) }}" class="form-control"
+                                                placeholder="Your company slogan">
+                                            @error('slogan_line')
+                                                <span class="text-danger">{{ $message }}</span>
+                                            @enderror
                                         </div>
                                     </div>
                                 </div>
@@ -68,14 +80,21 @@
                                 </div>
                                 <div class="card-body">
                                     <div class="mb-3">
-                                        <label>Title</label>
+                                        <label class="form-label">Title</label>
                                         <input type="text" name="subscribe_title"
                                             value="{{ old('subscribe_title', $data->subscribe_title) }}"
-                                            class="form-control">
+                                            class="form-control" placeholder="e.g., Subscribe to our newsletter">
+                                        @error('subscribe_title')
+                                            <span class="text-danger">{{ $message }}</span>
+                                        @enderror
                                     </div>
                                     <div class="mb-3">
-                                        <label>Description</label>
-                                        <textarea name="subscribe_description" rows="3" class="form-control">{{ old('subscribe_description', $data->subscribe_description) }}</textarea>
+                                        <label class="form-label">Description</label>
+                                        <textarea name="subscribe_description" rows="3" class="form-control"
+                                            placeholder="Enter subscribe section description">{{ old('subscribe_description', $data->subscribe_description) }}</textarea>
+                                        @error('subscribe_description')
+                                            <span class="text-danger">{{ $message }}</span>
+                                        @enderror
                                     </div>
                                 </div>
                             </div>
@@ -87,94 +106,98 @@
                                 </div>
                                 <div class="card-body">
                                     <div class="mb-3">
-                                        <label>Copyright</label>
+                                        <label class="form-label">Copyright</label>
                                         <input type="text" name="copyright"
-                                            value="{{ old('copyright', $data->copyright) }}" class="form-control">
+                                            value="{{ old('copyright', $data->copyright) }}" class="form-control"
+                                            placeholder="© 2024 Your Company. All rights reserved.">
+                                        @error('copyright')
+                                            <span class="text-danger">{{ $message }}</span>
+                                        @enderror
                                     </div>
                                     <div class="mb-3">
-                                        <label>Disclaimer</label>
-                                        <input type="text" name="disclaimer"
-                                            value="{{ old('disclaimer', $data->disclaimer) }}" class="form-control">
+                                        <label class="form-label">Disclaimer</label>
+                                        <textarea name="disclaimer" rows="2" class="form-control" placeholder="Enter disclaimer text">{{ old('disclaimer', $data->disclaimer) }}</textarea>
+                                        @error('disclaimer')
+                                            <span class="text-danger">{{ $message }}</span>
+                                        @enderror
                                     </div>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Right Column -->
-                        <div class="col-lg-4">
+                        <div class="col-lg-5">
 
                             <!-- Social Links -->
                             <div class="card">
-                                <div class="card-header d-flex justify-content-between">
-                                    <h3 class="card-title">Social Links</h3>
-                                    <button type="button" class="btn btn-sm btn-primary" onclick="addSocial()">Add</button>
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h3 class="card-title mb-0">Social Links</h3>
+                                    <button type="button" class="btn btn-sm btn-primary" onclick="addSocial()">
+                                        <i class="fa fa-plus"></i> Add Social
+                                    </button>
                                 </div>
                                 <div class="card-body" id="social-links-container">
-                                    @foreach (old('social_links', $data->social_links ?? []) as $index => $link)
+                                    @php
+                                        $socialLinks = is_string($data->social_links)
+                                            ? json_decode($data->social_links, true) ?? []
+                                            : $data->social_links ?? [];
+                                    @endphp
+
+                                    @forelse (old('social_links', $socialLinks) as $index => $link)
                                         <div class="social-item mb-3 p-3 border">
-                                            <div class="row g-2">
-                                                <div class="col-4">
+                                            <div class="row g-1">
+                                                <div class="col-md-2">
+                                                    <label class="form-label small">Platform</label>
                                                     <select name="social_links[{{ $index }}][platform]"
-                                                        class="form-control">
-                                                        <option value="">Platform</option>
-                                                        @foreach (['linkedin', 'tiktok', 'youtube', 'medium', 'facebook', 'instagram', 'twitter', 'x'] as $plat)
-                                                            <option value="{{ $plat }}"
-                                                                {{ ($link['platform'] ?? '') == $plat ? 'selected' : '' }}>
-                                                                {{ ucfirst($plat) }}
+                                                        class="form-control form-control-sm">
+                                                        <option value="">Select</option>
+                                                        @foreach (['facebook' => 'Facebook', 'instagram' => 'Instagram', 'twitter' => 'Twitter', 'x' => 'X (Twitter)', 'linkedin' => 'LinkedIn', 'youtube' => 'YouTube', 'tiktok' => 'TikTok', 'medium' => 'Medium'] as $key => $plat)
+                                                            <option value="{{ $key }}"
+                                                                {{ ($link['platform'] ?? '') == $key ? 'selected' : '' }}>
+                                                                {{ $plat }}
                                                             </option>
                                                         @endforeach
                                                     </select>
                                                 </div>
-                                                <div class="col-5">
+                                                <div class="col-md-4">
+                                                    <label class="form-label small">URL</label>
                                                     <input type="url" name="social_links[{{ $index }}][url]"
                                                         value="{{ $link['url'] ?? '' }}" placeholder="https://..."
-                                                        class="form-control">
+                                                        class="form-control form-control-sm">
                                                 </div>
-                                                <div class="col-2">
+                                                <div class="col-md-4">
+                                                    <label class="form-label small">Icon (Optional)</label>
                                                     <input type="file" name="social_links[{{ $index }}][icon]"
                                                         class="form-control form-control-sm" accept="image/*,.svg">
-                                                    @if (isset($link['icon']))
-                                                        <img src="{{ asset('/' . $link['icon']) }}" width="24"
-                                                            class="mt-1">
+                                                    @if (!empty($link['icon']))
+                                                        <input type="hidden"
+                                                            name="social_links[{{ $index }}][existing_icon]"
+                                                            value="{{ $link['icon'] }}">
+                                                        <img src="{{ asset('/' . $link['icon']) }}" width="30"
+                                                            height="30" class="mt-2 border">
                                                     @endif
                                                 </div>
-                                                <div class="col-1">
-                                                    <button type="button" class="btn btn-danger btn-sm"
-                                                        onclick="this.closest('.social-item').remove()">×</button>
+                                                <div class="col-md-1 d-flex align-items-center" style="margin-bottom: 10px">
+                                                    <button type="button" class="btn btn-danger btn-sm w-100"
+                                                        onclick="this.closest('.social-item').remove()">
+                                                        <i class="fa fa-trash"></i>
+                                                    </button>
                                                 </div>
                                             </div>
                                         </div>
-                                    @endforeach
+                                    @empty
+                                        <p class="text-muted text-center">No social links added yet. Click "Add Social" to
+                                            start.</p>
+                                    @endforelse
                                 </div>
                             </div>
 
-                            <!-- Footer Links -->
+                            <!-- Submit Button -->
                             <div class="card">
-                                <div class="card-header d-flex justify-content-between">
-                                    <h3 class="card-title">Footer Links</h3>
-                                    <button type="button" class="btn btn-sm btn-primary"
-                                        onclick="addFooterLink()">Add</button>
-                                </div>
-                                <div class="card-body" id="footer-links-container">
-                                    @foreach (old('footer_links', $data->footer_links ?? []) as $index => $link)
-                                        <div class="footer-link-item mb-2 p-2 border d-flex gap-2">
-                                            <input type="text" name="footer_links[{{ $index }}][title]"
-                                                value="{{ $link['title'] ?? '' }}" placeholder="Title"
-                                                class="form-control form-control-sm">
-                                            <input type="text" name="footer_links[{{ $index }}][url]"
-                                                value="{{ $link['url'] ?? '' }}" placeholder="/url"
-                                                class="form-control form-control-sm">
-                                            <button type="button" class="btn btn-danger btn-sm"
-                                                onclick="this.parentElement.remove()">×</button>
-                                        </div>
-                                    @endforeach
-                                </div>
-                            </div>
-
-                            <!-- Submit -->
-                            <div class="card mt-4">
                                 <div class="card-body text-center">
-                                    <button type="submit" class="btn btn-success btn-lg">Update Footer</button>
+                                    <button type="submit" class="btn btn-success btn-lg">
+                                        <i class="fa fa-save"></i> Update Footer
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -187,47 +210,66 @@
 
 @push('scripts')
     <script>
-        let socialIndex = {{ count(old('social_links', $data->social_links ?? [])) }};
-        let footerLinkIndex = {{ count(old('footer_links', $data->footer_links ?? [])) }};
+        // Logo Live Preview
+        document.getElementById('logoInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            const preview = document.getElementById('logoPreview');
+            const img = preview.querySelector('img');
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    img.src = e.target.result;
+                    preview.style.display = 'block';
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        let socialIndex =
+            {{ count(old('social_links', is_string($data->social_links) ? json_decode($data->social_links, true) ?? [] : $data->social_links ?? [])) }};
 
         function addSocial() {
             const container = document.getElementById('social-links-container');
+
+            // Remove "no social links" message if exists
+            const emptyMsg = container.querySelector('p.text-muted');
+            if (emptyMsg) emptyMsg.remove();
+
             const html = `
-            <div class="social-item mb-3 border">
+            <div class="social-item mb-3 p-3 border">
                 <div class="row g-1">
-                    <div class="col-2">
-                        <select name="social_links[${socialIndex}][platform]" class="form-control">
-                            <option value="">Platform</option>
-                            @foreach (['linkedin', 'tiktok', 'youtube', 'medium', 'facebook', 'instagram', 'twitter', 'x'] as $plat)
-                                <option value="{{ $plat }}">{{ ucfirst($plat) }}</option>
-                            @endforeach
+                    <div class="col-md-2">
+                        <label class="form-label small">Platform</label>
+                        <select name="social_links[${socialIndex}][platform]" class="form-control form-control-sm">
+                            <option value="">Select</option>
+                            <option value="facebook">Facebook</option>
+                            <option value="instagram">Instagram</option>
+                            <option value="twitter">Twitter</option>
+                            <option value="x">X (Twitter)</option>
+                            <option value="linkedin">LinkedIn</option>
+                            <option value="youtube">YouTube</option>
+                            <option value="tiktok">TikTok</option>
+                            <option value="medium">Medium</option>
                         </select>
                     </div>
-                    <div class="col-3">
-                        <input type="url" name="social_links[${socialIndex}][url]" placeholder="https://..." class="form-control">
+                    <div class="col-md-4">
+                        <label class="form-label small">URL</label>
+                        <input type="url" name="social_links[${socialIndex}][url]" placeholder="https://..." class="form-control form-control-sm">
                     </div>
-                    <div class="col-5">
+                    <div class="col-md-4">
+                        <label class="form-label small">Icon (Optional)</label>
                         <input type="file" name="social_links[${socialIndex}][icon]" class="form-control form-control-sm" accept="image/*,.svg">
                     </div>
-                    <div class="col-2">
-                        <button type="button" class="btn btn-danger btn-sm" onclick="this.closest('.social-item').remove()">×</button>
+                    <div class="col-md-1 d-flex align-items-end" style="margin-bottom:3px">
+                        <button type="button" class="btn btn-danger btn-sm w-100" onclick="this.closest('.social-item').remove()">
+                            <i class="fa fa-trash"></i>
+                        </button>
                     </div>
                 </div>
             </div>`;
             container.insertAdjacentHTML('beforeend', html);
             socialIndex++;
-        }
-
-        function addFooterLink() {
-            const container = document.getElementById('footer-links-container');
-            const html = `
-        <div class="footer-link-item mb-2 p-2 border d-flex gap-2">
-            <input type="text" name="footer_links[${footerLinkIndex}][title]" placeholder="Title" class="form-control form-control-sm">
-            <input type="text" name="footer_links[${footerLinkIndex}][url]" placeholder="/url" class="form-control form-control-sm">
-            <button type="button" class="btn btn-danger btn-sm" onclick="this.parentElement.remove()">×</button>
-        </div>`;
-            container.insertAdjacentHTML('beforeend', html);
-            footerLinkIndex++;
         }
     </script>
 @endpush

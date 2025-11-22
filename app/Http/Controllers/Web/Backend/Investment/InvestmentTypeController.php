@@ -5,56 +5,43 @@ namespace App\Http\Controllers\Web\Backend\Investment;
 use Exception;
 use Illuminate\Http\Request;
 use App\Models\InvestmentTypes;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
-use Yajra\DataTables\Facades\DataTables;
 
 class InvestmentTypeController extends Controller
 {
-    /*
-    * show investment types in datatable
-    */
+    /**
+     * Show investment types page
+     */
     public function index(Request $request)
     {
-        if ($request->ajax()) {
-            $types = InvestmentTypes::latest('id')->get();
-
-            return DataTables::of($types)
-                ->addIndexColumn()
-
-                ->addColumn('name', fn($item) => $item->name)
-
-                ->addColumn('description', function ($item) {
-                    return strlen($item->description) > 50
-                        ? substr($item->description, 0, 50) . '...'
-                        : $item->description;
-                })
-
-                ->addColumn('created_at', fn($item) => $item->created_at->format('Y-m-d h:i A'))
-
-                ->addColumn('action', function ($item) {
-                    return '
-                    <button type="button" class="btn btn-sm btn-primary editBtn"
-                        data-id="' . $item->id . '"
-                        data-name="' . $item->name . '"
-                        data-description="' . $item->description . '">
-                        <i class="fa fa-edit"></i> Edit
-                    </button>
-                     <button type="button" class="btn btn-sm btn-danger deleteBtn" onclick="showDeleteConfirm(' . $item->id . ')">
-                        <i class="fa fa-trash"></i> Delete
-                    </button>
-                    ';
-                })
-
-
-                ->rawColumns(['description', 'action'])
-                ->make();
-        }
-
         return view("backend.layouts.investment.investment_type");
     }
 
     /**
-     * Investment type store
+     * Get all investment types ordered by 'order' column
+     */
+    public function getAllClasses()
+    {
+        try {
+            $types = InvestmentTypes::orderBy('order', 'ASC')
+                ->orderBy('id', 'ASC')
+                ->get();
+
+            return response()->json([
+                'success' => true,
+                'data' => $types
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to load data'
+            ], 500);
+        }
+    }
+
+    /**
+     * Store new investment type
      */
     public function store(Request $request)
     {
@@ -63,6 +50,10 @@ class InvestmentTypeController extends Controller
                 'name' => 'required|max:100|string',
                 'description' => 'nullable|string|max:5000'
             ]);
+
+            // Get the max order and add 1
+            $maxOrder = InvestmentTypes::max('order') ?? 0;
+            $validated_data['order'] = $maxOrder + 1;
 
             InvestmentTypes::create($validated_data);
 
@@ -74,13 +65,13 @@ class InvestmentTypeController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Error creating type!',
-            ], status: 200);
+            ], 500);
         }
     }
 
-    /*
-    * Update investment type
-    */
+    /**
+     * Update investment type
+     */
     public function update(Request $request, $id)
     {
         try {
@@ -100,23 +91,64 @@ class InvestmentTypeController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Error updating type!',
-            ], 200);
+            ], 500);
         }
     }
 
     /**
-     * Delete class
-     **/
+     * Update order of investment types
+     */
+    public function updateOrder(Request $request)
+    {
+        try {
+            $orderData = $request->order_data;
+
+            DB::beginTransaction();
+
+            foreach ($orderData as $item) {
+                InvestmentTypes::where('id', $item['id'])
+                    ->update(['order' => $item['order']]);
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Order updated successfully!'
+            ]);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update order!'
+            ], 500);
+        }
+    }
+
+    /**
+     * Delete investment type
+     */
     public function destroy($id)
     {
-        $item = InvestmentTypes::find($id);
+        try {
+            $item = InvestmentTypes::findOrFail($id);
+            $deletedOrder = $item->order;
 
-        if (!$item) {
-            return response()->json(['success' => false, 'message' => 'Type not found'], 404);
+            $item->delete();
+
+            // Reorder remaining items
+            InvestmentTypes::where('order', '>', $deletedOrder)
+                ->decrement('order');
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Type deleted successfully'
+            ]);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error deleting type'
+            ], 500);
         }
-
-        $item->delete();
-
-        return response()->json(['success' => true, 'message' => 'Type deleted successfully']);
     }
 }

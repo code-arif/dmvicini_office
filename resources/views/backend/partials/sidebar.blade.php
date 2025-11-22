@@ -79,16 +79,16 @@
                 {{-- blog/education --}}
                 <li class="slide">
                     <a class="side-menu__item" data-bs-toggle="slide" href="#">
-                        <i class="fa-solid fa-blog"></i>
+                        <i class="fa-brands fa-edge-legacy"></i>
                         <span class="side-menu__label">Education</span>
                         <i class="angle fa fa-angle-right"></i>
                     </a>
 
 
                     <ul class="slide-menu">
-                        <li><a href="{{ route('show.category.list') }}" class="slide-item">Categories</a>
+                        <li><a href="{{ route('show.category.list') }}" class="slide-item">Education Categories</a>
                         </li>
-                        <li><a href="{{ route('show.education.list') }}" class="slide-item">Education</a>
+                        <li><a href="{{ route('show.education.list') }}" class="slide-item">Articles</a>
                         </li>
                     </ul>
                 </li>
@@ -149,7 +149,7 @@
                     <ul class="slide-menu">
                         <li><a href="{{ route('setting.general.index') }}" class="slide-item">General Settings</a>
                         </li>
-                        <li><a href="{{ route('setting.profile.index') }}" class="slide-item">Profile Settings</a>
+                        <li><a href="{{ route('setting.admin.profile.index') }}" class="slide-item">Profile Settings</a>
                         </li>
 
                     </ul>

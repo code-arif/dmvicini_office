@@ -34,16 +34,16 @@
                                 <div class="row mb-4">
 
                                     <div class="form-group">
-                                        <label for="username" class="form-label">Name:</label>
+                                        <label for="username" class="form-label">Project Name:</label>
                                         <input type="text" class="form-control @error('name') is-invalid @enderror"
-                                            name="name" placeholder="Name" id="username"
+                                            name="name" placeholder="Enter Project Name" id="username"
                                             value="{{ $setting->name ?? old('name') ?? '' }}">
                                         @error('name')
                                         <span class="text-danger">{{ $message }}</span>
                                         @enderror
                                     </div>
 
-                                    <div class="form-group">
+                                    {{-- <div class="form-group">
                                         <label for="title" class="form-label">Title:</label>
                                         <input type="text" class="form-control @error('title') is-invalid @enderror"
                                             name="title" placeholder="Title" id="title"
@@ -51,27 +51,27 @@
                                         @error('title')
                                         <span class="text-danger">{{ $message }}</span>
                                         @enderror
-                                    </div>
-                                    
-                                    <div class="form-group">
+                                    </div> --}}
+
+                                    {{-- <div class="form-group">
                                         <label for="description" class="form-label">Description:</label>
                                         <textarea class="description form-control @error('description') is-invalid @enderror"
                                             name="description" placeholder="Description" id="description">{{ $setting->description ?? old('description') ?? '' }}</textarea>
                                         @error('description')
                                         <span class="text-danger">{{ $message }}</span>
                                         @enderror
-                                    </div>
+                                    </div> --}}
 
-                                    <div class="form-group">
+                                    {{-- <div class="form-group">
                                         <label for="keywords" class="form-label">Keywords:</label>
                                         <textarea class="description form-control @error('keywords') is-invalid @enderror"
                                             name="keywords" placeholder="Keywords" id="keywords">{{ $setting->keywords ?? old('keywords') ?? '' }}</textarea>
                                         @error('keywords')
                                         <span class="text-danger">{{ $message }}</span>
                                         @enderror
-                                    </div>
-                                    
-                                    <div class="form-group">
+                                    </div> --}}
+
+                                    {{-- <div class="form-group">
                                         <label for="author" class="form-label">Author:</label>
                                         <input type="text" class="form-control @error('author') is-invalid @enderror"
                                             name="author" placeholder="Author" id="author"
@@ -79,9 +79,9 @@
                                         @error('author')
                                         <span class="text-danger">{{ $message }}</span>
                                         @enderror
-                                    </div>
+                                    </div> --}}
 
-                                    <div class="form-group">
+                                    {{-- <div class="form-group">
                                         <label for="phone" class="form-label">Phone:</label>
                                         <input type="text" class="form-control @error('phone') is-invalid @enderror"
                                             name="phone" placeholder="Phone" id="phone"
@@ -89,9 +89,9 @@
                                         @error('phone')
                                         <span class="text-danger">{{ $message }}</span>
                                         @enderror
-                                    </div>
+                                    </div> --}}
 
-                                    <div class="form-group">
+                                    {{-- <div class="form-group">
                                         <label for="email" class="form-label">Email:</label>
                                         <input type="email" class="form-control @error('email') is-invalid @enderror"
                                             name="email" placeholder="Email" id="email"
@@ -99,9 +99,9 @@
                                         @error('email')
                                         <span class="text-danger">{{ $message }}</span>
                                         @enderror
-                                    </div>
+                                    </div> --}}
 
-                                    <div class="form-group">
+                                    {{-- <div class="form-group">
                                         <label for="address" class="form-label">Address:</label>
                                         <input type="text" class="form-control @error('address') is-invalid @enderror"
                                             name="address" placeholder="Address" id="address"
@@ -109,9 +109,9 @@
                                         @error('address')
                                         <span class="text-danger">{{ $message }}</span>
                                         @enderror
-                                    </div>
+                                    </div> --}}
 
-                                    <div class="form-group">
+                                    {{-- <div class="form-group">
                                         <label for="copyright" class="form-label">Copyright:</label>
                                         <input type="text" class="form-control @error('copyright') is-invalid @enderror"
                                             name="copyright" placeholder="Copyright" id="copyright"
@@ -119,7 +119,7 @@
                                         @error('copyright')
                                         <span class="text-danger">{{ $message }}</span>
                                         @enderror
-                                    </div>
+                                    </div> --}}
 
                                     <div class="row">
                                         <div class="col-md-6">

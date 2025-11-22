@@ -13,15 +13,12 @@ return new class extends Migration
         Schema::create('footers', function (Blueprint $table) {
             $table->id();
             $table->string('logo')->nullable();
-            $table->string('slogan_line1')->nullable();
-            $table->string('slogan_line2')->nullable();
+            $table->string('slogan_line')->nullable();
             $table->string('subscribe_title')->nullable();
             $table->text('subscribe_description')->nullable();
             $table->string('copyright')->nullable();
             $table->text('disclaimer')->nullable();
             $table->json('social_links')->nullable();
-            $table->json('footer_links')->nullable();
-            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
     }

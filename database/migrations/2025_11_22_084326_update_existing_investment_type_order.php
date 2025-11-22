@@ -1,7 +1,9 @@
 <?php
 
-use App\Models\AssetClass;
+use App\Models\InvestmentTypes;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -11,11 +13,11 @@ return new class extends Migration
     public function up(): void
     {
         // Set order for existing records
-        $classes = AssetClass::orderBy('id', 'ASC')->get();
+        $types = InvestmentTypes::orderBy('id', 'ASC')->get();
 
-        foreach ($classes as $index => $class) {
-            $class->order = $index + 1;
-            $class->save();
+        foreach ($types as $index => $type) {
+            $types->order = $index + 1;
+            $types->save();
         }
     }
 
@@ -25,6 +27,6 @@ return new class extends Migration
     public function down(): void
     {
         // Reset all orders to 0
-        AssetClass::query()->update(['order' => 0]);
+        InvestmentTypes::query()->update(['order' => 0]);
     }
 };

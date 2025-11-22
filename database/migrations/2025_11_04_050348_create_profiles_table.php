@@ -17,12 +17,12 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
 
             // Basic Info
-            $table->string('first_name');
-            $table->string('last_name');
+            $table->string('first_name')->nullable();
+            $table->string('last_name')->nullable();
             $table->string('title')->nullable();
-            $table->string('firm_name');
-            $table->string('phone'); // E.164 format
-            $table->string('country');
+            $table->string('firm_name')->nullable();
+            $table->string('phone')->nullable(); // E.164 format
+            $table->string('country')->nullable();
 
             // Investor Info
             $table->string('investor_type')->nullable()->default('other');

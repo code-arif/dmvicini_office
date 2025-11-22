@@ -24,24 +24,6 @@ class EducationController extends Controller
             return DataTables::of($educations)
                 ->addIndexColumn()
 
-                // Title
-                ->addColumn('title', fn($item) => $item->title)
-
-                // Sub Title
-                ->addColumn('sub_title', fn($item) => $item->sub_title ?? '-')
-
-                // Category
-                // ->addColumn('category', fn($item) => $item->category->title ?? 'Uncategorized')
-                ->addColumn('category', function ($item) {
-                    if ($item->category && $item->category->title) {
-                        $title = e($item->category->title);
-                        return '<span class="badge rounded-pill bg-info text-dark">' . $title . '</span>';
-                    }
-                    // return '<span class="badge rounded-pill bg-danger-subtle text-danger">Uncategorized</span>';
-                    return '<span class="badge rounded-pill red-accent">Uncategorized</span>';
-                })
-
-
                 // Image (render as <img>)
                 ->addColumn('image', function ($item) {
                     if ($item->image) {
@@ -50,31 +32,30 @@ class EducationController extends Controller
                     return '-';
                 })
 
+                // Title
+                ->addColumn('title', fn($item) => $item->title)
+
+                // Sub Title
+                ->addColumn('sub_title', fn($item) => $item->sub_title ?? '-')
+
+                // Category
+                ->addColumn('category', function ($item) {
+                    if ($item->category && $item->category->title) {
+                        $title = e($item->category->title);
+                        return '<span class="badge rounded-pill bg-info text-dark">' . $title . '</span>';
+                    }
+                    return '<span class="badge rounded-pill red-accent">Uncategorized</span>';
+                })
+
                 // Created at
                 ->addColumn('created_at', fn($item) => $item->created_at->format('Y-m-d h:i A'))
 
-                // Action buttons
-                ->addColumn('action', function ($item) {
-                    return '
-                    <div class="d-flex justify-content-start gap-2">
-                        <button type="button" class="btn btn-sm btn-primary editBtn"
-                            data-id="' . $item->id . '"
-                            data-title="' . e($item->title) . '"
-                            data-sub_title="' . e($item->sub_title) . '"
-                            data-description="' . e($item->description) . '"
-                            data-category_id="' . $item->category_id . '"
-                            data-image="' . $item->image . '">
-                            <i class="fas fa-edit"></i> Edit
-                        </button>
-                        <button type="button" class="btn btn-sm btn-danger deleteBtn" onclick="showDeleteConfirm(' . $item->id . ')">
-                            <i class="fas fa-trash"></i> Delete
-                        </button>
-                    </div>
-                        ';
-                })
-                // status (Pin/Unpin toggle)
+                // status (Pin/Unpin toggle) - Only one can be pinned at a time
                 ->addColumn('status', function ($item) {
-                    $isPinned = $item->pinnedByUser ? true : false;
+                    $isPinned = PinnedEducation::where('education_id', $item->id)
+                        ->where('user_id', auth()->id())
+                        ->exists();
+
                     $checked = $isPinned ? 'checked' : '';
 
                     return '<div class="form-check form-switch d-flex justify-content-center align-items-center">
@@ -87,6 +68,26 @@ class EducationController extends Controller
                         </div>';
                 })
 
+                // Action buttons
+                ->addColumn('action', function ($item) {
+                    return '
+                    <div class="d-flex justify-content-start gap-2">
+                        <button type="button" class="btn btn-sm btn-primary editBtn"
+                            data-id="' . $item->id . '"
+                            data-title="' . e($item->title) . '"
+                            data-sub_title="' . e($item->sub_title) . '"
+                            data-description="' . e($item->description) . '"
+                            data-category_id="' . $item->category_id . '"
+                            data-image="' . $item->image . '">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button type="button" class="btn btn-sm btn-danger deleteBtn" onclick="showDeleteConfirm(' . $item->id . ')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                        ';
+                })
+
                 ->rawColumns(['action', 'image', 'category', 'status'])
                 ->make(true);
         }
@@ -97,25 +98,14 @@ class EducationController extends Controller
     //store education
     public function store(Request $request)
     {
-        // dd($request->all());
         try {
             $validated_data = $request->validate([
                 'title'       => 'required|string|max:250',
                 'sub_title'   => 'nullable|string|max:250',
                 'description' => 'nullable|string',
-                'category_id' => 'nullable|exists:categories,id',
-                'category_name' => 'nullable|string|max:100',
-                'image'       => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'category_id' => 'required|exists:categories,id',
+                'image'       => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240',
             ]);
-
-            // Category check (if no category_id but new category name given)
-            if (!$request->category_id && $request->category_name) {
-                $category = Category::create([
-                    'title'       => $request->category_name,
-                    'description' => null,
-                ]);
-                $validated_data['category_id'] = $category->id;
-            }
 
             // Image upload
             if ($request->hasFile('image')) {
@@ -149,23 +139,12 @@ class EducationController extends Controller
                 'title'         => 'required|string|max:250',
                 'sub_title'     => 'nullable|string|max:250',
                 'description'   => 'nullable|string',
-                'category_id'   => 'nullable|exists:categories,id',
-                'category_name' => 'nullable|string|max:100',
-                'image'         => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'category_id'   => 'required|exists:categories,id',
+                'image'         => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240',
             ]);
-
-            // Category check (if no category_id but new category name given)
-            if (!$request->category_id && $request->category_name) {
-                $category = Category::create([
-                    'title'       => $request->category_name,
-                    'description' => null,
-                ]);
-                $validated_data['category_id'] = $category->id;
-            }
 
             // Image upload (replace old image if new one uploaded)
             if ($request->hasFile('image')) {
-                // চাইলে আগের ফাইল delete করতে পারো
                 if ($education->image && file_exists(public_path('/' . $education->image))) {
                     unlink(public_path('/' . $education->image));
                 }
@@ -192,7 +171,6 @@ class EducationController extends Controller
     //delete education
     public function destroy($id)
     {
-
         $item = Education::find($id);
 
         if (!$item) {
@@ -207,8 +185,7 @@ class EducationController extends Controller
         return response()->json(['success' => true, 'message' => 'Item deleted successfully']);
     }
 
-    //education pinned/unpinned
-    // education pinned/unpinned
+    //education pinned/unpinned - Only one can be pinned at a time
     public function togglePinned($id)
     {
         $user = auth()->user();
@@ -219,7 +196,7 @@ class EducationController extends Controller
             return response()->json(['success' => false, 'message' => 'Item not found'], 404);
         }
 
-        // Check if the user already pinned the education
+        // Check if the user already pinned this education
         $alreadyPinned = PinnedEducation::where('education_id', $education->id)
             ->where('user_id', $user->id)
             ->first();
@@ -233,7 +210,10 @@ class EducationController extends Controller
                 'message' => '📍 Education Unpinned!',
             ], 200);
         } else {
-            // Pin the education
+            // First, unpin all other educations for this user
+            PinnedEducation::where('user_id', $user->id)->delete();
+
+            // Then pin this education
             PinnedEducation::create([
                 'education_id' => $education->id,
                 'user_id'      => $user->id,
@@ -241,7 +221,7 @@ class EducationController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => '📍 Education Pinned!',
+                'message' => '📍 Education Pinned! (Previous pin removed)',
             ], 200);
         }
     }

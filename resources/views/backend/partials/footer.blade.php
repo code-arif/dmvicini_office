@@ -2,8 +2,9 @@
            <div class="container">
                <div class="row align-items-center flex-row-reverse">
                    <div class="col-md-12 col-sm-12 text-center">
-                        {{ date('Y') }} &copy; {{ ucfirst(config('app.name')) }}
-                       <!-- Copyright © 2022 <a href="#">Noa</a>. Designed with <span class="fa fa-heart text-danger"></span> by <a href="#"> Spruko </a> All rights reserved -->
+                       Copyright &copy; {{ date('Y') }} <span class="text-primary">
+                           {{ \App\Models\Setting::first()->name ?? 'Pinnacle Alt’s Platform' }}
+                       </span> All rights reserved
                    </div>
                </div>
            </div>
