@@ -107,28 +107,23 @@ Route::middleware(['auth', 'admin'])->group(function () {
 
         //investment
         Route::get('/', [InvestmentController::class, 'index'])->name('get.investments');
+    });
 
+    Route::prefix('investment')->name('investment.')->group(function () {
+        Route::get('/list', [InvestmentController::class, 'index'])->name('list'); // working
+        Route::get('/create', [InvestmentController::class, 'create'])->name('create');
+        Route::post('/store/basic', [InvestmentController::class, 'storeBasic'])->name('basic.store');
+        Route::get('/edit/{id}', [InvestmentController::class, 'edit'])->name('edit');
+        Route::post('/update/{id}', [InvestmentController::class, 'updateBasic'])->name('update');
+        Route::delete('/delete/{id}', [InvestmentController::class, 'destroy'])->name('destroy');
+        Route::post('/status/update', [InvestmentController::class, 'updateStatus'])->name('status.update');
+        Route::get('/show/{id}', [InvestmentController::class, 'getInvestment'])->name('show.investment');
 
-
-        Route::post('/update/{id}', [InvestmentController::class, 'update'])->name('update.investment');
-
-
-        Route::prefix('investment')->name('investment.')->group(function () {
-            Route::get('/list', [InvestmentController::class, 'index'])->name('list'); // working
-            Route::get('/create', [InvestmentController::class, 'create'])->name('create');
-            Route::post('/store/basic', [InvestmentController::class, 'storeBasic'])->name('basic.store');
-            Route::get('/edit/{id}', [InvestmentController::class, 'edit'])->name('edit');
-            Route::post('/update/{id}', [InvestmentController::class, 'updateBasic'])->name('update');
-            Route::delete('/delete/{id}', [InvestmentController::class, 'destroy'])->name('destroy');
-            Route::post('/status/update', [InvestmentController::class, 'updateStatus'])->name('status.update');
-            Route::get('/show/{id}', [InvestmentController::class, 'getInvestment'])->name('show.investment');
-
-            // investment highlight
-            Route::post('/{id}/highlight', [InvestmentHightlightController::class, 'storeOrUpdateHighlight'])->name('highlight.store');
-            Route::post('/{id}/document', [InvestmentDocController::class, 'uploadDocument'])->name('document.store');
-            Route::post('/{id}/images', [InvestmentDocController::class, 'uploadImage'])->name('images.store');
-            Route::post('/{id}/desclaimer', [InvestmentDesclaimerController::class, 'storeDisclaimer'])->name('disclaimer.store');
-        });
+        // investment highlight
+        Route::post('/{id}/highlight', [InvestmentHightlightController::class, 'storeOrUpdateHighlight'])->name('highlight.store');
+        Route::post('/{id}/document', [InvestmentDocController::class, 'uploadDocument'])->name('document.store');
+        Route::post('/{id}/images', [InvestmentDocController::class, 'uploadImage'])->name('images.store');
+        Route::post('/{id}/desclaimer', [InvestmentDesclaimerController::class, 'storeDisclaimer'])->name('disclaimer.store');
     });
 
 
