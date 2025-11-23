@@ -80,13 +80,13 @@
                 <li class="slide">
                     <a class="side-menu__item" data-bs-toggle="slide" href="#">
                         <i class="fa-brands fa-edge-legacy"></i>
-                        <span class="side-menu__label">Education</span>
+                        <span class="side-menu__label">Articles</span>
                         <i class="angle fa fa-angle-right"></i>
                     </a>
 
 
                     <ul class="slide-menu">
-                        <li><a href="{{ route('show.category.list') }}" class="slide-item">Education Categories</a>
+                        <li><a href="{{ route('show.category.list') }}" class="slide-item">Article Categories</a>
                         </li>
                         <li><a href="{{ route('show.education.list') }}" class="slide-item">Articles</a>
                         </li>

@@ -24,6 +24,6 @@ class AdminNewRegistrationMail extends Mailable implements ShouldQueue
     public function build()
     {
         return $this->subject('New Registration: ' . $this->user->profile->first_name . ' ' . $this->user->profile->last_name)
-            ->markdown('emails.admin.new_registration');
+            ->view('emails.admin.new_registration');
     }
 }

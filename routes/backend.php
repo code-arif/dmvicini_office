@@ -54,7 +54,6 @@ Route::middleware(['auth', 'admin'])->group(function () {
         Route::delete('/{id}', [UserListController::class, 'destroy'])->name('destroy');
     });
 
-
     // cms management
     Route::prefix('cms')->name('cms.')->group(function () {
         //help center page
@@ -66,7 +65,6 @@ Route::middleware(['auth', 'admin'])->group(function () {
         Route::post('/footer/update', [FooterManageController::class, 'update'])->name('footer.update');
     });
 
-
     //category management
     Route::group(['prefix' => 'category'], function () {
         Route::get('/', [CategoryController::class, 'index'])->name('show.category.list');
@@ -75,8 +73,8 @@ Route::middleware(['auth', 'admin'])->group(function () {
         Route::delete('/delete/{id}', [CategoryController::class, 'destroy'])->name('category.delete');
     });
 
-    //education manage
-    Route::group(['prefix' => 'education'], function () {
+    //article manage
+    Route::group(['prefix' => 'article'], function () {
         Route::get('/', [EducationController::class, 'index'])->name('show.education.list');
         Route::post('/store', [EducationController::class, 'store'])->name('education.store');
         Route::post('/update/{id}', [EducationController::class, 'update'])->name('education.update');

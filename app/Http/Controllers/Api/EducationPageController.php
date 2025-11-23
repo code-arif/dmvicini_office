@@ -14,6 +14,7 @@ use App\Http\Resources\EducationResource;
 class EducationPageController extends Controller
 {
     use ApiResponse;
+
     //education list
     public function getEducationlist(Request $request)
     {
@@ -56,14 +57,12 @@ class EducationPageController extends Controller
 
         return $this->success(
             [
-                'educations'  => EducationResource::collection($educations),
+                'articles'  => EducationResource::collection($educations),
                 'pagination'  => [
                     'total'        => $educations->total(),
                     'current_page' => $educations->currentPage(),
                     'last_page'    => $educations->lastPage(),
                     'per_page'     => $educations->perPage(),
-                    'from'         => $educations->firstItem(),
-                    'to'           => $educations->lastItem(),
                 ],
             ],
             'Educations retrieved successfully.',
@@ -102,7 +101,7 @@ class EducationPageController extends Controller
     //pinned education
     public function pinnedEducation()
     {
-        $pinnedEdu = PinnedEducation::latest()->first();
+        $pinnedEdu = PinnedEducation::with('education')->first();
         return $this->success($pinnedEdu, 'Pinned Education Retrieve Successfully.', 200);
     }
 

@@ -21,7 +21,7 @@ class InvestmentController extends Controller
     {
         $perPage = $request->input('per_page', 10);
 
-        $query = Investment::with(['assetClass', 'investmentType', 'strategy'])->where('status', 'active')->latest('id');
+        $query = Investment::with(['assetClass', 'investmentType', 'strategy', 'highlight'])->where('status', 'active')->latest('id');
 
         // Search by title
         if ($request->filled('title')) {
@@ -138,16 +138,12 @@ class InvestmentController extends Controller
                 'title'           => $item->title,
                 'term'            => $item->term,
                 'min_investment'  => $item->min_investment,
-                'min_investment_numeric' => (float) $minInvestmentClean, // For frontend sorting/filtering
-                'targeted_irr'    => $item->targeted_irr,
-                'targeted_eps'    => $item->targeted_eps,
+                'targeted_irr'    => $item->highlight->targeted_irr,
                 'p_strategy'      => optional($item->strategy)->name,
                 'asset_class'     => optional($item->assetClass)->name,
                 'investment_type' => optional($item->investmentType)->name,
                 'location'        => trim("{$item->city}, {$item->country}", ', '),
-                'thumbnail'       => $item->thumbnail ? url($item->thumbnail) : null,
-                'sponsor'         => $item->sponsor,
-                'fund_name'       => $item->fund_name,
+                'thumbnail'       => $item->mountain_image ? url($item->mountain_image) : null,
                 'property_type'   => $item->property_type,
                 'launch_date'     => $item->launch_date,
                 'close_date'      => $item->close_date,

@@ -23,6 +23,6 @@ class UserWelcomeVerificationMail extends Mailable
     public function build()
     {
         return $this->subject('New Registration: ' . $this->user->profile->first_name . ' ' . $this->user->profile->last_name)
-            ->markdown('emails.user.user_welcome_verification_mail');
+            ->view('emails.user.user_welcome_verification_mail');
     }
 }

@@ -1,5 +1,5 @@
 @extends('backend.app')
-@section('title', 'Import Investments')
+@section('title', 'Import Deals')
 
 @section('content')
     <div class="app-content main-content mt-0">
@@ -7,7 +7,7 @@
             <div class="main-container container-fluid">
                 <div class="page-header">
                     <div>
-                        <h1 class="page-title">Import Investments</h1>
+                        <h1 class="page-title">Import Deals</h1>
                     </div>
                     <div class="ms-auto pageheader-btn">
                         <ol class="breadcrumb">
@@ -21,7 +21,7 @@
                     <div class="col-12">
                         <div class="card">
                             <div class="card-header">
-                                <h3 class="card-title">Upload CSV/Excel File</h3>
+                                <h3 class="card-title">Upload Deals - CSV/Excel File</h3>
                                 <div class="ms-auto">
                                     <a href="{{ route('investments.download-template') }}" class="btn btn-success btn-sm">
                                         <i class="fa fa-download"></i> Download Template
@@ -35,7 +35,7 @@
                                     <ul>
                                         <li>Download the template file using the button above</li>
                                         <li>Fill in your investment data following the template format</li>
-                                        <li>Supported formats: CSV, XLS, XLSX (Max: 100MB)</li>
+                                        <li>Supported formats: CSV, XLS, XLSX (Max: 500MB)</li>
                                         <li>Make sure column headers match exactly with the template</li>
                                         <li>Empty rows will be skipped automatically</li>
                                     </ul>
@@ -48,7 +48,7 @@
                                         <label class="form-label">Select File</label>
                                         <input type="file" name="file" id="fileInput" class="form-control"
                                             accept=".csv,.xlsx,.xls" required>
-                                        <small class="text-muted">Allowed: CSV, XLSX, XLS (Max 10MB)</small>
+                                        <small class="text-muted">Allowed: CSV, XLSX, XLS (Max 500MB)</small>
                                     </div>
 
                                     <div class="mb-3">

@@ -433,7 +433,8 @@
             documentStore: "{{ route('investment.document.store', $investment->id) }}",
             imagesStore: "{{ route('investment.images.store', $investment->id) }}",
             disclaimerStore: "{{ route('investment.disclaimer.store', $investment->id) }}",
-            updateBasic: "{{ route('investment.update', $investment->id) }}"
+            updateBasic: "{{ route('investment.update', $investment->id) }}",
+            deleteDoc: "{{ route('investment.document.delete', $investment->id) }}"
         };
 
         const investmentId = {{ $investment->id }};
@@ -641,7 +642,7 @@
 
             NProgress.start();
             $.ajax({
-                url: `/deal/document/${docId}`,
+                url: window.routes.deleteDoc,
                 type: "DELETE",
                 headers: {
                     'X-CSRF-TOKEN': "{{ csrf_token() }}"
@@ -825,104 +826,6 @@
             disclaimers.splice(index, 1);
             renderDisclaimers();
         }
-
-        // function submitInvestment() {
-        //     NProgress.start();
-
-        //     const promises = [];
-
-        //     // 1. Save highlights
-        //     const highlightData = {
-        //         overview: $('#overview').summernote('code'),
-        //         targeted_irr: $('[name="targeted_irr"]').val(),
-        //         tax_doc: $('[name="tax_doc"]').val(),
-        //         investor_waterfall: $('#investor_waterfall').summernote('code'),
-        //         promoted_interest: $('#promoted_interest').summernote('code'),
-        //         asset_management_fee: $('[name="asset_management_fee"]').val(),
-        //         organizational_and_offering_fee: $('[name="organizational_and_offering_fee"]').val(),
-        //         acquisition_fee: $('[name="acquisition_fee"]').val(),
-        //         disposition_fee: $('[name="disposition_fee"]').val(),
-        //         fund_administration_fee: $('[name="fund_administration_fee"]').val(),
-        //         _token: "{{ csrf_token() }}"
-        //     };
-
-        //     promises.push(
-        //         $.ajax({
-        //             url: window.routes.highlightStore,
-        //             type: "POST",
-        //             data: highlightData
-        //         })
-        //     );
-
-        //     // 2. Upload new documents
-        //     documents.forEach(doc => {
-        //         const formData = new FormData();
-        //         formData.append('name', doc.name);
-        //         formData.append('file', doc.file);
-        //         formData.append('_token', "{{ csrf_token() }}");
-
-        //         promises.push(
-        //             $.ajax({
-        //                 url: window.routes.documentStore,
-        //                 type: "POST",
-        //                 data: formData,
-        //                 processData: false,
-        //                 contentType: false
-        //             })
-        //         );
-        //     });
-
-        //     // 3. Upload new images
-        //     if (images.length > 0) {
-        //         const imageFormData = new FormData();
-        //         images.forEach(img => imageFormData.append('images[]', img));
-        //         imageFormData.append('_token', "{{ csrf_token() }}");
-
-        //         promises.push(
-        //             $.ajax({
-        //                 url: window.routes.imagesStore,
-        //                 type: "POST",
-        //                 data: imageFormData,
-        //                 processData: false,
-        //                 contentType: false
-        //             })
-        //         );
-        //     }
-
-        //     // 4. Save new disclaimers
-        //     disclaimers.forEach(disc => {
-        //         promises.push(
-        //             $.ajax({
-        //                 url: window.routes.disclaimerStore,
-        //                 type: "POST",
-        //                 data: {
-        //                     title: disc.title,
-        //                     description: disc.description,
-        //                     _token: "{{ csrf_token() }}"
-        //                 }
-        //             })
-        //         );
-        //     });
-
-        //     // Execute all promises
-        //     Promise.all(promises)
-        //         .then(() => {
-        //             NProgress.done();
-        //             toastr.success('Investment updated successfully!');
-        //             setTimeout(() => {
-        //                 window.location.href = "{{ route('investment.list') }}";
-        //             }, 1500);
-        //         })
-        //         .catch(err => {
-        //             NProgress.done();
-        //             console.error(err);
-        //             let message = 'Failed to complete investment update';
-        //             if (err.responseJSON && err.responseJSON.message) {
-        //                 message = err.responseJSON.message;
-        //             }
-        //             toastr.error(message);
-        //         });
-        // }
 
 
         // Update submitInvestment function for edit page

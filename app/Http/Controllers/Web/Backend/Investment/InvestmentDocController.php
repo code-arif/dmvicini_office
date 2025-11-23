@@ -24,7 +24,7 @@ class InvestmentDocController extends Controller
 
         $request->validate([
             'name' => 'required|string|max:255',
-            'file' => 'required|file|mimes:pdf,doc,docx,xlsx,ppt,pptx|max:20480',
+            'file' => 'required|file|max:51200',
         ]);
 
         try {
@@ -48,7 +48,7 @@ class InvestmentDocController extends Controller
                 'message' => 'Document uploaded successfully!'
             ]);
         } catch (\Exception $e) {
-            \Log::error('Document upload failed', [
+            Log::error('Document upload failed', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
@@ -94,7 +94,7 @@ class InvestmentDocController extends Controller
     public function uploadImage(Request $request, $investment_id)
     {
         $request->validate([
-            'images.*' => 'required|image|mimes:jpeg,png,jpg,webp|max:5120'
+            'images.*' => 'required|image|max:10240'
         ]);
 
         $uploaded = [];

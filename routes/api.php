@@ -28,29 +28,16 @@ Route::group(['middleware' => 'guest:api'], function () {
     Route::post('/register', [AuthenticationController::class, 'register']); // working
 
     // Password Reset
-    Route::post('/forgot-password', [ResetPasswordController::class, 'forgotPassword']);
-    Route::post('/resend-otp', [ResetPasswordController::class, 'resendOtp']);
-    Route::post('/verify-otp', [ResetPasswordController::class, 'verifyOTP']);
-    Route::post('/reset-password', [ResetPasswordController::class, 'ResetPassword']);
+    Route::post('/forgot-password', [ResetPasswordController::class, 'forgotPassword']); // working
+    Route::post('/resend-otp', [ResetPasswordController::class, 'resendOtp']); // working
+    Route::post('/verify-otp', [ResetPasswordController::class, 'verifyOTP']); // working
+    Route::post('/reset-password', [ResetPasswordController::class, 'ResetPassword']); // working
 
     //help center page routes
-    Route::get('/faq', [HelpcenterPageController::class, 'getFaqs']);
+    Route::get('/faq', [HelpcenterPageController::class, 'getFaqs']); //
 
     //help center hero section route
     Route::get('/hero', [HelpcenterPageController::class, 'helpCenterHero']);
-
-    //eudcation routes
-    Route::get('/education/list', [EducationPageController::class, 'getEducationlist']); // working
-
-    //pinned education
-    Route::get('/pinned/education', [EducationPageController::class, 'pinnedEducation']); // working
-
-    // investment list
-    Route::get('/investment-list', [InvestmentController::class, 'investmentList']); // working
-
-    // filtering item
-    Route::get('/investment-strategy', [InvestmentController::class, 'investmentStrategy']); // get asset class
-    Route::get('/filter-data', [InvestmentController::class, 'filterData']); // get country list
 
 
     Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe']);
@@ -70,8 +57,20 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::post('/update-firm', [UserProfileController::class, 'updateFirm']); // working
 
 
-    Route::get('/education/{id}', [EducationPageController::class, 'show']); // education details
-    Route::get('/investment/{id}', [InvestmentController::class, 'show']); // investment details
+    Route::get('/articles/list', [EducationPageController::class, 'getEducationlist']); // working - articles list
+    Route::get('/article/{id}', [EducationPageController::class, 'show']); // working - education details
+    Route::get('/pinned/article', [EducationPageController::class, 'pinnedEducation']); // working - pinned articles
+
+
+    // investment list
+    Route::get('/deals-list', [InvestmentController::class, 'investmentList']); // working
+    Route::get('/deals/{id}', [InvestmentController::class, 'show']); // investment details
+
+    // filtering item
+    Route::get('/deals-strategy', [InvestmentController::class, 'investmentStrategy']); // get asset class
+    Route::get('/filter-data', [InvestmentController::class, 'filterData']); // get country list
+
+
     Route::get('/categories', [EducationPageController::class, 'getCategories']); // categories list
 
     // footer data
