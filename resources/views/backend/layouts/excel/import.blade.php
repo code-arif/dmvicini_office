@@ -55,7 +55,7 @@
                                         <button type="submit" class="btn btn-primary" id="importBtn">
                                             <i class="fa fa-upload"></i> Import Data
                                         </button>
-                                        <a href="{{ route('get.investments') }}" class="btn btn-secondary">
+                                        <a href="{{ route('investment.list') }}" class="btn btn-secondary">
                                             Cancel
                                         </a>
                                     </div>
@@ -145,7 +145,7 @@
                             if (response.details.failed === 0) {
                                 setTimeout(function() {
                                     window.location.href =
-                                        "{{ route('get.investments') }}";
+                                        "{{ route('investment.list') }}";
                                 }, 3000);
                             }
                         }

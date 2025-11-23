@@ -27,7 +27,7 @@ class UserListController extends Controller
                 ->addColumn('name', function ($user) {
                     $avatar = $user->avatar
                         ? asset('/' . $user->avatar)
-                        : asset('default/default_image.jpg');
+                        : asset('default/profile.jpg');
 
                     $email = $user->email;
                     $fullName = $user->profile
@@ -111,7 +111,7 @@ class UserListController extends Controller
                     'email' => $user->email,
                     'avatar' => $user->avatar
                         ? asset('/' . $user->avatar)
-                        : asset('default/default_image.jpg'),
+                        : asset('default/profile.jpg'),
                     'access_level' => $user->access_level,
                     'is_active' => $user->is_active,
                     'created_at' => $user->created_at->format('M d, Y h:i A'),

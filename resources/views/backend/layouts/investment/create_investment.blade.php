@@ -98,7 +98,7 @@
                                             </div>
                                             <div class="col-md-3 mb-3">
                                                 <label class="form-label">Tax Strategy</label>
-                                                <select name="investments_strategy_id" class="form-select">
+                                                <select name="tax_strategie_id" class="form-select">
                                                     <option value="">-- Select --</option>
                                                     @foreach ($tax_strategies as $item)
                                                         <option value="{{ $item->id }}">{{ $item->name }}</option>
@@ -177,7 +177,7 @@
                                     <div class="step-content" data-step="3">
                                         <h4 class="mb-4">Investment Highlights</h4>
                                         <div class="mb-3">
-                                            <label class="form-label">Overview</label>
+                                            <label class="form-label">Summary</label>
                                             <textarea name="overview" id="overview" class="form-control"></textarea>
                                         </div>
                                         <div class="row">
@@ -322,10 +322,8 @@
         let map, marker, geocoder, searchBox;
         let documents = [];
         let images = [];
-        let disclaimers = [];
 
         $(document).ready(function() {
-            // Initialize Summernote for all rich text editors including disclaimer
             $('#investmentDetails, #overview, #investor_waterfall, #promoted_interest, #disclaimerDescription')
                 .summernote({
                     height: 200,
@@ -340,10 +338,8 @@
                     ]
                 });
 
-            // Initialize Google Map
             initMap();
 
-            // Mountain image preview
             $('input[name="mountain_image"]').on('change', function() {
                 if (this.files && this.files[0]) {
                     let reader = new FileReader();
@@ -354,7 +350,6 @@
                 }
             });
 
-            // Navigation
             $('#nextBtn').on('click', () => {
                 if (currentStep === 1 && !investmentId) {
                     saveBasicInfo();
@@ -365,15 +360,8 @@
 
             $('#prevBtn').on('click', () => navigateStep(-1));
             $('#submitBtn').on('click', submitInvestment);
-
-            // Documents
             $('#addDocumentBtn').on('click', addDocument);
-
-            // Gallery
             $('#galleryImages').on('change', previewGalleryImages);
-
-            // Disclaimers
-            $('#addDisclaimerBtn').on('click', addDisclaimer);
         });
 
         function initMap() {
@@ -384,17 +372,20 @@
 
             map = new google.maps.Map(document.getElementById('map'), {
                 center: dhaka,
-                zoom: 13
+                zoom: 13,
+                mapTypeControl: true,
+                streetViewControl: true,
+                fullscreenControl: true
             });
 
             marker = new google.maps.Marker({
                 map: map,
                 position: dhaka,
-                draggable: true
+                draggable: true,
+                animation: google.maps.Animation.DROP
             });
 
             geocoder = new google.maps.Geocoder();
-
             const input = document.getElementById('searchBox');
             searchBox = new google.maps.places.SearchBox(input);
 
@@ -404,10 +395,19 @@
 
             searchBox.addListener('places_changed', () => {
                 const places = searchBox.getPlaces();
-                if (places.length == 0) return;
+
+                if (places.length == 0) {
+                    console.log('No places found');
+                    return;
+                }
 
                 const place = places[0];
-                if (!place.geometry || !place.geometry.location) return;
+                console.log('Selected place:', place);
+
+                if (!place.geometry || !place.geometry.location) {
+                    console.log('Place has no geometry');
+                    return;
+                }
 
                 marker.setPosition(place.geometry.location);
                 map.setCenter(place.geometry.location);
@@ -417,20 +417,33 @@
             });
 
             marker.addListener('dragend', function() {
+                console.log('Marker dragged to:', marker.getPosition());
                 reverseGeocode(marker.getPosition());
             });
 
             map.addListener('click', function(e) {
+                console.log('Map clicked at:', e.latLng);
                 marker.setPosition(e.latLng);
                 reverseGeocode(e.latLng);
             });
+
+            console.log('Map initialized');
         }
 
         function reverseGeocode(location) {
+            console.log('Reverse geocoding:', location.lat(), location.lng());
+
             geocoder.geocode({
                 location: location
             }, (results, status) => {
+                console.log('Geocode status:', status);
+
                 if (status === 'OK' && results[0]) {
+                    console.log('Geocode result:', results[0]);
+
+                    $('#latitude').val(location.lat());
+                    $('#longitude').val(location.lng());
+
                     updateLocationFields({
                         geometry: {
                             location: location
@@ -438,32 +451,78 @@
                         formatted_address: results[0].formatted_address,
                         address_components: results[0].address_components
                     });
+                } else {
+                    console.error('Geocode failed:', status);
+                    toastr.warning('Could not get location details');
                 }
             });
         }
 
         function updateLocationFields(place) {
-            $('#latitude').val(place.geometry.location.lat());
-            $('#longitude').val(place.geometry.location.lng());
-            $('#address').val(place.formatted_address);
+            const lat = place.geometry.location.lat();
+            const lng = place.geometry.location.lng();
+
+            $('#latitude').val(lat);
+            $('#longitude').val(lng);
+
+            console.log('Coordinates:', {
+                lat,
+                lng
+            });
+
+            if (place.formatted_address) {
+                $('#address').val(place.formatted_address);
+                console.log('Address:', place.formatted_address);
+            }
 
             if (place.address_components) {
+                $('#country').val('');
+                $('#state').val('');
+                $('#city').val('');
+
                 place.address_components.forEach(component => {
-                    if (component.types.includes('country')) {
+                    const types = component.types;
+                    console.log('Component:', component.long_name, types);
+
+                    if (types.includes('country')) {
                         $('#country').val(component.long_name);
                     }
-                    if (component.types.includes('administrative_area_level_1')) {
+
+                    if (types.includes('administrative_area_level_1')) {
                         $('#state').val(component.long_name);
                     }
-                    if (component.types.includes('locality')) {
+
+                    if (types.includes('locality')) {
+                        $('#city').val(component.long_name);
+                    } else if (types.includes('administrative_area_level_2') && !$('#city').val()) {
+                        $('#city').val(component.long_name);
+                    } else if (types.includes('sublocality_level_1') && !$('#city').val()) {
                         $('#city').val(component.long_name);
                     }
                 });
+
+                console.log('Location fields updated:', {
+                    country: $('#country').val(),
+                    state: $('#state').val(),
+                    city: $('#city').val(),
+                    address: $('#address').val()
+                });
+
+                toastr.success('Location updated successfully');
             }
         }
 
         function saveBasicInfo() {
             const formData = new FormData($('#investmentForm')[0]);
+
+            console.log('Saving basic info with location:', {
+                country: formData.get('country'),
+                state: formData.get('state'),
+                city: formData.get('city'),
+                address: formData.get('address'),
+                latitude: formData.get('latitude'),
+                longitude: formData.get('longitude')
+            });
 
             NProgress.start();
             $.ajax({
@@ -474,16 +533,21 @@
                 contentType: false,
                 success: function(res) {
                     NProgress.done();
-                    if (res.success) {
+                    if (res.success && res.investment_id) {
                         investmentId = res.investment_id;
+                        console.log('Investment created with ID:', investmentId);
                         toastr.success(res.message);
+                        $(`.step-item[data-step="1"]`).addClass('completed');
                         navigateStep(1);
                     }
                 },
                 error: function(xhr) {
                     NProgress.done();
+                    console.error('Save error:', xhr);
                     let message = 'Failed to save basic info';
-                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                    if (xhr.responseJSON && xhr.responseJSON.errors) {
+                        message = Object.values(xhr.responseJSON.errors).flat().join('<br>');
+                    } else if (xhr.responseJSON && xhr.responseJSON.message) {
                         message = xhr.responseJSON.message;
                     }
                     toastr.error(message);
@@ -498,11 +562,19 @@
         function goToStep(step) {
             if (step < 1 || step > totalSteps) return;
 
+            if (step > 1 && !investmentId) {
+                toastr.error('Please complete Step 1 first');
+                return;
+            }
+
             $(`.step-content[data-step="${currentStep}"]`).removeClass('active');
-            $(`.step-item[data-step="${currentStep}"]`).removeClass('active').addClass('completed');
+
+            if (step > currentStep) {
+                $(`.step-item[data-step="${currentStep}"]`).removeClass('active').addClass('completed');
+            }
 
             $(`.step-content[data-step="${step}"]`).addClass('active');
-            $(`.step-item[data-step="${step}"]`).addClass('active');
+            $(`.step-item[data-step="${step}"]`).addClass('active').removeClass('completed');
 
             currentStep = step;
 
@@ -534,13 +606,13 @@
             let html = '<div class="list-group">';
             documents.forEach((doc, index) => {
                 html += `
-                    <div class="list-group-item d-flex justify-content-between align-items-center">
-                        <span><i class="fa fa-file"></i> ${doc.name}</span>
-                        <button type="button" class="btn btn-sm btn-danger" onclick="removeDocument(${index})">
-                            <i class="fa fa-trash"></i>
-                        </button>
-                    </div>
-                `;
+            <div class="list-group-item d-flex justify-content-between align-items-center">
+                <span><i class="fa fa-file"></i> ${doc.name}</span>
+                <button type="button" class="btn btn-sm btn-danger" onclick="removeDocument(${index})">
+                    <i class="fa fa-trash"></i>
+                </button>
+            </div>
+        `;
             });
             html += '</div>';
             $('#documentsList').html(html);
@@ -564,13 +636,13 @@
                 reader.readAsDataURL(file);
 
                 html += `
-                    <div class="image-preview-item">
-                        <img id="img-preview-${index}" src="" alt="Preview">
-                        <button type="button" class="remove-btn" onclick="removeImage(${index})">
-                            <i class="fa fa-times"></i>
-                        </button>
-                    </div>
-                `;
+            <div class="image-preview-item">
+                <img id="img-preview-${index}" src="" alt="Preview">
+                <button type="button" class="remove-btn" onclick="removeImage(${index})">
+                    <i class="fa fa-times"></i>
+                </button>
+            </div>
+        `;
             });
 
             $('#imagePreviewGrid').html(html);
@@ -584,62 +656,16 @@
             previewGalleryImages.call($('#galleryImages')[0]);
         }
 
-        function addDisclaimer() {
-            const title = $('#disclaimerTitle').val().trim();
-            const description = $('#disclaimerDescription').val().trim();
-
-            if (!title) {
-                toastr.error('Please provide disclaimer title');
-                return;
-            }
-
-            disclaimers.push({
-                title,
-                description
-            });
-            renderDisclaimers();
-            $('#disclaimerTitle').val('');
-            $('#disclaimerDescription').val('');
-        }
-
-        function renderDisclaimers() {
-            let html = '<div class="list-group">';
-            disclaimers.forEach((disc, index) => {
-                html += `
-                    <div class="list-group-item">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div>
-                                <h6>${disc.title}</h6>
-                                ${disc.description ? `<p class="mb-0 text-muted">${disc.description}</p>` : ''}
-                            </div>
-                            <button type="button" class="btn btn-sm btn-danger" onclick="removeDisclaimer(${index})">
-                                <i class="fa fa-trash"></i>
-                            </button>
-                        </div>
-                    </div>
-                `;
-            });
-            html += '</div>';
-            $('#disclaimersList').html(html);
-        }
-
-        function removeDisclaimer(index) {
-            disclaimers.splice(index, 1);
-            renderDisclaimers();
-        }
-
-        // Update submitInvestment function
         function submitInvestment() {
             if (!investmentId) {
                 toastr.error('Please complete step 1 first');
                 return;
             }
 
+            console.log('Starting submission with ID:', investmentId);
             NProgress.start();
-
             const promises = [];
 
-            // 1. Save highlights
             const highlightData = {
                 overview: $('#overview').summernote('code'),
                 targeted_irr: $('[name="targeted_irr"]').val(),
@@ -654,41 +680,47 @@
                 _token: "{{ csrf_token() }}"
             };
 
+            const highlightUrl = window.routes.highlightStore.replace(':id', investmentId);
+
             promises.push(
                 $.ajax({
-                    url: window.routes.highlightStore,
+                    url: highlightUrl,
                     type: "POST",
                     data: highlightData
                 })
             );
 
-            // 2. Upload documents
-            documents.forEach(doc => {
-                const formData = new FormData();
-                formData.append('name', doc.name);
-                formData.append('file', doc.file);
-                formData.append('_token', "{{ csrf_token() }}");
+            if (documents.length > 0) {
+                documents.forEach((doc, index) => {
+                    const formDocument = new FormData();
+                    formDocument.append('name', doc.name);
+                    formDocument.append('file', doc.file);
+                    formDocument.append('_token', "{{ csrf_token() }}");
 
-                promises.push(
-                    $.ajax({
-                        url: window.routes.documentStore,
-                        type: "POST",
-                        data: formData,
-                        processData: false,
-                        contentType: false
-                    })
-                );
-            });
+                    const documentUrl = window.routes.documentStore.replace(':id', investmentId);
 
-            // 3. Upload images
+                    promises.push(
+                        $.ajax({
+                            url: documentUrl,
+                            type: "POST",
+                            data: formDocument,
+                            processData: false,
+                            contentType: false
+                        })
+                    );
+                });
+            }
+
             if (images.length > 0) {
                 const imageFormData = new FormData();
                 images.forEach(img => imageFormData.append('images[]', img));
                 imageFormData.append('_token', "{{ csrf_token() }}");
 
+                const imagesUrl = window.routes.imagesStore.replace(':id', investmentId);
+
                 promises.push(
                     $.ajax({
-                        url: window.routes.imagesStore,
+                        url: imagesUrl,
                         type: "POST",
                         data: imageFormData,
                         processData: false,
@@ -697,12 +729,13 @@
                 );
             }
 
-            // 4. Save disclaimer (single)
             const disclaimerContent = $('#disclaimerDescription').summernote('code');
             if (disclaimerContent && disclaimerContent.trim() !== '') {
+                const disclaimerUrl = window.routes.disclaimerStore.replace(':id', investmentId);
+
                 promises.push(
                     $.ajax({
-                        url: window.routes.disclaimerStore,
+                        url: disclaimerUrl,
                         type: "POST",
                         data: {
                             description: disclaimerContent,
@@ -712,23 +745,39 @@
                 );
             }
 
-            // Execute all promises
             Promise.all(promises)
                 .then(() => {
                     NProgress.done();
-                    toastr.success('Investment created successfully!');
-                    setTimeout(() => {
+                    console.log('All requests completed');
+
+                    Swal.fire({
+                        title: 'Success',
+                        text: 'Investment created successfully',
+                        icon: 'success',
+                        confirmButtonText: 'View List',
+                        confirmButtonColor: '#0d6efd'
+                    }).then(() => {
                         window.location.href = "{{ route('investment.list') }}";
-                    }, 1500);
+                    });
                 })
                 .catch(err => {
                     NProgress.done();
-                    console.error(err);
+                    console.error('Submission error:', err);
+
                     let message = 'Failed to complete investment creation';
                     if (err.responseJSON && err.responseJSON.message) {
                         message = err.responseJSON.message;
+                    } else if (err.responseJSON && err.responseJSON.errors) {
+                        message = Object.values(err.responseJSON.errors).flat().join('<br>');
                     }
-                    toastr.error(message);
+
+                    Swal.fire({
+                        title: 'Error',
+                        html: message,
+                        icon: 'error',
+                        confirmButtonText: 'OK',
+                        confirmButtonColor: '#dc3545'
+                    });
                 });
         }
     </script>

@@ -69,6 +69,11 @@ class Investment extends Model
         return $this->hasOne(InvestmentDisclaimer::class);
     }
 
+    public function tax_strategies()
+    {
+        return $this->hasOne(InvestmentDisclaimer::class);
+    }
+
 
     public function images()
     {

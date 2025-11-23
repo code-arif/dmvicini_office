@@ -121,6 +121,32 @@ Route::middleware(['auth', 'admin'])->group(function () {
         Route::delete('/tax/strategy/delete/{id}', [InvestTaxStrategyController::class, 'destroy'])->name('tax.strategy.delete');
     });
 
+    // Route::prefix('deal')->name('investment.')->group(function () {
+    //     Route::get('/list', [InvestmentController::class, 'index'])->name('list');
+    //     Route::get('/create', [InvestmentController::class, 'create'])->name('create');
+    //     Route::post('/store/basic', [InvestmentController::class, 'storeBasic'])->name('basic.store');
+    //     Route::get('/edit/{id}', [InvestmentController::class, 'edit'])->name('edit');
+    //     Route::post('/update/{id}', [InvestmentController::class, 'updateBasic'])->name('update');
+    //     Route::delete('/delete/{id}', [InvestmentController::class, 'destroy'])->name('destroy');
+    //     Route::post('/status/update', [InvestmentController::class, 'updateStatus'])->name('status.update');
+    //     Route::get('/show/{id}', [InvestmentController::class, 'show'])->name('show'); // Changed from getInvestment
+
+    //     // Investment highlight
+    //     Route::post('/{id}/highlight', [InvestmentHightlightController::class, 'storeOrUpdateHighlight'])->name('highlight.store');
+
+    //     // Investment documents
+    //     Route::post('/{id}/document', [InvestmentDocController::class, 'uploadDocument'])->name('document.store');
+    //     Route::delete('/document/{id}', [InvestmentDocController::class, 'deleteDocument'])->name('document.delete');
+
+    //     // Investment images
+    //     Route::post('/{id}/images', [InvestmentDocController::class, 'uploadImage'])->name('images.store');
+    //     Route::delete('/image/{id}', [InvestmentDocController::class, 'deleteImage'])->name('image.delete');
+
+    //     // Investment disclaimers
+    //     Route::post('/{id}/disclaimer', [InvestmentDesclaimerController::class, 'storeOrUpdateDisclaimer'])->name('disclaimer.store');
+    // });
+
+
     Route::prefix('deal')->name('investment.')->group(function () {
         Route::get('/list', [InvestmentController::class, 'index'])->name('list');
         Route::get('/create', [InvestmentController::class, 'create'])->name('create');
@@ -129,21 +155,16 @@ Route::middleware(['auth', 'admin'])->group(function () {
         Route::post('/update/{id}', [InvestmentController::class, 'updateBasic'])->name('update');
         Route::delete('/delete/{id}', [InvestmentController::class, 'destroy'])->name('destroy');
         Route::post('/status/update', [InvestmentController::class, 'updateStatus'])->name('status.update');
-        Route::get('/show/{id}', [InvestmentController::class, 'show'])->name('show'); // Changed from getInvestment
+        Route::get('/show/{id}', [InvestmentController::class, 'show'])->name('show');
 
-        // Investment highlight
-        Route::post('/{id}/highlight', [InvestmentHightlightController::class, 'storeOrUpdateHighlight'])->name('highlight.store');
+        // IMPORTANT: Use {investment} instead of {id} for consistency
+        Route::post('/{investment}/highlight', [InvestmentHightlightController::class, 'storeOrUpdateHighlight'])->name('highlight.store');
+        Route::post('/{investment}/document', [InvestmentDocController::class, 'uploadDocument'])->name('document.store');
+        Route::post('/{investment}/images', [InvestmentDocController::class, 'uploadImage'])->name('images.store');
+        Route::post('/{investment}/disclaimer', [InvestmentDesclaimerController::class, 'storeOrUpdateDisclaimer'])->name('disclaimer.store');
 
-        // Investment documents
-        Route::post('/{id}/document', [InvestmentDocController::class, 'uploadDocument'])->name('document.store');
         Route::delete('/document/{id}', [InvestmentDocController::class, 'deleteDocument'])->name('document.delete');
-
-        // Investment images
-        Route::post('/{id}/images', [InvestmentDocController::class, 'uploadImage'])->name('images.store');
         Route::delete('/image/{id}', [InvestmentDocController::class, 'deleteImage'])->name('image.delete');
-
-        // Investment disclaimers
-        Route::post('/{id}/disclaimer', [InvestmentDesclaimerController::class, 'storeOrUpdateDisclaimer'])->name('disclaimer.store');
     });
 
 

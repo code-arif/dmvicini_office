@@ -20,7 +20,7 @@ $settings = \App\Models\Setting::first();
     {{-- <meta name="keywords" content="{!! strip_tags($settings->keywords) ?? '' !!}"> --}}
 
     <!-- TITLE -->
-    <title>{{ config('app.name') }} - {{ $title ?? $settings->title ?? '' }}</title>
+    <title>{{ config('app.name') }} - Admin Login</title>
 
     <!-- FAVICON -->
     <link rel="shortcut icon" type="image/x-icon" href="{{ asset($settings->favicon ?? 'default/logo.png') }}" />
@@ -36,7 +36,7 @@ $settings = \App\Models\Setting::first();
     <link href="{{ asset('backend') }}/plugins/icons/icons.css" rel="stylesheet" />
 
     <!-- INTERNAL Switcher css -->
-    <link href="{{ asset('backend') }}/switcher/css/switcher.css" rel="stylesheet">
+    {{-- <link href="{{ asset('backend') }}/switcher/css/switcher.css" rel="stylesheet"> --}}
     <link href="{{ asset('backend') }}/switcher/demo.css" rel="stylesheet">
 
     <style>
@@ -53,7 +53,7 @@ $settings = \App\Models\Setting::first();
 
 <body class="ltr login-img" style="background-image: url('{{ asset( $cms->image ?? 'default/bg.jpg' ) }}')">
 
-    @include('backend.partials.switcher')
+    {{-- @include('backend.partials.switcher') --}}
 
     @include('backend.partials.loader')
 

@@ -6,12 +6,13 @@ use Exception;
 use App\Helper\Helper;
 use App\Models\AssetClass;
 use App\Models\Investment;
+use App\Models\TaxStrategy;
 use Illuminate\Http\Request;
 use App\Models\InvestmentTypes;
 use App\Models\InvestmentStrategy;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
-use App\Models\TaxStrategy;
 use Yajra\DataTables\Facades\DataTables;
 
 class InvestmentController extends Controller
@@ -151,25 +152,26 @@ class InvestmentController extends Controller
     /**
      * Store investment - Step 1: Basic Information
      */
+
     public function storeBasic(Request $request)
     {
         $validated = $request->validate([
-            'title'                       => 'required|string|max:255',
-            'asset_class_id'              => 'nullable|exists:asset_classes,id',
-            'investment_type_id'          => 'nullable|exists:investment_types,id',
-            'investments_strategy_id'     => 'nullable|exists:investment_strategies,id',
-            'tax_strategie_id'            => 'nullable|exists:tax_strategies,id',
-            'term'                        => 'nullable|string',
-            'min_investment'              => 'nullable|string',
-            'mountain_image'              => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
-            'investment_details'          => 'nullable|string',
-            'country'                     => 'nullable|string|max:200',
-            'city'                        => 'nullable|string|max:200',
-            'state'                       => 'nullable|string|max:200',
-            'address'                     => 'nullable|string',
-            'latitude'                    => 'nullable|numeric',
-            'longitude'                   => 'nullable|numeric',
-            'status'                      => 'required|in:draft,active,closed',
+            'title' => 'required|string|max:255',
+            'asset_class_id' => 'nullable|exists:asset_classes,id',
+            'investment_type_id' => 'nullable|exists:investment_types,id',
+            'investments_strategy_id' => 'nullable|exists:investment_strategies,id',
+            'tax_strategie_id' => 'nullable|exists:tax_strategies,id',
+            'term' => 'nullable|string',
+            'min_investment' => 'nullable|string',
+            'mountain_image' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
+            'investment_details' => 'nullable|string',
+            'country' => 'nullable|string|max:200',
+            'city' => 'nullable|string|max:200',
+            'state' => 'nullable|string|max:200',
+            'address' => 'nullable|string',
+            'latitude' => 'nullable|numeric',
+            'longitude' => 'nullable|numeric',
+            'status' => 'required|in:draft,active,closed',
         ]);
 
         try {
@@ -190,14 +192,18 @@ class InvestmentController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Investment created successfully!',
-                'investment_id' => $investment->id
+                'investment_id' => $investment->id,
+                'investment' => $investment
             ], 201);
         } catch (Exception $e) {
             DB::rollBack();
+
+            Log::error('Investment creation failed: ' . $e->getMessage());
+
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to create investment',
-                'error' => $e->getMessage()
+                'error' => config('app.debug') ? $e->getMessage() : 'An error occurred'
             ], 500);
         }
     }
@@ -211,18 +217,21 @@ class InvestmentController extends Controller
             'highlight',
             'documents',
             'images',
-            'disclaimers'
+            'disclaimers',
+            'tax_strategies'
         ])->findOrFail($id);
 
         $asset_classes = AssetClass::latest('id')->get();
         $investment_types = InvestmentTypes::latest('id')->get();
         $strategies = InvestmentStrategy::latest('id')->get();
+        $tax_strategies = TaxStrategy::latest('id')->get();
 
         return view('backend.layouts.investment.edit_investment', compact(
             'investment',
             'asset_classes',
             'investment_types',
-            'strategies'
+            'strategies',
+            'tax_strategies'
         ));
     }
 

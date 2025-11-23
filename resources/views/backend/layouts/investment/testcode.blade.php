@@ -1,136 +1,6 @@
 @extends('backend.app')
 @section('title', 'Create Investment')
 
-@push('styles')
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.css" rel="stylesheet">
-    <style>
-        .step-wizard {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 2rem;
-            position: relative;
-        }
-
-        .step-wizard::before {
-            content: '';
-            position: absolute;
-            top: 20px;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: #e0e0e0;
-            z-index: 0;
-        }
-
-        .step-item {
-            flex: 1;
-            text-align: center;
-            position: relative;
-            z-index: 1;
-        }
-
-        .step-circle {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: #fff;
-            border: 2px solid #e0e0e0;
-            color: #666;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            margin-bottom: 0.5rem;
-            transition: all 0.3s;
-        }
-
-        .step-item.active .step-circle {
-            background: #0d6efd;
-            border-color: #0d6efd;
-            color: white;
-        }
-
-        .step-item.completed .step-circle {
-            background: #28a745;
-            border-color: #28a745;
-            color: white;
-        }
-
-        .step-label {
-            font-size: 0.875rem;
-            color: #666;
-        }
-
-        .step-item.active .step-label {
-            color: #0d6efd;
-            font-weight: 600;
-        }
-
-        .step-content {
-            display: none;
-        }
-
-        .step-content.active {
-            display: block;
-        }
-
-        .nav-buttons {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 2rem;
-            padding-top: 1rem;
-            border-top: 1px solid #e0e0e0;
-        }
-
-        #map {
-            height: 400px;
-            border-radius: 8px;
-            border: 1px solid #dee2e6;
-        }
-
-        .image-preview-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-
-        .image-preview-item {
-            position: relative;
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        .image-preview-item img {
-            width: 100%;
-            height: 150px;
-            object-fit: cover;
-        }
-
-        .image-preview-item .remove-btn {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            background: rgba(220, 53, 69, 0.9);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            cursor: pointer;
-        }
-
-        .mountain-image-preview {
-            max-width: 200px;
-            max-height: 200px;
-            margin-top: 10px;
-            border-radius: 8px;
-            display: none;
-        }
-    </style>
-@endpush
-
 @section('content')
     <div class="app-content main-content mt-0">
         <div class="side-app">
@@ -141,7 +11,7 @@
                     </div>
                     <div class="ms-auto pageheader-btn">
                         <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="{{ route('get.investments') }}">Investments</a></li>
+                            <li class="breadcrumb-item"><a href="{{ route('investment.list') }}">Investments</a></li>
                             <li class="breadcrumb-item active">Create</li>
                         </ol>
                     </div>
@@ -199,7 +69,7 @@
                                         </div>
 
                                         <div class="row">
-                                            <div class="col-md-4 mb-3">
+                                            <div class="col-md-3 mb-3">
                                                 <label class="form-label">Asset Class</label>
                                                 <select name="asset_class_id" class="form-select">
                                                     <option value="">-- Select --</option>
@@ -208,7 +78,7 @@
                                                     @endforeach
                                                 </select>
                                             </div>
-                                            <div class="col-md-4 mb-3">
+                                            <div class="col-md-3 mb-3">
                                                 <label class="form-label">Investment Type</label>
                                                 <select name="investment_type_id" class="form-select">
                                                     <option value="">-- Select --</option>
@@ -217,11 +87,20 @@
                                                     @endforeach
                                                 </select>
                                             </div>
-                                            <div class="col-md-4 mb-3">
+                                            <div class="col-md-3 mb-3">
                                                 <label class="form-label">Investment Strategy</label>
                                                 <select name="investments_strategy_id" class="form-select">
                                                     <option value="">-- Select --</option>
                                                     @foreach ($strategies as $item)
+                                                        <option value="{{ $item->id }}">{{ $item->name }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                            <div class="col-md-3 mb-3">
+                                                <label class="form-label">Tax Strategy</label>
+                                                <select name="investments_strategy_id" class="form-select">
+                                                    <option value="">-- Select --</option>
+                                                    @foreach ($tax_strategies as $item)
                                                         <option value="{{ $item->id }}">{{ $item->name }}</option>
                                                     @endforeach
                                                 </select>
@@ -298,7 +177,7 @@
                                     <div class="step-content" data-step="3">
                                         <h4 class="mb-4">Investment Highlights</h4>
                                         <div class="mb-3">
-                                            <label class="form-label">Overview</label>
+                                            <label class="form-label">Summary</label>
                                             <textarea name="overview" id="overview" class="form-control"></textarea>
                                         </div>
                                         <div class="row">
@@ -384,25 +263,16 @@
                                         <div id="imagePreviewGrid" class="image-preview-grid"></div>
                                     </div>
 
-                                    <!-- Step 6: Disclaimers -->
+
+                                    <!-- Step 6: Disclaimer (Single) -->
                                     <div class="step-content" data-step="6">
-                                        <h4 class="mb-4">Disclaimers</h4>
-                                        <div id="disclaimersList" class="mb-3"></div>
-                                        <div class="card bg-light">
-                                            <div class="card-body">
-                                                <div class="mb-3">
-                                                    <label class="form-label">Title <span
-                                                            class="text-danger">*</span></label>
-                                                    <input type="text" id="disclaimerTitle" class="form-control">
-                                                </div>
-                                                <div class="mb-3">
-                                                    <label class="form-label">Description</label>
-                                                    <textarea id="disclaimerDescription" class="form-control" rows="3"></textarea>
-                                                </div>
-                                                <button type="button" class="btn btn-primary" id="addDisclaimerBtn">
-                                                    <i class="fa fa-plus"></i> Add Disclaimer
-                                                </button>
-                                            </div>
+                                        <h4 class="mb-4">Investment Disclaimer</h4>
+
+                                        <div class="mb-3">
+                                            <label class="form-label">Disclaimer Content</label>
+                                            <textarea name="disclaimer_description" id="disclaimerDescription" class="form-control"></textarea>
+                                            <small class="text-muted">Add any legal disclaimers, risk warnings, or
+                                                important notices here.</small>
                                         </div>
                                     </div>
 
@@ -436,6 +306,16 @@
     </script>
 
     <script>
+        window.routes = {
+            basicStore: "{{ route('investment.basic.store') }}",
+            highlightStore: "{{ route('investment.highlight.store', ':id') }}",
+            documentStore: "{{ route('investment.document.store', ':id') }}",
+            imagesStore: "{{ route('investment.images.store', ':id') }}",
+            disclaimerStore: "{{ route('investment.disclaimer.store', ':id') }}"
+        };
+    </script>
+
+    <script>
         let currentStep = 1;
         let totalSteps = 6;
         let investmentId = null;
@@ -445,19 +325,20 @@
         let disclaimers = [];
 
         $(document).ready(function() {
-            // Initialize Summernote
-            $('#investmentDetails, #overview, #investor_waterfall, #promoted_interest').summernote({
-                height: 200,
-                toolbar: [
-                    ['style', ['style']],
-                    ['font', ['bold', 'italic', 'underline', 'clear']],
-                    ['color', ['color']],
-                    ['para', ['ul', 'ol', 'paragraph']],
-                    ['table', ['table']],
-                    ['insert', ['link', 'picture']],
-                    ['view', ['fullscreen', 'codeview']]
-                ]
-            });
+            // Initialize Summernote for all rich text editors including disclaimer
+            $('#investmentDetails, #overview, #investor_waterfall, #promoted_interest, #disclaimerDescription')
+                .summernote({
+                    height: 200,
+                    toolbar: [
+                        ['style', ['style']],
+                        ['font', ['bold', 'italic', 'underline', 'clear']],
+                        ['color', ['color']],
+                        ['para', ['ul', 'ol', 'paragraph']],
+                        ['table', ['table']],
+                        ['insert', ['link', 'picture']],
+                        ['view', ['fullscreen', 'codeview']]
+                    ]
+                });
 
             // Initialize Google Map
             initMap();
@@ -475,7 +356,6 @@
 
             // Navigation
             $('#nextBtn').on('click', () => {
-                alert('hello');
                 if (currentStep === 1 && !investmentId) {
                     saveBasicInfo();
                 } else {
@@ -585,7 +465,6 @@
         function saveBasicInfo() {
             const formData = new FormData($('#investmentForm')[0]);
 
-
             NProgress.start();
             $.ajax({
                 url: "{{ route('investment.basic.store') }}",
@@ -619,16 +498,16 @@
         function goToStep(step) {
             if (step < 1 || step > totalSteps) return;
 
-            $(`.step-content[data-step="${currentStep}"] `).removeClass('active');
+            $(`.step-content[data-step="${currentStep}"]`).removeClass('active');
             $(`.step-item[data-step="${currentStep}"]`).removeClass('active').addClass('completed');
 
-            $(`.step-content[data-step="${step}"] `).addClass('active');
+            $(`.step-content[data-step="${step}"]`).addClass('active');
             $(`.step-item[data-step="${step}"]`).addClass('active');
 
             currentStep = step;
 
             $('#prevBtn').toggle(currentStep > 1);
-            $('#nextBtn').toggle(currentStep < script totalSteps);
+            $('#nextBtn').toggle(currentStep < totalSteps);
             $('#submitBtn').toggle(currentStep === totalSteps);
         }
 
@@ -655,13 +534,13 @@
             let html = '<div class="list-group">';
             documents.forEach((doc, index) => {
                 html += `
-                        <div class="list-group-item d-flex justify-content-between align-items-center">
-                            <span><i class="fa fa-file"></i> ${doc.name}</span>
-                            <button type="button" class="btn btn-sm btn-danger" onclick="removeDocument(${index})">
-                                <i class="fa fa-trash"></i>
-                            </button>
-                        </div>
-                    `;
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <span><i class="fa fa-file"></i> ${doc.name}</span>
+                        <button type="button" class="btn btn-sm btn-danger" onclick="removeDocument(${index})">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </div>
+                `;
             });
             html += '</div>';
             $('#documentsList').html(html);
@@ -685,13 +564,13 @@
                 reader.readAsDataURL(file);
 
                 html += `
-                        <div class="image-preview-item">
-                            <img id="img-preview-${index}" src="" alt="Preview">
-                            <button type="button" class="remove-btn" onclick="removeImage(${index})">
-                                <i class="fa fa-times"></i>
-                            </button>
-                        </div>
-                    `;
+                    <div class="image-preview-item">
+                        <img id="img-preview-${index}" src="" alt="Preview">
+                        <button type="button" class="remove-btn" onclick="removeImage(${index})">
+                            <i class="fa fa-times"></i>
+                        </button>
+                    </div>
+                `;
             });
 
             $('#imagePreviewGrid').html(html);
@@ -727,18 +606,18 @@
             let html = '<div class="list-group">';
             disclaimers.forEach((disc, index) => {
                 html += `
-                        <div class="list-group-item">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <div>
-                                    <h6>${disc.title}</h6>
-                                    ${disc.description ? `<p class="mb-0 text-muted">${disc.description}</p>` : ''}
-                                </div>
-                                <button type="button" class="btn btn-sm btn-danger" onclick="removeDisclaimer(${index})">
-                                    <i class="fa fa-trash"></i>
-                                </button>
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6>${disc.title}</h6>
+                                ${disc.description ? `<p class="mb-0 text-muted">${disc.description}</p>` : ''}
                             </div>
+                            <button type="button" class="btn btn-sm btn-danger" onclick="removeDisclaimer(${index})">
+                                <i class="fa fa-trash"></i>
+                            </button>
                         </div>
-                    `;
+                    </div>
+                `;
             });
             html += '</div>';
             $('#disclaimersList').html(html);
@@ -749,6 +628,7 @@
             renderDisclaimers();
         }
 
+        // Update submitInvestment function
         function submitInvestment() {
             if (!investmentId) {
                 toastr.error('Please complete step 1 first');
@@ -757,7 +637,6 @@
 
             NProgress.start();
 
-            // Prepare all promises
             const promises = [];
 
             // 1. Save highlights
@@ -777,24 +656,25 @@
 
             promises.push(
                 $.ajax({
-                    url: `{{ url('admin/investment') }}/${investmentId}/highlight`,
+                    url: window.routes.highlightStore.replace(':id', investmentId),
                     type: "POST",
                     data: highlightData
                 })
             );
 
+
             // 2. Upload documents
             documents.forEach(doc => {
-                const formData = new FormData();
-                formData.append('name', doc.name);
-                formData.append('file', doc.file);
-                formData.append('_token', "{{ csrf_token() }}");
+                const formDocument = new FormData();
+                formDocument.append('name', doc.name);
+                formDocument.append('file', doc.file);
+                formDocument.append('_token', "{{ csrf_token() }}");
 
                 promises.push(
                     $.ajax({
-                        url: `{{ url('admin/investment') }}/${investmentId}/document`,
+                        url: window.routes.documentStore.replace(':id', investmentId),
                         type: "POST",
-                        data: formData,
+                        data: formDocument,
                         processData: false,
                         contentType: false
                     })
@@ -809,29 +689,32 @@
 
                 promises.push(
                     $.ajax({
-                        url: `{{ url('admin/investment') }}/${investmentId}/images`,
+                        url: window.routes.imagesStore.replace(':id', investmentId),
                         type: "POST",
                         data: imageFormData,
                         processData: false,
                         contentType: false
                     })
                 );
+
             }
 
-            // 4. Save disclaimers
-            disclaimers.forEach(disc => {
+            // 4. Save disclaimer (single)
+            const disclaimerContent = $('#disclaimerDescription').summernote('code');
+            if (disclaimerContent && disclaimerContent.trim() !== '') {
+
                 promises.push(
                     $.ajax({
-                        url: `{{ url('admin/investment') }}/${investmentId}/disclaimer`,
+                        url: window.routes.disclaimerStore.replace(':id', investmentId),
                         type: "POST",
                         data: {
-                            title: disc.title,
-                            description: disc.description,
+                            description: disclaimerContent,
                             _token: "{{ csrf_token() }}"
                         }
                     })
                 );
-            });
+
+            }
 
             // Execute all promises
             Promise.all(promises)
@@ -839,7 +722,7 @@
                     NProgress.done();
                     toastr.success('Investment created successfully!');
                     setTimeout(() => {
-                        window.location.href = "{{ route('get.investments') }}";
+                        window.location.href = "{{ route('investment.list') }}";
                     }, 1500);
                 })
                 .catch(err => {

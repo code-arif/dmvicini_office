@@ -77,7 +77,7 @@
                                         </div>
 
                                         <div class="row">
-                                            <div class="col-md-4 mb-3">
+                                            <div class="col-md-3 mb-3">
                                                 <label class="form-label">Asset Class</label>
                                                 <select name="asset_class_id" class="form-select">
                                                     <option value="">-- Select --</option>
@@ -89,7 +89,7 @@
                                                     @endforeach
                                                 </select>
                                             </div>
-                                            <div class="col-md-4 mb-3">
+                                            <div class="col-md-3 mb-3">
                                                 <label class="form-label">Investment Type</label>
                                                 <select name="investment_type_id" class="form-select">
                                                     <option value="">-- Select --</option>
@@ -101,13 +101,25 @@
                                                     @endforeach
                                                 </select>
                                             </div>
-                                            <div class="col-md-4 mb-3">
+                                            <div class="col-md-3 mb-3">
                                                 <label class="form-label">Investment Strategy</label>
                                                 <select name="investments_strategy_id" class="form-select">
                                                     <option value="">-- Select --</option>
                                                     @foreach ($strategies as $item)
                                                         <option value="{{ $item->id }}"
                                                             {{ $investment->investments_strategy_id == $item->id ? 'selected' : '' }}>
+                                                            {{ $item->name }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                            <div class="col-md-3 mb-3">
+                                                <label class="form-label">Tax Strategy</label>
+                                                <select name="tax_strategie_id" class="form-select">
+                                                    <option value="">-- Select --</option>
+                                                    @foreach ($tax_strategies as $item)
+                                                        <option value="{{ $item->id }}"
+                                                            {{ $investment->tax_strategies_id == $item->id ? 'selected' : '' }}>
                                                             {{ $item->name }}
                                                         </option>
                                                     @endforeach
@@ -127,7 +139,8 @@
                                                     value="{{ $investment->min_investment }}">
                                             </div>
                                             <div class="col-md-4 mb-3">
-                                                <label class="form-label">Status <span class="text-danger">*</span></label>
+                                                <label class="form-label">Status <span
+                                                        class="text-danger">*</span></label>
                                                 <select name="status" class="form-select" required>
                                                     <option value="draft"
                                                         {{ $investment->status == 'draft' ? 'selected' : '' }}>Draft
