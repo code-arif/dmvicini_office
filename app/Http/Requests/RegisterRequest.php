@@ -3,7 +3,6 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class RegisterRequest extends FormRequest
 {
@@ -15,37 +14,48 @@ class RegisterRequest extends FormRequest
     public function rules(): array
     {
         return [
-            // Basic Info
-            'first_name' => ['required', 'string', 'max:100'],
-            'last_name' => ['required', 'string', 'max:100'],
-            'title' => ['nullable', 'string', 'max:100'],
-            'firm_name' => ['required', 'string', 'max:200'],
-            'email' => ['required', 'email', 'max:255', 'unique:users,email'],
-            'phone' => ['required', 'string'], // E.164 format
-            'country' => ['required', 'string'], // ISO 3166-1 alpha-2
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            // Basic
+            'email'      => 'required|email|unique:users,email|max:255',
+            'password'   => 'required|string|min:8|confirmed',
 
-            // Firm Registration
-            'is_registered' => ['required', 'boolean'],
-            'firm_crd' => ['required_if:is_registered,true', 'nullable', 'string', 'max:50'],
-            'individual_crd' => ['nullable', 'string', 'max:50'],
-            'firm_aum' => ['nullable', 'integer', 'min:0'],
-            'address' => ['nullable', 'string', 'max:500'],
-            'city' => ['nullable', 'string', 'max:100'],
-            'state' => ['nullable', 'string', 'max:100'],
-            'zip' => ['nullable', 'integer', 'min:0'],
-            'explain_not_registered' => ['required_if:is_registered,false', 'nullable', 'string', 'max:1000'],
+            // Profile
+            'first_name' => 'required|string|max:100',
+            'last_name'  => 'required|string|max:100',
+            'firm_name'  => 'required|string|max:255',
+            'phone'      => 'required|string|max:50',
+            'country'    => 'required|string|max:100',
 
             // Investor Type
-            'investor_type' => ['nullable', 'string'],
-            'investor_type_other' => ['nullable', 'string'],
+            'investor_type'        => 'nullable|string',
+            'investor_type_other'  => 'nullable|string|max:255',
 
-            // Compliance (all required except marketing)
-            'terms_agreed' => ['required', 'accepted'],
-            'privacy_agreed' => ['required', 'accepted'],
-            'investor_acknowledgment' => ['required', 'accepted'],
-            'confidentiality_agreed' => ['required', 'accepted'],
-            'marketing_opt_in' => ['nullable', 'boolean'],
+            // Firm Details
+            'is_registered'                 => 'required|boolean',
+            'firm_crd'                      => 'nullable|string',
+            'individual_crd'                => 'nullable|string',
+            'firm_aum'                      => 'nullable|numeric|min:0',
+            'address'                       => 'nullable|string|max:500',
+            'city'                          => 'nullable|string|max:100',
+            'state'                         => 'nullable|string|max:100',
+            'zip'                           => 'nullable|string|max:20',
+            'explanation_if_not_registered' => 'required_if:is_registered,0|string|nullable',
+
+            // Compliance
+            'terms_agreed'           => 'required|accepted',
+            'privacy_agreed'         => 'required|accepted',
+            'investor_acknowledgment' => 'required|accepted',
+            'confidentiality_agreed' => 'required|accepted',
+            'marketing_opt_in'       => 'sometimes|boolean',
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'email.unique' => 'This email is already registered.',
+            'terms_agreed.accepted' => 'You must agree to the Terms of Service.',
+            'investor_type_other.required_if' => 'Please specify your investor type if selecting "Other".',
+            'explanation_if_not_registered.required_if' => 'Please explain why your firm is not registered.',
         ];
     }
 }

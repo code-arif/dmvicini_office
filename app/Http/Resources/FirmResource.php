@@ -14,12 +14,13 @@ class FirmResource extends JsonResource
             'is_registered'                 => $this->is_registered,
             'firm_crd'                      => $this->firm_crd,
             'individual_crd'                => $this->individual_crd,
-            'firm_aum_min'                  => $this->firm_aum_min,
-            'firm_aum_max'                  => $this->firm_aum_max,
+            'firm_aum'                  => $this->firm_aum,
             'address'                       => $this->address,
+            'city'                       => $this->city,
+            'state'                       => $this->state,
+            'zip'                       => $this->zip,
             'explanation_if_not_registered' => $this->explanation_if_not_registered,
-            'created_at'                    => $this->created_at?->toISOString(),
-            'updated_at'                    => $this->updated_at?->toISOString(),
+            'created_at'                    => $this->created_at?->diffForHumans(),
         ];
     }
 }

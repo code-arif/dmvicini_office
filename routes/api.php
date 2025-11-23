@@ -64,10 +64,10 @@ Route::group(['middleware' => 'auth:api'], function () {
 
     // user profile
     Route::get('/profile', [UserProfileController::class, 'me']); // working
-    Route::post('/update-profile', [UserProfileController::class, 'updateProfile']);
-    Route::post('/update-password', [UserProfileController::class, 'updatePassword']);
-    Route::post('/update-avatar', [UserProfileController::class, 'updateAvatar']);
-    Route::post('/update-firm', [UserProfileController::class, 'updateFirm']);
+    Route::post('/update-profile', [UserProfileController::class, 'updateProfile']); // working
+    Route::post('/update-password', [UserProfileController::class, 'updatePassword']); // working
+    Route::post('/update-avatar', [UserProfileController::class, 'updateAvatar']); // working
+    Route::post('/update-firm', [UserProfileController::class, 'updateFirm']); // working
 
 
     Route::get('/education/{id}', [EducationPageController::class, 'show']); // education details

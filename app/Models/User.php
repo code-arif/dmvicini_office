@@ -3,16 +3,17 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Laravel\Cashier\Billable;
+use Illuminate\Auth\MustVerifyEmail;
+use Tymon\JWTAuth\Contracts\JWTSubject;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Laravel\Cashier\Billable;
-use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class User extends Authenticatable implements JWTSubject
 {
 
-    use HasFactory, Notifiable, Billable;
+    use HasFactory, Notifiable, Billable, MustVerifyEmail;
 
     public function getJWTIdentifier()
     {
@@ -29,18 +30,19 @@ class User extends Authenticatable implements JWTSubject
         'password',
         'email_verified_at',
         'access_level',
+        'avatar',
         'is_active',
-        'provisional_expires_at',
         'reset_password_token',
         'reset_password_token_expire_at',
         'role',
         'otp',
         'otp_expires_at',
+        'email_verification_token',
+        'email_verification_token_expires_at',
     ];
 
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'provisional_expires_at' => 'datetime',
         'is_active' => 'boolean',
     ];
 

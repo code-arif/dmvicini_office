@@ -2,7 +2,6 @@
 
 namespace App\Http\Resources;
 
-use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class UserResource extends JsonResource
@@ -14,10 +13,10 @@ class UserResource extends JsonResource
             'email'      => $this->email,
             'role'       => $this->role,
             'avatar'     => $this->avatar
-                ? asset('storage/' . $this->avatar)
-                : asset('default/default_image.jpg'),
+                ? asset('/' . $this->avatar)
+                : asset('default/profile.jpg'),
+            'access_level' => $this->access_level,
             'created_at' => $this->created_at?->diffForHumans(),
-            'updated_at' => $this->updated_at?->diffForHumans(),
 
             // Correct: Use ProfileResource with loaded firm
             'profile' => $this->whenLoaded('profile', fn() => new ProfileResource($this->profile)),

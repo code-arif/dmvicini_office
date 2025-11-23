@@ -33,7 +33,7 @@ return new class extends Migration
 
             $table->rememberToken();
             $table->timestamps();
-            $table->softDeletes(); // compliance er jonno data retain
+            $table->softDeletes();
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

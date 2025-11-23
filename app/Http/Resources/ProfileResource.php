@@ -20,8 +20,7 @@ class ProfileResource extends JsonResource
             'country'               => $this->country,
             'investor_type'         => $this->investor_type,
             'investor_type_other'   => $this->investor_type_other,
-            'created_at'            => $this->created_at?->toISOString(),
-            'updated_at'            => $this->updated_at?->toISOString(),
+            'created_at'            => $this->created_at?->diffForHumans(),
 
             // Nested Firm
             'firm' => $this->whenLoaded('firm', fn() => new FirmResource($this->firm)),

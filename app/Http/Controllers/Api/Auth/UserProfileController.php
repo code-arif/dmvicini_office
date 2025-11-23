@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\Auth;
 
 use Exception;
+use Throwable;
 use App\Helper\Helper;
 use App\Traits\ApiResponse;
 use Illuminate\Support\Arr;
@@ -31,7 +32,7 @@ class UserProfileController extends Controller
             }
 
             // Load all needed relations in one go
-            $user->loadMissing(['profile.firm', 'accessRequest', 'complianceAcknowledgment']);
+            $user->loadMissing(['profile.firm', 'complianceAcknowledgment']);
 
             if (! $user->is_active) {
                 return $this->error([], 'Your account has been deactivated.', 403);
@@ -42,14 +43,6 @@ class UserProfileController extends Controller
 
             // Convert to array first so we can merge extra fields
             $data = $resource->toArray($request);
-
-            // Add access request status
-            if ($user->accessRequest) {
-                $data['access_request'] = [
-                    'status'       => $user->accessRequest->status,
-                    'verified_at'  => $user->accessRequest->verified_at?->toISOString(),
-                ];
-            }
 
             // Add provisional access info
             if ($user->access_level === 'provisional' && $user->provisional_expires_at) {
@@ -79,14 +72,13 @@ class UserProfileController extends Controller
     {
         $user = auth('api')->user();
 
-        // -----------------------------------------------------------------
-        // 1. Validation (avatar + all profile fields)
-        // -----------------------------------------------------------------
-        $validator = Validator::make($request->all(), [
-            // ----- User ----------------------------------------------------
-            'avatar' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
 
-            // ----- Profile -------------------------------------------------
+        // Validation (avatar + all profile fields)
+        $validator = Validator::make($request->all(), [
+            // User table avatar
+            'avatar' => ['nullable', 'image', 'max:5120'],
+
+            // Profile
             'first_name'            => ['required', 'string', 'max:255'],
             'last_name'             => ['required', 'string', 'max:255'],
             'title'                 => ['nullable', 'string', 'max:255'],
@@ -103,12 +95,10 @@ class UserProfileController extends Controller
 
         $data = $validator->validated();
 
-        // -----------------------------------------------------------------
-        // 2. Transaction – everything or nothing
-        // -----------------------------------------------------------------
+        // Transaction – everything or nothing
         DB::beginTransaction();
         try {
-            // ----- Avatar handling (User table) -------------------------
+            // Avatar handling (User table)
             if ($request->hasFile('avatar')) {
                 if ($user->avatar) {
                     Helper::deleteImage($user->avatar);
@@ -121,8 +111,8 @@ class UserProfileController extends Controller
             // Update User (only avatar for now)
             $user->update(Arr::only($data, ['avatar']));
 
-            // ----- Profile handling --------------------------------------
-            $profile = $user->profile; // assuming `profile()` relation on User model
+            // Profile handling
+            $profile = $user->profile;
             if (! $profile) {
                 // safety net – create if missing (should never happen)
                 $profile = $user->profile()->create([]);
@@ -141,7 +131,7 @@ class UserProfileController extends Controller
             $profile->update(Arr::only($data, $profileFields));
 
             DB::commit();
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             DB::rollBack();
             Log::error('Profile update failed', [
                 'user_id' => $user->id,
@@ -152,9 +142,6 @@ class UserProfileController extends Controller
             return $this->error([], 'Failed to update profile.', 500);
         }
 
-        // -----------------------------------------------------------------
-        // 3. Return fresh resource
-        // -----------------------------------------------------------------
         return $this->success(new UserResource($user->fresh(['profile'])), 'Profile updated successfully.', 200);
     }
 
@@ -165,7 +152,7 @@ class UserProfileController extends Controller
         $user = auth('api')->user();
 
         $validator = Validator::make($request->all(), [
-            'avatar' => ['required', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
+            'avatar' => ['required', 'image', 'max:5120'],
         ]);
 
         if ($validator->fails()) {
@@ -179,7 +166,7 @@ class UserProfileController extends Controller
 
             $path = Helper::uploadImage($request->file('avatar'), 'profile');
             $user->update(['avatar' => $path]);
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             Log::error('Avatar update error', [
                 'user_id'   => $user->id,
                 'exception' => $e->getMessage(),
@@ -205,8 +192,8 @@ class UserProfileController extends Controller
 
         $validator = Validator::make($request->all(), [
             'is_registered'                 => ['required', 'boolean'],
-            'firm_crd'                      => ['nullable', 'string', 'size:7'],
-            'individual_crd'                => ['nullable', 'string', 'size:7'],
+            'firm_crd'                      => ['nullable', 'string'],
+            'individual_crd'                => ['nullable', 'string'],
             'firm_aum'                      => ['nullable', 'integer', 'min:0'],
             'address'                       => ['nullable', 'string'],
             'explanation_if_not_registered' => ['nullable', 'required_if:is_registered,0', 'string'],
@@ -226,7 +213,7 @@ class UserProfileController extends Controller
             $firm->update($validator->validated());
 
             DB::commit();
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             DB::rollBack();
             Log::error('Firm update failed', [
                 'user_id'   => $user->id,
