@@ -434,11 +434,13 @@
             imagesStore: "{{ route('investment.images.store', $investment->id) }}",
             disclaimerStore: "{{ route('investment.disclaimer.store', $investment->id) }}",
             updateBasic: "{{ route('investment.update', $investment->id) }}",
-            deleteDoc: "{{ route('investment.document.delete', $investment->id) }}"
+            deleteDoc: "/admin/deal/document/delete/",
+            deleteImage: "/admin/deal/image/delete/"
         };
 
         const investmentId = {{ $investment->id }};
     </script>
+
 
     <script>
         let currentStep = 1;
@@ -449,7 +451,7 @@
         let disclaimers = [];
 
         $(document).ready(function() {
-            // Initialize Summernote for disclaimer
+            // Initialize Summernote
             $('#investmentDetails, #overview, #investor_waterfall, #promoted_interest, #disclaimerDescription')
                 .summernote({
                     height: 200,
@@ -482,6 +484,8 @@
             $('#nextBtn').on('click', () => {
                 if (currentStep === 1) {
                     updateBasicInfo();
+                } else if (currentStep === 2) {
+                    updateLocation();
                 } else {
                     navigateStep(1);
                 }
@@ -489,15 +493,8 @@
 
             $('#prevBtn').on('click', () => navigateStep(-1));
             $('#submitBtn').on('click', submitInvestment);
-
-            // Documents
             $('#addDocumentBtn').on('click', addDocument);
-
-            // Gallery
             $('#galleryImages').on('change', previewGalleryImages);
-
-            // Disclaimers
-            $('#addDisclaimerBtn').on('click', addDisclaimer);
         });
 
         function initMap() {
@@ -510,17 +507,20 @@
 
             map = new google.maps.Map(document.getElementById('map'), {
                 center: position,
-                zoom: 13
+                zoom: 13,
+                mapTypeControl: true,
+                streetViewControl: true,
+                fullscreenControl: true
             });
 
             marker = new google.maps.Marker({
                 map: map,
                 position: position,
-                draggable: true
+                draggable: true,
+                animation: google.maps.Animation.DROP
             });
 
             geocoder = new google.maps.Geocoder();
-
             const input = document.getElementById('searchBox');
             searchBox = new google.maps.places.SearchBox(input);
 
@@ -550,6 +550,8 @@
                 marker.setPosition(e.latLng);
                 reverseGeocode(e.latLng);
             });
+
+            console.log('Map initialized for edit page');
         }
 
         function reverseGeocode(location) {
@@ -571,25 +573,61 @@
         function updateLocationFields(place) {
             $('#latitude').val(place.geometry.location.lat());
             $('#longitude').val(place.geometry.location.lng());
-            $('#address').val(place.formatted_address);
+            $('#address').val(place.formatted_address || '');
 
             if (place.address_components) {
+                $('#country').val('');
+                $('#state').val('');
+                $('#city').val('');
+
                 place.address_components.forEach(component => {
-                    if (component.types.includes('country')) {
+                    const types = component.types;
+
+                    if (types.includes('country')) {
                         $('#country').val(component.long_name);
                     }
-                    if (component.types.includes('administrative_area_level_1')) {
+                    if (types.includes('administrative_area_level_1')) {
                         $('#state').val(component.long_name);
                     }
-                    if (component.types.includes('locality')) {
+                    if (types.includes('locality')) {
+                        $('#city').val(component.long_name);
+                    } else if (types.includes('administrative_area_level_2') && !$('#city').val()) {
+                        $('#city').val(component.long_name);
+                    } else if (types.includes('sublocality_level_1') && !$('#city').val()) {
                         $('#city').val(component.long_name);
                     }
                 });
+
+                console.log('Location fields updated:', {
+                    country: $('#country').val(),
+                    state: $('#state').val(),
+                    city: $('#city').val(),
+                    address: $('#address').val()
+                });
+
+                toastr.success('Location updated successfully');
             }
         }
 
         function updateBasicInfo() {
             const formData = new FormData($('#investmentForm')[0]);
+
+            // Explicitly add location data
+            formData.set('country', $('#country').val() || '');
+            formData.set('state', $('#state').val() || '');
+            formData.set('city', $('#city').val() || '');
+            formData.set('address', $('#address').val() || '');
+            formData.set('latitude', $('#latitude').val() || '');
+            formData.set('longitude', $('#longitude').val() || '');
+
+            console.log('Updating with location:', {
+                country: formData.get('country'),
+                state: formData.get('state'),
+                city: formData.get('city'),
+                address: formData.get('address'),
+                latitude: formData.get('latitude'),
+                longitude: formData.get('longitude')
+            });
 
             NProgress.start();
             $.ajax({
@@ -616,6 +654,50 @@
             });
         }
 
+        // New function to update location from Step 2
+        function updateLocation() {
+            const locationData = new FormData();
+            locationData.append('_token', "{{ csrf_token() }}");
+            locationData.append('_method', 'POST');
+            locationData.append('country', $('#country').val() || '');
+            locationData.append('state', $('#state').val() || '');
+            locationData.append('city', $('#city').val() || '');
+            locationData.append('address', $('#address').val() || '');
+            locationData.append('latitude', $('#latitude').val() || '');
+            locationData.append('longitude', $('#longitude').val() || '');
+
+            console.log('Updating location from Step 2:', {
+                country: $('#country').val(),
+                state: $('#state').val(),
+                city: $('#city').val(),
+                address: $('#address').val(),
+                latitude: $('#latitude').val(),
+                longitude: $('#longitude').val()
+            });
+
+            NProgress.start();
+            $.ajax({
+                url: window.routes.updateBasic,
+                type: "POST",
+                data: locationData,
+                processData: false,
+                contentType: false,
+                success: function(res) {
+                    NProgress.done();
+                    if (res.success) {
+                        toastr.success('Location updated successfully');
+                        navigateStep(1);
+                    }
+                },
+                error: function(xhr) {
+                    NProgress.done();
+                    console.error('Location update error:', xhr);
+                    toastr.error('Failed to update location');
+                }
+            });
+        }
+
+        // Rest of the functions remain same...
         function navigateStep(direction) {
             goToStep(currentStep + direction);
         }
@@ -636,52 +718,123 @@
             $('#submitBtn').toggle(currentStep === totalSteps);
         }
 
+        // ... rest of your existing functions (addDocument, deleteExistingDocument, etc.)
         // Delete existing document
         function deleteExistingDocument(docId) {
-            if (!confirm('Are you sure you want to delete this document?')) return;
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    NProgress.start();
+                    $.ajax({
+                        url: window.routes.deleteDoc + docId,
+                        type: "DELETE",
+                        headers: {
+                            'X-CSRF-TOKEN': "{{ csrf_token() }}"
+                        },
+                        success: function(res) {
+                            NProgress.done();
+                            if (res.success) {
+                                $(`#existingDocuments [data-doc-id="${docId}"]`).remove();
 
-            NProgress.start();
-            $.ajax({
-                url: window.routes.deleteDoc,
-                type: "DELETE",
-                headers: {
-                    'X-CSRF-TOKEN': "{{ csrf_token() }}"
-                },
-                success: function(res) {
-                    NProgress.done();
-                    if (res.success) {
-                        $(`#existingDocuments [data-doc-id="${docId}"]`).remove();
-                        toastr.success('Document deleted successfully');
-                    }
-                },
-                error: function() {
-                    NProgress.done();
-                    toastr.error('Failed to delete document');
+                                Swal.fire({
+                                    title: 'Deleted!',
+                                    text: res.message || 'Document deleted successfully',
+                                    icon: 'success',
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                });
+                            } else {
+                                Swal.fire({
+                                    title: 'Error!',
+                                    text: res.message || 'Failed to delete document',
+                                    icon: 'error'
+                                });
+                            }
+                        },
+                        error: function(xhr) {
+                            NProgress.done();
+                            console.error('Delete error:', xhr);
+
+                            let errorMsg = 'Failed to delete document';
+                            if (xhr.responseJSON && xhr.responseJSON.message) {
+                                errorMsg = xhr.responseJSON.message;
+                            }
+
+                            Swal.fire({
+                                title: 'Error!',
+                                text: errorMsg,
+                                icon: 'error'
+                            });
+                        }
+                    });
                 }
             });
         }
 
         // Delete existing image
         function deleteExistingImage(imgId) {
-            if (!confirm('Are you sure you want to delete this image?')) return;
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "This image will be permanently deleted!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    NProgress.start();
+                    $.ajax({
+                        url: window.routes.deleteImage + imgId,
+                        type: "DELETE",
+                        headers: {
+                            'X-CSRF-TOKEN': "{{ csrf_token() }}"
+                        },
+                        success: function(res) {
+                            NProgress.done();
+                            if (res.success) {
+                                $(`#existingImages [data-img-id="${imgId}"]`).remove();
 
-            NProgress.start();
-            $.ajax({
-                url: `/deal/image/${imgId}`,
-                type: "DELETE",
-                headers: {
-                    'X-CSRF-TOKEN': "{{ csrf_token() }}"
-                },
-                success: function(res) {
-                    NProgress.done();
-                    if (res.success) {
-                        $(`#existingImages [data-img-id="${imgId}"]`).remove();
-                        toastr.success('Image deleted successfully');
-                    }
-                },
-                error: function() {
-                    NProgress.done();
-                    toastr.error('Failed to delete image');
+                                Swal.fire({
+                                    title: 'Deleted!',
+                                    text: res.message || 'Image deleted successfully',
+                                    icon: 'success',
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                });
+                            } else {
+                                Swal.fire({
+                                    title: 'Error!',
+                                    text: res.message || 'Failed to delete image',
+                                    icon: 'error'
+                                });
+                            }
+                        },
+                        error: function(xhr) {
+                            NProgress.done();
+                            console.error('Delete error:', xhr);
+
+                            let errorMsg = 'Failed to delete image';
+                            if (xhr.responseJSON && xhr.responseJSON.message) {
+                                errorMsg = xhr.responseJSON.message;
+                            }
+
+                            Swal.fire({
+                                title: 'Error!',
+                                text: errorMsg,
+                                icon: 'error'
+                            });
+                        }
+                    });
                 }
             });
         }
@@ -911,10 +1064,16 @@
             Promise.all(promises)
                 .then(() => {
                     NProgress.done();
-                    toastr.success('Investment updated successfully!');
-                    setTimeout(() => {
+
+                    Swal.fire({
+                        title: 'Success',
+                        text: 'Investment updated successfully',
+                        icon: 'success',
+                        confirmButtonText: 'View List',
+                        confirmButtonColor: '#172870'
+                    }).then(() => {
                         window.location.href = "{{ route('investment.list') }}";
-                    }, 1500);
+                    });
                 })
                 .catch(err => {
                     NProgress.done();
@@ -923,7 +1082,13 @@
                     if (err.responseJSON && err.responseJSON.message) {
                         message = err.responseJSON.message;
                     }
-                    toastr.error(message);
+                    Swal.fire({
+                        title: 'Error',
+                        html: message,
+                        icon: 'error',
+                        confirmButtonText: 'OK',
+                        confirmButtonColor: '#dc3545'
+                    });
                 });
         }
     </script>

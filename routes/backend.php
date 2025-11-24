@@ -136,8 +136,8 @@ Route::middleware(['auth', 'admin'])->group(function () {
         Route::post('/{investment}/images', [InvestmentDocController::class, 'uploadImage'])->name('images.store');
         Route::post('/{investment}/disclaimer', [InvestmentDesclaimerController::class, 'storeOrUpdateDisclaimer'])->name('disclaimer.store');
 
-        Route::delete('/document/{id}', [InvestmentDocController::class, 'deleteDocument'])->name('document.delete');
-        Route::delete('/image/{id}', [InvestmentDocController::class, 'deleteImage'])->name('image.delete');
+        Route::delete('/document/delete/{id}', [InvestmentDocController::class, 'deleteDocument'])->name('document.delete');
+        Route::delete('/image/delete/{id}', [InvestmentDocController::class, 'deleteImage'])->name('image.delete');
     });
 
 

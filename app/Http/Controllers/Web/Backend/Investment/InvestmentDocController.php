@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Web\Backend\Investment;
 
+use Exception;
 use App\Helper\Helper;
 use Illuminate\Http\Request;
 use App\Models\InvestmentImage;
@@ -80,7 +81,7 @@ class InvestmentDocController extends Controller
                 'success' => true,
                 'message' => 'Document deleted successfully'
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Failed to delete document'

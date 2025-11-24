@@ -20,7 +20,7 @@ return new class extends Migration
 
             // Access Management
             $table->enum('access_level', ['full', 'provisional'])->default('provisional');
-            $table->boolean('is_active')->default(false);
+            $table->boolean('is_active')->default(true);
 
             // Security
             $table->string('otp')->nullable();

@@ -311,7 +311,8 @@
             highlightStore: "{{ route('investment.highlight.store', ':id') }}",
             documentStore: "{{ route('investment.document.store', ':id') }}",
             imagesStore: "{{ route('investment.images.store', ':id') }}",
-            disclaimerStore: "{{ route('investment.disclaimer.store', ':id') }}"
+            disclaimerStore: "{{ route('investment.disclaimer.store', ':id') }}",
+            updateBasic: "{{ route('investment.update', ':id') }}",
         };
     </script>
 
@@ -353,6 +354,9 @@
             $('#nextBtn').on('click', () => {
                 if (currentStep === 1 && !investmentId) {
                     saveBasicInfo();
+                } else if (currentStep === 2) {
+                    // Save location when moving from Step 2
+                    updateLocation();
                 } else {
                     navigateStep(1);
                 }
@@ -515,6 +519,14 @@
         function saveBasicInfo() {
             const formData = new FormData($('#investmentForm')[0]);
 
+            // Explicitly add location data to ensure they're included
+            formData.set('country', $('#country').val() || '');
+            formData.set('state', $('#state').val() || '');
+            formData.set('city', $('#city').val() || '');
+            formData.set('address', $('#address').val() || '');
+            formData.set('latitude', $('#latitude').val() || '');
+            formData.set('longitude', $('#longitude').val() || '');
+
             console.log('Saving basic info with location:', {
                 country: formData.get('country'),
                 state: formData.get('state'),
@@ -551,6 +563,55 @@
                         message = xhr.responseJSON.message;
                     }
                     toastr.error(message);
+                }
+            });
+        }
+
+
+        // Add new function to update location
+        function updateLocation() {
+            if (!investmentId) {
+                toastr.error('Please complete Step 1 first');
+                return;
+            }
+
+            const locationData = new FormData();
+            locationData.append('_token', "{{ csrf_token() }}");
+            locationData.append('_method', 'POST');
+            locationData.append('country', $('#country').val() || '');
+            locationData.append('state', $('#state').val() || '');
+            locationData.append('city', $('#city').val() || '');
+            locationData.append('address', $('#address').val() || '');
+            locationData.append('latitude', $('#latitude').val() || '');
+            locationData.append('longitude', $('#longitude').val() || '');
+
+            console.log('Updating location:', {
+                country: $('#country').val(),
+                state: $('#state').val(),
+                city: $('#city').val(),
+                address: $('#address').val(),
+                latitude: $('#latitude').val(),
+                longitude: $('#longitude').val()
+            });
+
+            NProgress.start();
+            $.ajax({
+                url: window.routes.updateBasic.replace(':id', investmentId),
+                type: "POST",
+                data: locationData,
+                processData: false,
+                contentType: false,
+                success: function(res) {
+                    NProgress.done();
+                    if (res.success) {
+                        toastr.success('Location updated successfully');
+                        navigateStep(1);
+                    }
+                },
+                error: function(xhr) {
+                    NProgress.done();
+                    console.error('Location update error:', xhr);
+                    toastr.error('Failed to update location');
                 }
             });
         }
@@ -748,14 +809,13 @@
             Promise.all(promises)
                 .then(() => {
                     NProgress.done();
-                    console.log('All requests completed');
 
                     Swal.fire({
                         title: 'Success',
                         text: 'Investment created successfully',
                         icon: 'success',
                         confirmButtonText: 'View List',
-                        confirmButtonColor: '#0d6efd'
+                        confirmButtonColor: '#172870'
                     }).then(() => {
                         window.location.href = "{{ route('investment.list') }}";
                     });

@@ -156,7 +156,7 @@ class InvestmentController extends Controller
     public function storeBasic(Request $request)
     {
         $validated = $request->validate([
-            'title' => 'required|string|max:255',
+            'title' => 'nullable|string|max:255',
             'asset_class_id' => 'nullable|exists:asset_classes,id',
             'investment_type_id' => 'nullable|exists:investment_types,id',
             'investments_strategy_id' => 'nullable|exists:investment_strategies,id',
@@ -244,7 +244,7 @@ class InvestmentController extends Controller
         $investment = Investment::findOrFail($id);
 
         $validated = $request->validate([
-            'title'                       => 'required|string|max:255',
+            'title'                       => 'nullable|string|max:255',
             'asset_class_id'              => 'nullable|exists:asset_classes,id',
             'investment_type_id'          => 'nullable|exists:investment_types,id',
             'investments_strategy_id'     => 'nullable|exists:investment_strategies,id',
@@ -259,7 +259,7 @@ class InvestmentController extends Controller
             'address'                     => 'nullable|string',
             'latitude'                    => 'nullable|numeric',
             'longitude'                   => 'nullable|numeric',
-            'status'                      => 'required|in:draft,active,closed',
+            'status'                      => 'nullable|in:draft,active,closed',
         ]);
 
         try {
