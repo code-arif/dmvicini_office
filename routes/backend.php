@@ -11,6 +11,7 @@ use App\Http\Controllers\Web\Backend\SubscriberController;
 use App\Http\Controllers\Web\Backend\CMS\AuthPageController;
 use App\Http\Controllers\Web\Backend\FooterManageController;
 use App\Http\Controllers\Web\Backend\CMS\HelpCenterController;
+use App\Http\Controllers\Web\Backend\InterestUserController;
 use App\Http\Controllers\Web\Backend\Investment\InvestmentDesclaimerController;
 use App\Http\Controllers\Web\Backend\InvestmentImportController;
 use App\Http\Controllers\Web\Backend\Settings\ProfileController;
@@ -152,6 +153,11 @@ Route::middleware(['auth', 'admin'])->group(function () {
 
     Route::get('/subscribers', [SubscriberController::class, 'index'])
         ->name('subscribers.index');
+
+    // investment interest user
+    Route::get('/deals/interest/users', [InterestUserController::class, 'index'])->name('deals.interst.user');
+    // web.php
+    Route::get('/deal/interested-users/{id}', [InterestUserController::class, 'show'])->name('interested-users.show-modal');
 });
 
 

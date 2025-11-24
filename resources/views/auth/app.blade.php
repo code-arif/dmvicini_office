@@ -1,7 +1,4 @@
 @php
-use App\Enums\PageEnum;
-use App\Enums\SectionEnum;
-// $cms = \App\Models\CMS::where('page', PageEnum::AUTH)->where('section', SectionEnum::BG)->first();
 $settings = \App\Models\Setting::first();
 @endphp
 <!doctype html>
@@ -15,9 +12,7 @@ $settings = \App\Models\Setting::first();
     <meta charset="UTF-8">
     <meta name='viewport' content='width=device-width, initial-scale=1.0, user-scalable=0'>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    {{-- <meta name="description" content="{!! strip_tags($settings->description) ?? '' !!}"> --}}
     <meta name="author" content="{{ $settings->author ?? '' }}">
-    {{-- <meta name="keywords" content="{!! strip_tags($settings->keywords) ?? '' !!}"> --}}
 
     <!-- TITLE -->
     <title>{{ config('app.name') }} - Admin Login</title>
@@ -52,8 +47,6 @@ $settings = \App\Models\Setting::first();
 </head>
 
 <body class="ltr login-img" style="background-image: url('{{ asset( $cms->image ?? 'default/bg.jpg' ) }}')">
-
-    {{-- @include('backend.partials.switcher') --}}
 
     @include('backend.partials.loader')
 

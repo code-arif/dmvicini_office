@@ -11,4 +11,14 @@ class InterestedUser extends Model
         'investment_id',
         'email',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function investment()
+    {
+        return $this->belongsTo(Investment::class);
+    }
 }

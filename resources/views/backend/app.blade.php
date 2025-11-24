@@ -34,7 +34,6 @@ $settings = \App\Models\Setting::first();
 </head>
 
 <body class="ltr app sidebar-mini">
-    @include('backend.partials.switcher')
 
     @include('backend.partials.loader')
 

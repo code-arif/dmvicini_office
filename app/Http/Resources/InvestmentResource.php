@@ -19,23 +19,16 @@ class InvestmentResource extends JsonResource
             'title'           => $this->title,
             'term'            => $this->term,
             'min_investment'  => $this->min_investment,
-            'targeted_irr'    => $this->targeted_irr,
-            'targeted_eps'    => $this->targeted_eps,
-            'summary'         => $this->summary,
+            'investment_details'         => $this->investment_details,
             'status'          => $this->status,
-            'thumbnail'       => $this->thumbnail ? url($this->thumbnail) : null,
+            'mountain_image'       => $this->mountain_image ? url($this->mountain_image) : null,
             'location'        => [
                 'address'  => $this->address,
                 'city'     => $this->city,
                 'state'    => $this->state,
                 'country'  => $this->country,
-                'map_url'  => $this->map_url,
                 'latitude' => $this->latitude,
                 'longitude' => $this->longitude,
-            ],
-            'banker' => [
-                'phone' => $this->banker_phone,
-                'email' => $this->banker_email,
             ],
             'highlight' => $this->whenLoaded('highlight', function () {
                 $targetedReturns = json_decode($this->highlight->targeted_returns, true);
@@ -43,14 +36,15 @@ class InvestmentResource extends JsonResource
 
                 return [
                     'overview' => $this->highlight->overview,
-
-                    'targeted_returns' => collect($targetedReturns)->map(function ($value, $key) {
-                        return ['key' => $key, 'value' => $value];
-                    })->values()->all(),
-
-                    'fees' => collect($fees)->map(function ($value, $key) {
-                        return ['key' => $key, 'value' => $value];
-                    })->values()->all(),
+                    'targeted_irr' => $this->highlight->overview,
+                    'tax_doc' => $this->highlight->overview,
+                    'investor_waterfall' => $this->highlight->overview,
+                    'promoted_interest' => $this->highlight->overview,
+                    'asset_management_fee' => $this->highlight->overview,
+                    'organizational_and_offering_fee' => $this->highlight->overview,
+                    'acquisition_fee' => $this->highlight->overview,
+                    'disposition_fee' => $this->highlight->overview,
+                    'fund_administration_fee' => $this->highlight->overview,
                 ];
             }),
 
@@ -82,6 +76,12 @@ class InvestmentResource extends JsonResource
                 return [
                     'name' => $this->strategy->name,
                     'description' => $this->strategy->description,
+                ];
+            }),
+            'tax_strategies' => $this->whenLoaded('tax_strategies', function () {
+                return [
+                    'name' => $this->tax_strategies->name,
+                    'description' => $this->tax_strategies->description,
                 ];
             }),
 

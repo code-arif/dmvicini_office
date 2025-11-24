@@ -122,8 +122,8 @@
 
                 {{-- interested user --}}
                 <li class="slide">
-                    <a class="side-menu__item {{ request()->routeIs('subscribers.index') ? 'has-link' : '' }}"
-                        href="{{ route('subscribers.index') }}">
+                    <a class="side-menu__item {{ request()->routeIs('deals.interst.user') ? 'has-link' : '' }}"
+                        href="{{ route('deals.interst.user') }}">
                         <i class="fa-solid fa-hand-pointer"></i>
                         <span class="side-menu__label">Interested User</span>
                     </a>
