@@ -36,15 +36,15 @@ class InvestmentResource extends JsonResource
 
                 return [
                     'overview' => $this->highlight->overview,
-                    'targeted_irr' => $this->highlight->overview,
-                    'tax_doc' => $this->highlight->overview,
-                    'investor_waterfall' => $this->highlight->overview,
-                    'promoted_interest' => $this->highlight->overview,
-                    'asset_management_fee' => $this->highlight->overview,
-                    'organizational_and_offering_fee' => $this->highlight->overview,
-                    'acquisition_fee' => $this->highlight->overview,
-                    'disposition_fee' => $this->highlight->overview,
-                    'fund_administration_fee' => $this->highlight->overview,
+                    'targeted_irr' => $this->highlight->targeted_irr,
+                    'tax_doc' => $this->highlight->tax_doc,
+                    'investor_waterfall' => $this->highlight->investor_waterfall,
+                    'promoted_interest' => $this->highlight->promoted_interest,
+                    'asset_management_fee' => $this->highlight->asset_management_fee,
+                    'organizational_and_offering_fee' => $this->highlight->organizational_and_offering_fee,
+                    'acquisition_fee' => $this->highlight->acquisition_fee,
+                    'disposition_fee' => $this->highlight->disposition_fee,
+                    'fund_administration_fee' => $this->highlight->fund_administration_fee,
                 ];
             }),
 
