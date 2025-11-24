@@ -196,6 +196,9 @@ class UserProfileController extends Controller
             'individual_crd'                => ['nullable', 'string'],
             'firm_aum'                      => ['nullable', 'integer', 'min:0'],
             'address'                       => ['nullable', 'string'],
+            'city'                          =>  ['nullable', 'string'],
+            'state'                         =>  ['nullable', 'string'],
+            'zip'                           =>  ['nullable', 'string'],
             'explanation_if_not_registered' => ['nullable', 'required_if:is_registered,0', 'string'],
         ]);
 

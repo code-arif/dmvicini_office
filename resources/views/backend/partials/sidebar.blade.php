@@ -120,6 +120,15 @@
                     </a>
                 </li>
 
+                {{-- interested user --}}
+                <li class="slide">
+                    <a class="side-menu__item {{ request()->routeIs('subscribers.index') ? 'has-link' : '' }}"
+                        href="{{ route('subscribers.index') }}">
+                        <i class="fa-solid fa-hand-pointer"></i>
+                        <span class="side-menu__label">Interested User</span>
+                    </a>
+                </li>
+
                 <h3>CMS</h3>
 
                 <li class="slide">
@@ -149,7 +158,8 @@
                     <ul class="slide-menu">
                         <li><a href="{{ route('setting.general.index') }}" class="slide-item">General Settings</a>
                         </li>
-                        <li><a href="{{ route('setting.admin.profile.index') }}" class="slide-item">Profile Settings</a>
+                        <li><a href="{{ route('setting.admin.profile.index') }}" class="slide-item">Profile
+                                Settings</a>
                         </li>
 
                     </ul>

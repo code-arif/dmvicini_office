@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\EducationPageController;
 use App\Http\Controllers\Api\HelpcenterPageController;
 use App\Http\Controllers\Api\Auth\UserProfileController;
 use App\Http\Controllers\Api\Auth\ResetPasswordController;
+use App\Http\Controllers\Api\InvestmentInterestController;
 use App\Http\Controllers\Api\Auth\AuthenticationController;
 
 //health-check
@@ -79,4 +80,7 @@ Route::group(['middleware' => 'auth:api'], function () {
     // dashboard stats
     Route::get('/dashboard/stats', [DashboardController::class, 'index']);
     Route::get('/dashboard/approved-deals', [DashboardController::class, 'approvedDeals']);
+
+    // interested user
+    Route::post('/investment/interested', [InvestmentInterestController::class, 'store']);
 });
