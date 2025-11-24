@@ -49,7 +49,7 @@ class AssetClassController extends Controller
             $validated_data = $request->validate([
                 'name' => 'required|max:100|string',
                 'asset_type' => 'nullable|string',
-                'description' => 'nullable|string|max:5000'
+                'description' => 'nullable|string|max:30000'
             ]);
 
             // Get the max order and add 1
@@ -79,7 +79,7 @@ class AssetClassController extends Controller
             $validated_data = $request->validate([
                 'name' => 'required|max:100|string',
                 'asset_type' => 'nullable|string',
-                'description' => 'nullable|string|max:5000'
+                'description' => 'nullable|string|max:30000'
             ]);
 
             $class = AssetClass::findOrFail($id);

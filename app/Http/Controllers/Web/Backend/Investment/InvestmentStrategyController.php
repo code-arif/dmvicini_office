@@ -48,7 +48,7 @@ class InvestmentStrategyController extends Controller
         try {
             $validated_data = $request->validate([
                 'name' => 'required|max:100|string',
-                'description' => 'nullable|string|max:5000'
+                'description' => 'nullable|string|max:30000'
             ]);
 
             // Get the max order and add 1
@@ -77,7 +77,7 @@ class InvestmentStrategyController extends Controller
         try {
             $validated_data = $request->validate([
                 'name' => 'required|max:100|string',
-                'description' => 'nullable|string|max:5000'
+                'description' => 'nullable|string|max:30000'
             ]);
 
             $strategy = InvestmentStrategy::findOrFail($id);
