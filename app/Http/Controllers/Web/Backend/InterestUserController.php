@@ -37,10 +37,10 @@ class InterestUserController extends Controller
     }
 
 
-    public function showModal($id)
+    public function show($id)
     {
         $interest = InterestedUser::with(['user.profile', 'investment'])->findOrFail($id);
 
-        return view('backend.interested_users.modal_details', compact('interest'))->render();
+        return view('backend.layouts.interested_users.modal_details', compact('interest'))->render();
     }
 }

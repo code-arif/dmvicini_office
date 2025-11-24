@@ -29,11 +29,14 @@
     </div>
 </div>
 
-<div class="mt-4 text-center">
-    @if($interest->user)
+<div class="mt-4 text-end">
+    {{-- @if($interest->user)
         <a href="{{ route('admin.users.show', $interest->user->id) }}" class="btn btn-primary">
             View Full Investor Profile
         </a>
-    @endif
+        <a href="#" class="btn btn-primary">
+            View Full Investor Profile
+        </a>
+    @endif --}}
     <button type="button" class="btn btn-secondary ms-2" data-bs-dismiss="modal">Close</button>
 </div>
