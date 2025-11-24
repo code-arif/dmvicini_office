@@ -189,7 +189,8 @@ class InvestmentController extends Controller
             'highlight',
             'documents',
             'disclaimers',
-            'tax_strategies'
+            'tax_strategies',
+            'images'
         ])->find($id);
 
         // return $investment;exit();

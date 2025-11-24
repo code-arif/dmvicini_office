@@ -54,6 +54,7 @@ class InvestmentResource extends JsonResource
                     'file' => url($doc->file_path),
                 ]);
             }),
+
             'risks' => $this->whenLoaded('risks', function () {
                 return [
                     'title'       => $this->risks->title,
@@ -83,6 +84,13 @@ class InvestmentResource extends JsonResource
                     'name' => $this->tax_strategies->name,
                     'description' => $this->tax_strategies->description,
                 ];
+            }),
+            'images' => $this->whenLoaded('images', function () {
+                return $this->images->map(function ($img) {
+                    return [
+                        'image_url' => $img->image_url ? url($img->image_url) : null,
+                    ];
+                });
             }),
 
         ];
