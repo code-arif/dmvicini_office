@@ -12,7 +12,7 @@ class FooterResource extends JsonResource
         return [
             'id' => $this->id,
             'logo' => asset($this->logo), // full URL
-            'slogan_line' => $this->slogan_line1,
+            'slogan_line' => $this->slogan_line,
             'subscribe_title' => $this->subscribe_title,
             'subscribe_description' => $this->subscribe_description,
             'copyright' => $this->copyright,
