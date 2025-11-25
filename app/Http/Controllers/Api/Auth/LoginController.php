@@ -34,11 +34,6 @@ class LoginController extends Controller
             return $this->error([], 'Please verify your email first. Check your inbox for the verification link.', 403);
         }
 
-        // 3. Admin approved?
-        if (!$user->is_active) {
-            return $this->error([], 'Your account is pending admin approval. We\'ll notify you once approved.', 403);
-        }
-
         // 4. Generate JWT Token
         $token = auth('api')->login($user);
 
