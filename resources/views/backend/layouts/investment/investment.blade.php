@@ -104,7 +104,8 @@
                                     </div>
 
                                     <div class="col-md-1 mb-3 d-flex align-items-end">
-                                        <button type="button" id="resetFilters" class="btn btn-reset w-100 py-1" style="margin-bottom: 3px;">
+                                        <button type="button" id="resetFilters" class="btn btn-reset w-100 py-1"
+                                            style="margin-bottom: 3px;">
                                             <i class="fa fa-redo"></i>
                                         </button>
                                     </div>
@@ -121,8 +122,11 @@
                             <div class="card-header border-bottom">
                                 <h3 class="card-title mb-0">Investment List</h3>
                                 <div class="card-options ms-auto">
-                                    <a href="{{ route('investment.create') }}" class="btn btn-primary btn-sm">
+                                    <a href="{{ route('investment.create') }}" class="btn btn-primary btn-sm" style="margin-right: 10px">
                                         <i class="fa fa-plus"></i> Add Investment
+                                    </a>
+                                    <a href="{{ route('investment.create') }}" class="btn btn-outline-secondary btn-sm">
+                                        <i class="fa fa-trash"></i> Trash
                                     </a>
                                 </div>
                             </div>

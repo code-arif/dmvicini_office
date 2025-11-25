@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\Auth\UserProfileController;
 use App\Http\Controllers\Api\Auth\ResetPasswordController;
 use App\Http\Controllers\Api\InvestmentInterestController;
 use App\Http\Controllers\Api\Auth\AuthenticationController;
+use App\Http\Controllers\Api\CMS\CMSController;
 
 //health-check
 Route::get("/check", function () {
@@ -42,6 +43,9 @@ Route::group(['middleware' => 'guest:api'], function () {
 
 
     Route::post('/newsletter/subscribe', [NewsletterController::class, 'subscribe']);
+
+
+    Route::get('/help-center', [CMSController::class, 'helpCenterPage']); // working - help center page
 });
 
 

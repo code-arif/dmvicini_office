@@ -13,9 +13,22 @@ class FooterController extends Controller
     use ApiResponse;
 
     // get all footer item
+    // public function index()
+    // {
+    //     $footer = Footer::first();
+    //     // return $footer;
+    //     return $this->success(new FooterResource($footer), 'Footer settings retrieved.');
+    // }
+
+
     public function index()
     {
-        $footer = Footer::first();
-        return $this->success(new FooterResource($footer), 'Footer settings retrieved.');
+        $data = Footer::first();
+
+        if (!$data) {
+            return $this->error('No footer data found', 404);
+        }
+
+        return $this->success(new FooterResource($data), 'Footer data retrieved successfully');
     }
 }

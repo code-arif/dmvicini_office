@@ -18,10 +18,28 @@ class FooterResource extends JsonResource
             'subscribe_description' => $this->subscribe_description,
             'copyright' => $this->copyright,
             'disclaimer' => $this->disclaimer,
-            'social_links' => $this->social_links, // already has icon_url
-            'footer_links' => $this->footer_links,
-            'is_active' => $this->is_active,
-            'created_at' => $this->created_at?->format('Y-m-d H:i:A'),
+            // 'social_links' => $this->social_links, // already has icon_url
+            'social_links' => $this->formatSocialLinks($this->social_links),
         ];
+    }
+
+
+    private function formatSocialLinks($socialLinks)
+    {
+        if (!$socialLinks) {
+            return [];
+        }
+
+        $links = is_string($socialLinks)
+            ? json_decode($socialLinks, true)
+            : $socialLinks;
+
+        return collect($links)->map(function ($link) {
+            return [
+                'url' => $link['url'] ?? null,
+                'icon' => isset($link['icon']) ? asset($link['icon']) : null,
+                'platform' => $link['platform'] ?? null,
+            ];
+        })->toArray();
     }
 }
