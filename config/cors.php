@@ -39,5 +39,6 @@ return [
         'https://dmvicini.softvencefsd.xyz/',
         'https://dmvicini.softvencefsd.xyz/api/',
         'https://dmvicini.softvencefsd.xyz/api/*',
+        'https://pinnacle-capital.netlify.app/'
     ],
 ];

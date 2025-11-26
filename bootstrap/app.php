@@ -47,9 +47,10 @@ return Application::configure(basePath: dirname(__DIR__))
             'https://dmvicini.softvencefsd.xyz/api/',
             'https://dmvicini.softvencefsd.xyz/api/*',
             'http://localhost:5173/investment',
-            'http://localhost:5173/*'
+            'http://localhost:5173/*',
+            'https://pinnacle-capital.netlify.app/'
         ]);
-        
+
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

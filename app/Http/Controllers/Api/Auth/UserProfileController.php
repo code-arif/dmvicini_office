@@ -34,10 +34,6 @@ class UserProfileController extends Controller
             // Load all needed relations in one go
             $user->loadMissing(['profile.firm', 'complianceAcknowledgment']);
 
-            if (! $user->is_active) {
-                return $this->error([], 'Your account has been deactivated.', 403);
-            }
-
             // Use the full UserResource (includes profile + firm)
             $resource = new UserResource($user);
 
