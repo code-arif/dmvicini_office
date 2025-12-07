@@ -100,13 +100,8 @@
                         <td bgcolor="#f7fafc" align="center"
                             style="padding: 30px; text-align: center; font-family: Arial, sans-serif; font-size: 13px; color: #718096; border-top: 1px solid #e2e8f0;">
 
-                            <p style="margin: 0 0 10px; font-family: Arial, sans-serif;">&copy; {{ date('Y') }}
+                            <p style="margin: 0 0 10px; font-family: Arial, sans-serif;">&copy; 2026
                                 Pinnacle Alt's Platform. All rights reserved.</p>
-
-                            {{-- <p style="margin: 0 0 15px; font-family: Arial, sans-serif;">
-            <a href="{{ config('app.url') }}/privacy" style="color: #172971; text-decoration: none;">Privacy Policy</a> •
-            <a href="{{ config('app.url') }}/terms" style="color: #172971; text-decoration: none;">Terms of Use</a>
-        </p> --}}
 
                             <p style="margin: 0; font-size: 12px; color: #a0aec0; font-family: Arial, sans-serif;">
                                 This is an automated message. Please do not reply.
