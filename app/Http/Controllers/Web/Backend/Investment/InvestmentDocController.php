@@ -48,7 +48,7 @@ class InvestmentDocController extends Controller
                 'document' => $doc,
                 'message' => 'Document uploaded successfully!'
             ]);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Document upload failed', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()

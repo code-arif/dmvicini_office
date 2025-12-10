@@ -4,10 +4,10 @@ namespace App\Http\Controllers\Web\Backend;
 
 use Exception;
 use App\Helper\Helper;
-use App\Models\Category;
 use App\Models\Education;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\AssetClass;
 use App\Models\PinnedEducation;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -16,10 +16,12 @@ class EducationController extends Controller
     //education list
     public function index(Request $request)
     {
-        $categories = Category::get();
+        $asset_classes = AssetClass::get();
+
         if ($request->ajax()) {
             // eager load category relationship
-            $educations = Education::with('category')->latest()->get();
+            $educations = Education::with('asset_class')->latest()->get();
+
 
             return DataTables::of($educations)
                 ->addIndexColumn()
@@ -39,10 +41,10 @@ class EducationController extends Controller
                 ->addColumn('sub_title', fn($item) => $item->sub_title ?? '-')
 
                 // Category
-                ->addColumn('category', function ($item) {
-                    if ($item->category && $item->category->title) {
-                        $title = e($item->category->title);
-                        return '<span class="badge rounded-pill bg-info text-dark">' . $title . '</span>';
+                ->addColumn('asset_class', function ($item) {
+                    if ($item->asset_class && $item->asset_class->name) {
+                        $name = e($item->asset_class->name);
+                        return '<span class="badge rounded-pill bg-info text-dark">' . $name . '</span>';
                     }
                     return '<span class="badge rounded-pill red-accent">Uncategorized</span>';
                 })
@@ -77,7 +79,7 @@ class EducationController extends Controller
                             data-title="' . e($item->title) . '"
                             data-sub_title="' . e($item->sub_title) . '"
                             data-description="' . e($item->description) . '"
-                            data-category_id="' . $item->category_id . '"
+                            data-asset_class_id="' . $item->asset_class_id . '"
                             data-image="' . $item->image . '">
                             <i class="fas fa-edit"></i>
                         </button>
@@ -88,11 +90,11 @@ class EducationController extends Controller
                         ';
                 })
 
-                ->rawColumns(['action', 'image', 'category', 'status'])
+                ->rawColumns(['action', 'image', 'asset_class', 'status'])
                 ->make(true);
         }
 
-        return view("backend.layouts.education.index", compact('categories'));
+        return view("backend.layouts.education.index", compact('asset_classes'));
     }
 
     //store education
@@ -103,7 +105,7 @@ class EducationController extends Controller
                 'title'       => 'required|string|max:250',
                 'sub_title'   => 'nullable|string|max:250',
                 'description' => 'nullable|string',
-                'category_id' => 'required|exists:categories,id',
+                'asset_class_id' => 'required|exists:asset_classes,id',
                 'image'       => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240',
             ]);
 
@@ -139,7 +141,7 @@ class EducationController extends Controller
                 'title'         => 'required|string|max:250',
                 'sub_title'     => 'nullable|string|max:250',
                 'description'   => 'nullable|string',
-                'category_id'   => 'required|exists:categories,id',
+                'asset_class_id'   => 'required|exists:asset_classes,id',
                 'image'         => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240',
             ]);
 

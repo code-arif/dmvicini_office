@@ -38,11 +38,11 @@
                 <!-- PAGE-HEADER -->
                 <div class="page-header">
                     <div>
-                        <h1 class="page-title">Investments</h1>
+                        <h1 class="page-title">Deals</h1>
                     </div>
                     <div class="ms-auto pageheader-btn">
                         <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="javascript:void(0);">Investments</a></li>
+                            <li class="breadcrumb-item"><a href="javascript:void(0);">Deals</a></li>
                             <li class="breadcrumb-item active" aria-current="page">Index</li>
                         </ol>
                     </div>
@@ -120,10 +120,10 @@
                     <div class="col-12">
                         <div class="card product-sales-main">
                             <div class="card-header border-bottom">
-                                <h3 class="card-title mb-0">Investment List</h3>
+                                <h3 class="card-title mb-0">Deals List</h3>
                                 <div class="card-options ms-auto">
                                     <a href="{{ route('investment.create') }}" class="btn btn-primary btn-sm" style="margin-right: 10px">
-                                        <i class="fa fa-plus"></i> Add Investment
+                                        <i class="fa fa-plus"></i> Add Deal
                                     </a>
                                     <a href="{{ route('investment.create') }}" class="btn btn-outline-secondary btn-sm">
                                         <i class="fa fa-trash"></i> Trash

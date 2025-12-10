@@ -8,7 +8,7 @@ class Education extends Model
 {
     protected $fillable = [
         'user_id',
-        'category_id',
+        'asset_class_id',
         'title',
         'sub_title',
         'description',
@@ -16,9 +16,9 @@ class Education extends Model
     ];
 
     //reation with category table
-    public function category()
+    public function asset_class()
     {
-        return $this->BelongsTo(Category::class);
+        return $this->BelongsTo(AssetClass::class);
     }
 
     //relation with pin table

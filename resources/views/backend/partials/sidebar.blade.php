@@ -69,10 +69,10 @@
                         </li>
                         <li><a href="{{ route('show.investment.type.list') }}" class="slide-item">Investment Types</a>
                         </li>
-                        <li><a href="{{ route('show.investment.strategy.list') }}" class="slide-item">Strategies</a>
+                        <li><a href="{{ route('show.investment.strategy.list') }}" class="slide-item">Investment Strategies</a>
                         </li>
-                        <li><a href="{{ route('show.tax.strategy.list') }}" class="slide-item">Tax Strategy</a>
-                        </li>
+                        {{-- <li><a href="{{ route('show.tax.strategy.list') }}" class="slide-item">Tax Strategy</a>
+                        </li> --}}
                     </ul>
                 </li>
 
@@ -86,8 +86,8 @@
 
 
                     <ul class="slide-menu">
-                        <li><a href="{{ route('show.category.list') }}" class="slide-item">Article Categories</a>
-                        </li>
+                        {{-- <li><a href="{{ route('show.category.list') }}" class="slide-item">Article Categories</a>
+                        </li> --}}
                         <li><a href="{{ route('show.education.list') }}" class="slide-item">Articles</a>
                         </li>
                     </ul>

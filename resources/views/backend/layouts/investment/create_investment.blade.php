@@ -7,11 +7,11 @@
             <div class="main-container container-fluid">
                 <div class="page-header">
                     <div>
-                        <h1 class="page-title">Create Investment</h1>
+                        <h1 class="page-title">Create Deal</h1>
                     </div>
                     <div class="ms-auto pageheader-btn">
                         <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="{{ route('investment.list') }}">Investments</a></li>
+                            <li class="breadcrumb-item"><a href="{{ route('investment.list') }}">Deals</a></li>
                             <li class="breadcrumb-item active">Create</li>
                         </ol>
                     </div>
@@ -61,15 +61,15 @@
                                                 <input type="text" name="title" class="form-control" required>
                                             </div>
                                             <div class="col-md-6 mb-3">
-                                                <label class="form-label">Mountain Image</label>
+                                                <label class="form-label">Main Image</label>
                                                 <input type="file" name="mountain_image" class="form-control"
                                                     accept="image/*">
                                                 <img id="mountainImagePreview" class="mountain-image-preview">
                                             </div>
                                         </div>
 
-                                        <div class="row">
-                                            <div class="col-md-3 mb-3">
+                                        <div class="d-flex justify-content-between gap-1">
+                                            <div class="col-md-4 mb-3 bg-light p-3 rounded-1">
                                                 <label class="form-label">Asset Class</label>
                                                 <select name="asset_class_id" class="form-select">
                                                     <option value="">-- Select --</option>
@@ -78,7 +78,7 @@
                                                     @endforeach
                                                 </select>
                                             </div>
-                                            <div class="col-md-3 mb-3">
+                                            <div class="col-md-4 mb-3 bg-light p-3 rounded-1">
                                                 <label class="form-label">Investment Type</label>
                                                 <select name="investment_type_id" class="form-select">
                                                     <option value="">-- Select --</option>
@@ -87,7 +87,7 @@
                                                     @endforeach
                                                 </select>
                                             </div>
-                                            <div class="col-md-3 mb-3">
+                                            <div class="col-md-4 mb-3 bg-light p-3 rounded-1">
                                                 <label class="form-label">Investment Strategy</label>
                                                 <select name="investments_strategy_id" class="form-select">
                                                     <option value="">-- Select --</option>
@@ -96,7 +96,7 @@
                                                     @endforeach
                                                 </select>
                                             </div>
-                                            <div class="col-md-3 mb-3">
+                                            {{-- <div class="col-md-3 mb-3">
                                                 <label class="form-label">Tax Strategy</label>
                                                 <select name="tax_strategie_id" class="form-select">
                                                     <option value="">-- Select --</option>
@@ -104,7 +104,7 @@
                                                         <option value="{{ $item->id }}">{{ $item->name }}</option>
                                                     @endforeach
                                                 </select>
-                                            </div>
+                                            </div> --}}
                                         </div>
 
                                         <div class="row">
@@ -127,7 +127,7 @@
                                         </div>
 
                                         <div class="mb-3">
-                                            <label class="form-label">Investment Details</label>
+                                            <label class="form-label">Summary</label>
                                             <textarea name="investment_details" id="investmentDetails" class="form-control"></textarea>
                                         </div>
                                     </div>
@@ -254,13 +254,53 @@
 
                                     <!-- Step 5: Gallery -->
                                     <div class="step-content" data-step="5">
-                                        <h4 class="mb-4">Gallery Images</h4>
-                                        <div class="mb-3">
-                                            <label class="form-label">Select Multiple Images</label>
-                                            <input type="file" id="galleryImages" class="form-control"
-                                                accept="image/*" multiple>
+                                        <h4 class="mb-4">Gallery Images (Maximum 2)</h4>
+
+                                        <div class="row g-4">
+                                            <!-- First Image -->
+                                            <div class="col-md-6">
+                                                <div class="gallery-upload-box">
+                                                    <label class="form-label">Image 1</label>
+                                                    <div class="image-upload-wrapper" id="image1Wrapper">
+                                                        <input type="file" name="gallery_images[]" class="image-input"
+                                                            id="image1Input" accept="image/*">
+                                                        <div class="upload-placeholder">
+                                                            <i class="fa fa-image fa-3x text-muted"></i>
+                                                            <p class="mt-2">Click to upload Image 1</p>
+                                                        </div>
+                                                        <img id="image1Preview" class="image-preview"
+                                                            style="display:none;">
+                                                        <button type="button" class="remove-image-btn" id="removeImage1"
+                                                            style="display:none;">
+                                                            <i class="fa fa-times"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Second Image -->
+                                            <div class="col-md-6">
+                                                <div class="gallery-upload-box">
+                                                    <label class="form-label">Image 2</label>
+                                                    <div class="image-upload-wrapper" id="image2Wrapper">
+                                                        <input type="file" name="gallery_images[]" class="image-input"
+                                                            id="image2Input" accept="image/*">
+                                                        <div class="upload-placeholder">
+                                                            <i class="fa fa-image fa-3x text-muted"></i>
+                                                            <p class="mt-2">Click to upload Image 2</p>
+                                                        </div>
+                                                        <img id="image2Preview" class="image-preview"
+                                                            style="display:none;">
+                                                        <button type="button" class="remove-image-btn" id="removeImage2"
+                                                            style="display:none;">
+                                                            <i class="fa fa-times"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div id="imagePreviewGrid" class="image-preview-grid"></div>
+
+                                        <small class="text-muted">You can upload up to 2 images. Both are optional.</small>
                                     </div>
 
 
@@ -322,9 +362,10 @@
         let investmentId = null;
         let map, marker, geocoder, searchBox;
         let documents = [];
-        let images = [];
+        let galleryImages = [null, null]; // Fixed: Initialize with nulls for 2 images
 
         $(document).ready(function() {
+            // Initialize Summernote
             $('#investmentDetails, #overview, #investor_waterfall, #promoted_interest, #disclaimerDescription')
                 .summernote({
                     height: 200,
@@ -341,6 +382,7 @@
 
             initMap();
 
+            // Mountain image preview
             $('input[name="mountain_image"]').on('change', function() {
                 if (this.files && this.files[0]) {
                     let reader = new FileReader();
@@ -351,11 +393,11 @@
                 }
             });
 
+            // Navigation buttons
             $('#nextBtn').on('click', () => {
                 if (currentStep === 1 && !investmentId) {
                     saveBasicInfo();
                 } else if (currentStep === 2) {
-                    // Save location when moving from Step 2
                     updateLocation();
                 } else {
                     navigateStep(1);
@@ -365,7 +407,23 @@
             $('#prevBtn').on('click', () => navigateStep(-1));
             $('#submitBtn').on('click', submitInvestment);
             $('#addDocumentBtn').on('click', addDocument);
-            $('#galleryImages').on('change', previewGalleryImages);
+
+            // Gallery - 2 images handling (FIXED)
+            $('#image1Input').on('change', function() {
+                handleImageUpload(this, '#image1Preview', '#image1Wrapper', '#removeImage1', 0);
+            });
+
+            $('#image2Input').on('change', function() {
+                handleImageUpload(this, '#image2Preview', '#image2Wrapper', '#removeImage2', 1);
+            });
+
+            $('#removeImage1').on('click', function() {
+                removeImage(0);
+            });
+
+            $('#removeImage2').on('click', function() {
+                removeImage(1);
+            });
         });
 
         function initMap() {
@@ -399,19 +457,10 @@
 
             searchBox.addListener('places_changed', () => {
                 const places = searchBox.getPlaces();
-
-                if (places.length == 0) {
-                    console.log('No places found');
-                    return;
-                }
+                if (places.length == 0) return;
 
                 const place = places[0];
-                console.log('Selected place:', place);
-
-                if (!place.geometry || !place.geometry.location) {
-                    console.log('Place has no geometry');
-                    return;
-                }
+                if (!place.geometry || !place.geometry.location) return;
 
                 marker.setPosition(place.geometry.location);
                 map.setCenter(place.geometry.location);
@@ -421,30 +470,20 @@
             });
 
             marker.addListener('dragend', function() {
-                console.log('Marker dragged to:', marker.getPosition());
                 reverseGeocode(marker.getPosition());
             });
 
             map.addListener('click', function(e) {
-                console.log('Map clicked at:', e.latLng);
                 marker.setPosition(e.latLng);
                 reverseGeocode(e.latLng);
             });
-
-            console.log('Map initialized');
         }
 
         function reverseGeocode(location) {
-            console.log('Reverse geocoding:', location.lat(), location.lng());
-
             geocoder.geocode({
                 location: location
             }, (results, status) => {
-                console.log('Geocode status:', status);
-
                 if (status === 'OK' && results[0]) {
-                    console.log('Geocode result:', results[0]);
-
                     $('#latitude').val(location.lat());
                     $('#longitude').val(location.lng());
 
@@ -456,7 +495,6 @@
                         address_components: results[0].address_components
                     });
                 } else {
-                    console.error('Geocode failed:', status);
                     toastr.warning('Could not get location details');
                 }
             });
@@ -469,47 +507,27 @@
             $('#latitude').val(lat);
             $('#longitude').val(lng);
 
-            console.log('Coordinates:', {
-                lat,
-                lng
-            });
-
             if (place.formatted_address) {
                 $('#address').val(place.formatted_address);
-                console.log('Address:', place.formatted_address);
             }
 
             if (place.address_components) {
-                $('#country').val('');
-                $('#state').val('');
-                $('#city').val('');
+                $('#country, #state, #city').val('');
 
                 place.address_components.forEach(component => {
                     const types = component.types;
-                    console.log('Component:', component.long_name, types);
 
                     if (types.includes('country')) {
                         $('#country').val(component.long_name);
                     }
-
                     if (types.includes('administrative_area_level_1')) {
                         $('#state').val(component.long_name);
                     }
-
                     if (types.includes('locality')) {
                         $('#city').val(component.long_name);
                     } else if (types.includes('administrative_area_level_2') && !$('#city').val()) {
                         $('#city').val(component.long_name);
-                    } else if (types.includes('sublocality_level_1') && !$('#city').val()) {
-                        $('#city').val(component.long_name);
                     }
-                });
-
-                console.log('Location fields updated:', {
-                    country: $('#country').val(),
-                    state: $('#state').val(),
-                    city: $('#city').val(),
-                    address: $('#address').val()
                 });
 
                 toastr.success('Location updated successfully');
@@ -519,7 +537,7 @@
         function saveBasicInfo() {
             const formData = new FormData($('#investmentForm')[0]);
 
-            // Explicitly add location data to ensure they're included
+            // Add location data
             formData.set('country', $('#country').val() || '');
             formData.set('state', $('#state').val() || '');
             formData.set('city', $('#city').val() || '');
@@ -527,18 +545,9 @@
             formData.set('latitude', $('#latitude').val() || '');
             formData.set('longitude', $('#longitude').val() || '');
 
-            console.log('Saving basic info with location:', {
-                country: formData.get('country'),
-                state: formData.get('state'),
-                city: formData.get('city'),
-                address: formData.get('address'),
-                latitude: formData.get('latitude'),
-                longitude: formData.get('longitude')
-            });
-
             NProgress.start();
             $.ajax({
-                url: "{{ route('investment.basic.store') }}",
+                url: window.routes.basicStore,
                 type: "POST",
                 data: formData,
                 processData: false,
@@ -547,28 +556,19 @@
                     NProgress.done();
                     if (res.success && res.investment_id) {
                         investmentId = res.investment_id;
-                        console.log('Investment created with ID:', investmentId);
-                        toastr.success(res.message);
+                        console.log('Investment ID saved:', investmentId);
+                        toastr.success(res.message || 'Basic info saved successfully');
                         $(`.step-item[data-step="1"]`).addClass('completed');
                         navigateStep(1);
                     }
                 },
                 error: function(xhr) {
                     NProgress.done();
-                    console.error('Save error:', xhr);
-                    let message = 'Failed to save basic info';
-                    if (xhr.responseJSON && xhr.responseJSON.errors) {
-                        message = Object.values(xhr.responseJSON.errors).flat().join('<br>');
-                    } else if (xhr.responseJSON && xhr.responseJSON.message) {
-                        message = xhr.responseJSON.message;
-                    }
-                    toastr.error(message);
+                    handleAjaxError(xhr, 'Failed to save basic info');
                 }
             });
         }
 
-
-        // Add new function to update location
         function updateLocation() {
             if (!investmentId) {
                 toastr.error('Please complete Step 1 first');
@@ -576,7 +576,7 @@
             }
 
             const locationData = new FormData();
-            locationData.append('_token', "{{ csrf_token() }}");
+            locationData.append('_token', $('input[name="_token"]').val());
             locationData.append('_method', 'POST');
             locationData.append('country', $('#country').val() || '');
             locationData.append('state', $('#state').val() || '');
@@ -584,15 +584,6 @@
             locationData.append('address', $('#address').val() || '');
             locationData.append('latitude', $('#latitude').val() || '');
             locationData.append('longitude', $('#longitude').val() || '');
-
-            console.log('Updating location:', {
-                country: $('#country').val(),
-                state: $('#state').val(),
-                city: $('#city').val(),
-                address: $('#address').val(),
-                latitude: $('#latitude').val(),
-                longitude: $('#longitude').val()
-            });
 
             NProgress.start();
             $.ajax({
@@ -610,8 +601,7 @@
                 },
                 error: function(xhr) {
                     NProgress.done();
-                    console.error('Location update error:', xhr);
-                    toastr.error('Failed to update location');
+                    handleAjaxError(xhr, 'Failed to update location');
                 }
             });
         }
@@ -661,6 +651,7 @@
             renderDocuments();
             $('#docName').val('');
             $('#docFile').val('');
+            toastr.success('Document added');
         }
 
         function renderDocuments() {
@@ -682,51 +673,63 @@
         function removeDocument(index) {
             documents.splice(index, 1);
             renderDocuments();
+            toastr.info('Document removed');
         }
 
-        function previewGalleryImages() {
-            const files = this.files;
-            images = Array.from(files);
+        // FIXED: Gallery image handling
+        function handleImageUpload(input, previewId, wrapperId, removeBtnId, index) {
+            const file = input.files[0];
+            if (!file) return;
 
-            let html = '';
-            images.forEach((file, index) => {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    $(`#img-preview-${index}`).attr('src', e.target.result);
-                };
-                reader.readAsDataURL(file);
+            if (!file.type.startsWith('image/')) {
+                toastr.error('Please select an image file');
+                input.value = '';
+                return;
+            }
 
-                html += `
-            <div class="image-preview-item">
-                <img id="img-preview-${index}" src="" alt="Preview">
-                <button type="button" class="remove-btn" onclick="removeImage(${index})">
-                    <i class="fa fa-times"></i>
-                </button>
-            </div>
-        `;
-            });
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                $(previewId).attr('src', e.target.result).show();
+                $(wrapperId).addClass('has-image');
+                $(removeBtnId).show();
+            };
+            reader.readAsDataURL(file);
 
-            $('#imagePreviewGrid').html(html);
+            // Store the actual File object
+            galleryImages[index] = file;
+            console.log('Image added at index', index, galleryImages);
         }
 
         function removeImage(index) {
-            images.splice(index, 1);
-            const dt = new DataTransfer();
-            images.forEach(file => dt.items.add(file));
-            $('#galleryImages')[0].files = dt.files;
-            previewGalleryImages.call($('#galleryImages')[0]);
+            const imageNum = index + 1; // Convert to 1-based for IDs
+            const inputId = `#image${imageNum}Input`;
+            const previewId = `#image${imageNum}Preview`;
+            const wrapperId = `#image${imageNum}Wrapper`;
+            const removeBtnId = `#removeImage${imageNum}`;
+
+            $(inputId).val('');
+            $(previewId).hide();
+            $(wrapperId).removeClass('has-image');
+            $(removeBtnId).hide();
+
+            galleryImages[index] = null;
+            console.log('Image removed at index', index, galleryImages);
+            toastr.info('Image removed');
         }
 
+        // FIXED: Submit function - keep your existing API structure
         function submitInvestment() {
             if (!investmentId) {
                 toastr.error('Please complete step 1 first');
                 return;
             }
 
-            console.log('Starting submission with ID:', investmentId);
+            console.log('Starting submission for Investment ID:', investmentId);
             NProgress.start();
+
             const promises = [];
 
+            // Step 3: Highlights
             const highlightData = {
                 overview: $('#overview').summernote('code'),
                 targeted_irr: $('[name="targeted_irr"]').val(),
@@ -738,80 +741,85 @@
                 acquisition_fee: $('[name="acquisition_fee"]').val(),
                 disposition_fee: $('[name="disposition_fee"]').val(),
                 fund_administration_fee: $('[name="fund_administration_fee"]').val(),
-                _token: "{{ csrf_token() }}"
+                _token: $('input[name="_token"]').val()
             };
-
-            const highlightUrl = window.routes.highlightStore.replace(':id', investmentId);
 
             promises.push(
                 $.ajax({
-                    url: highlightUrl,
+                    url: window.routes.highlightStore.replace(':id', investmentId),
                     type: "POST",
                     data: highlightData
-                })
+                }).then(() => console.log('✓ Highlights saved'))
             );
 
+            // Step 4: Documents (keep existing one-by-one upload)
             if (documents.length > 0) {
+                console.log('Uploading', documents.length, 'documents');
                 documents.forEach((doc, index) => {
                     const formDocument = new FormData();
                     formDocument.append('name', doc.name);
                     formDocument.append('file', doc.file);
-                    formDocument.append('_token', "{{ csrf_token() }}");
-
-                    const documentUrl = window.routes.documentStore.replace(':id', investmentId);
+                    formDocument.append('_token', $('input[name="_token"]').val());
 
                     promises.push(
                         $.ajax({
-                            url: documentUrl,
+                            url: window.routes.documentStore.replace(':id', investmentId),
                             type: "POST",
                             data: formDocument,
                             processData: false,
                             contentType: false
-                        })
+                        }).then(() => console.log(`✓ Document ${index + 1} saved`))
                     );
                 });
             }
 
-            if (images.length > 0) {
-                const imageFormData = new FormData();
-                images.forEach(img => imageFormData.append('images[]', img));
-                imageFormData.append('_token', "{{ csrf_token() }}");
+            // Step 5: Gallery (FIXED - upload only non-null images)
+            const validImages = galleryImages.filter(img => img !== null);
+            console.log('Valid gallery images:', validImages.length);
 
-                const imagesUrl = window.routes.imagesStore.replace(':id', investmentId);
+            if (validImages.length > 0) {
+                const imageFormData = new FormData();
+
+                validImages.forEach((img) => {
+                    imageFormData.append('images[]', img);
+                });
+
+                imageFormData.append('_token', $('input[name="_token"]').val());
 
                 promises.push(
                     $.ajax({
-                        url: imagesUrl,
+                        url: window.routes.imagesStore.replace(':id', investmentId),
                         type: "POST",
                         data: imageFormData,
                         processData: false,
                         contentType: false
-                    })
+                    }).then(() => console.log('✓ Gallery images saved'))
                 );
             }
 
+            // Step 6: Disclaimer
             const disclaimerContent = $('#disclaimerDescription').summernote('code');
             if (disclaimerContent && disclaimerContent.trim() !== '') {
-                const disclaimerUrl = window.routes.disclaimerStore.replace(':id', investmentId);
-
                 promises.push(
                     $.ajax({
-                        url: disclaimerUrl,
+                        url: window.routes.disclaimerStore.replace(':id', investmentId),
                         type: "POST",
                         data: {
                             description: disclaimerContent,
-                            _token: "{{ csrf_token() }}"
+                            _token: $('input[name="_token"]').val()
                         }
-                    })
+                    }).then(() => console.log('✓ Disclaimer saved'))
                 );
             }
 
+            // Execute all promises
             Promise.all(promises)
                 .then(() => {
                     NProgress.done();
+                    console.log('✓ All data saved successfully');
 
                     Swal.fire({
-                        title: 'Success',
+                        title: 'Success!',
                         text: 'Investment created successfully',
                         icon: 'success',
                         confirmButtonText: 'View List',
@@ -825,10 +833,12 @@
                     console.error('Submission error:', err);
 
                     let message = 'Failed to complete investment creation';
-                    if (err.responseJSON && err.responseJSON.message) {
-                        message = err.responseJSON.message;
-                    } else if (err.responseJSON && err.responseJSON.errors) {
-                        message = Object.values(err.responseJSON.errors).flat().join('<br>');
+                    if (err.responseJSON) {
+                        if (err.responseJSON.message) {
+                            message = err.responseJSON.message;
+                        } else if (err.responseJSON.errors) {
+                            message = Object.values(err.responseJSON.errors).flat().join('<br>');
+                        }
                     }
 
                     Swal.fire({
@@ -839,6 +849,21 @@
                         confirmButtonColor: '#dc3545'
                     });
                 });
+        }
+
+        function handleAjaxError(xhr, defaultMsg) {
+            let message = defaultMsg;
+
+            if (xhr.responseJSON) {
+                if (xhr.responseJSON.message) {
+                    message = xhr.responseJSON.message;
+                } else if (xhr.responseJSON.errors) {
+                    message = Object.values(xhr.responseJSON.errors).flat().join('<br>');
+                }
+            }
+
+            toastr.error(message);
+            console.error(defaultMsg, xhr);
         }
     </script>
 @endpush
@@ -970,6 +995,72 @@
             margin-top: 10px;
             border-radius: 8px;
             display: none;
+        }
+    </style>
+
+    {{-- gallary image uploading style --}}
+    <style>
+        .gallery-upload-box {
+            margin-bottom: 1rem;
+        }
+
+        .image-upload-wrapper {
+            position: relative;
+            border: 2px dashed #dee2e6;
+            border-radius: 8px;
+            background: #f8f9fa;
+            height: 250px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .image-upload-wrapper:hover {
+            border-color: #0d6efd;
+        }
+
+        .image-input {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .upload-placeholder {
+            text-align: center;
+            color: #6c757d;
+        }
+
+        .image-preview {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+
+        .remove-image-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(220, 53, 69, 0.9);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0.9;
+            transition: opacity 0.3s;
+        }
+
+        .remove-image-btn:hover {
+            opacity: 1;
         }
     </style>
 @endpush

@@ -163,10 +163,13 @@ Route::middleware(['auth', 'admin'])->group(function () {
 
 Route::controller(FaqController::class)->group(function () {
     Route::get('/faq', 'index')->name('admin.faq.index');
-    Route::post('/faq/store', 'store')->name('admin.faq.store'); // Changed
-    Route::put('/faq/update/{id}', 'update')->name('admin.faq.update'); // Changed
+    Route::get('/faq/create', 'create')->name('admin.faq.create'); // NEW
+    Route::post('/faq/store', 'store')->name('admin.faq.store');
+    Route::get('/faq/edit/{id}', 'edit')->name('admin.faq.edit'); // NEW
+    Route::put('/faq/update/{id}', 'update')->name('admin.faq.update');
     Route::post('/faq/status/{id}', 'status')->name('admin.faq.status');
-    Route::delete('/faq/destroy/{id}', 'destroy')->name('admin.faq.destroy'); // Changed
+    Route::delete('/faq/destroy/{id}', 'destroy')->name('admin.faq.destroy');
+    Route::post('/faq/upload-image', 'uploadImage')->name('admin.faq.upload-image'); // NEW
 });
 
 Route::controller(DynamicPageController::class)->group(function () {

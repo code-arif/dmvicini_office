@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('education', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('category_id')->nullable()->constrained()->onDelete('cascade');
+            $table->foreignId('asset_class_id')->nullable()->constrained()->cascadeOnDelete();
             $table->string('title', 250);
             $table->string('sub_title')->nullable();
             $table->text('description')->nullable();

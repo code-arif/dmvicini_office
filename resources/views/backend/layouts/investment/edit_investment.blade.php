@@ -309,7 +309,7 @@
                                     </div>
 
                                     <!-- Step 5: Gallery -->
-                                    <div class="step-content" data-step="5">
+                                    {{-- <div class="step-content" data-step="5">
                                         <h4 class="mb-4">Gallery Images</h4>
 
                                         <!-- Existing Images -->
@@ -335,29 +335,23 @@
                                                 accept="image/*" multiple>
                                         </div>
                                         <div id="imagePreviewGrid" class="image-preview-grid"></div>
-                                    </div>
+                                    </div> --}}
 
-                                    <!-- Step 6: Disclaimers -->
-                                    {{-- <div class="step-content" data-step="6">
-                                        <h4 class="mb-4">Disclaimers</h4>
+                                    <!-- Step 5: Gallery (REPLACE OLD SECTION) -->
+                                    <div class="step-content" data-step="5">
+                                        <h4 class="mb-4">Gallery Images</h4>
 
-                                        <!-- Existing Disclaimers -->
+                                        <!-- Existing Images -->
                                         <div class="mb-4">
-                                            <h5>Existing Disclaimers</h5>
-                                            <div id="existingDisclaimers" class="list-group">
-                                                @foreach ($investment->disclaimers as $disc)
-                                                    <div class="list-group-item" data-disc-id="{{ $disc->id }}">
-                                                        <div class="d-flex justify-content-between align-items-start">
-                                                            <div>
-                                                                <h6>{{ $disc->title }}</h6>
-                                                                @if ($disc->description)
-                                                                    <p class="mb-0 text-muted">{{ $disc->description }}
-                                                                    </p>
-                                                                @endif
-                                                            </div>
-                                                            <button type="button" class="btn btn-sm btn-danger"
-                                                                onclick="deleteExistingDisclaimer({{ $disc->id }})">
-                                                                <i class="fa fa-trash"></i>
+                                            <h5>Existing Images (Maximum 2 total)</h5>
+                                            <div id="existingImages" class="row g-3">
+                                                @foreach ($investment->images as $img)
+                                                    <div class="col-md-6" data-img-id="{{ $img->id }}">
+                                                        <div class="image-preview-item">
+                                                            <img src="{{ asset($img->image_url) }}" alt="Gallery Image">
+                                                            <button type="button" class="remove-btn"
+                                                                onclick="deleteExistingImage({{ $img->id }})">
+                                                                <i class="fa fa-times"></i>
                                                             </button>
                                                         </div>
                                                     </div>
@@ -365,26 +359,73 @@
                                             </div>
                                         </div>
 
-                                        <!-- New Disclaimers -->
-                                        <div id="disclaimersList" class="mb-3"></div>
-                                        <div class="card bg-light">
-                                            <div class="card-body">
-                                                <div class="mb-3">
-                                                    <label class="form-label">Title <span
-                                                            class="text-danger">*</span></label>
-                                                    <input type="text" id="disclaimerTitle" class="form-control">
-                                                </div>
-                                                <div class="mb-3">
-                                                    <label class="form-label">Description</label>
-                                                    <textarea id="disclaimerDescription" class="form-control" rows="3"></textarea>
-                                                </div>
-                                                <button type="button" class="btn btn-primary" id="addDisclaimerBtn">
-                                                    <i class="fa fa-plus"></i> Add New Disclaimer
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div> --}}
+                                        @php
+                                            $existingCount = $investment->images->count();
+                                            $canAddMore = $existingCount < 2;
+                                            $remainingSlots = 2 - $existingCount;
+                                        @endphp
 
+                                        @if ($canAddMore)
+                                            <!-- New Images Section -->
+                                            <div class="mb-4">
+                                                <h5>Add New Images ({{ $remainingSlots }} remaining)</h5>
+                                                <div class="row g-4">
+                                                    @if ($remainingSlots >= 1)
+                                                        <div class="col-md-6">
+                                                            <div class="gallery-upload-box">
+                                                                <label class="form-label">New Image 1</label>
+                                                                <div class="image-upload-wrapper" id="image1Wrapper">
+                                                                    <input type="file" class="image-input"
+                                                                        id="image1Input" accept="image/*">
+                                                                    <div class="upload-placeholder">
+                                                                        <i class="fa fa-image fa-3x text-muted"></i>
+                                                                        <p class="mt-2">Click to upload</p>
+                                                                    </div>
+                                                                    <img id="image1Preview" class="image-preview"
+                                                                        style="display:none;">
+                                                                    <button type="button" class="remove-image-btn"
+                                                                        id="removeImage1" style="display:none;">
+                                                                        <i class="fa fa-times"></i>
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    @endif
+
+                                                    @if ($remainingSlots >= 2)
+                                                        <div class="col-md-6">
+                                                            <div class="gallery-upload-box">
+                                                                <label class="form-label">New Image 2</label>
+                                                                <div class="image-upload-wrapper" id="image2Wrapper">
+                                                                    <input type="file" class="image-input"
+                                                                        id="image2Input" accept="image/*">
+                                                                    <div class="upload-placeholder">
+                                                                        <i class="fa fa-image fa-3x text-muted"></i>
+                                                                        <p class="mt-2">Click to upload</p>
+                                                                    </div>
+                                                                    <img id="image2Preview" class="image-preview"
+                                                                        style="display:none;">
+                                                                    <button type="button" class="remove-image-btn"
+                                                                        id="removeImage2" style="display:none;">
+                                                                        <i class="fa fa-times"></i>
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        @else
+                                            <div class="alert alert-info">
+                                                <i class="fa fa-info-circle"></i> You have reached the maximum limit of 2
+                                                gallery images.
+                                                Delete an existing image to add a new one.
+                                            </div>
+                                        @endif
+
+                                        <small class="text-muted">Total allowed: 2 images. Currently uploaded:
+                                            {{ $existingCount }}</small>
+                                    </div>
 
                                     <!-- Step 6: Disclaimer (Single) in Edit Page -->
                                     <div class="step-content" data-step="6">
@@ -442,7 +483,7 @@
     </script>
 
 
-    <script>
+    {{-- <script>
         let currentStep = 1;
         let totalSteps = 6;
         let map, marker, geocoder, searchBox;
@@ -1091,6 +1132,554 @@
                     });
                 });
         }
+    </script> --}}
+
+
+    <script>
+        let currentStep = 1;
+        let totalSteps = 6;
+        let map, marker, geocoder, searchBox;
+        let documents = [];
+        let galleryImages = [null, null]; // Fixed: 2 images only
+
+        $(document).ready(function() {
+            // Initialize Summernote
+            $('#investmentDetails, #overview, #investor_waterfall, #promoted_interest, #disclaimerDescription')
+                .summernote({
+                    height: 200,
+                    toolbar: [
+                        ['style', ['style']],
+                        ['font', ['bold', 'italic', 'underline', 'clear']],
+                        ['color', ['color']],
+                        ['para', ['ul', 'ol', 'paragraph']],
+                        ['table', ['table']],
+                        ['insert', ['link', 'picture']],
+                        ['view', ['fullscreen', 'codeview']]
+                    ]
+                });
+
+            initMap();
+
+            // Mountain image preview
+            $('input[name="mountain_image"]').on('change', function() {
+                if (this.files && this.files[0]) {
+                    let reader = new FileReader();
+                    reader.onload = e => {
+                        $('#mountainImagePreview').attr('src', e.target.result).show();
+                    };
+                    reader.readAsDataURL(this.files[0]);
+                }
+            });
+
+            // Navigation
+            $('#nextBtn').on('click', () => {
+                if (currentStep === 1) {
+                    updateBasicInfo();
+                } else if (currentStep === 2) {
+                    updateLocation();
+                } else {
+                    navigateStep(1);
+                }
+            });
+
+            $('#prevBtn').on('click', () => navigateStep(-1));
+            $('#submitBtn').on('click', submitInvestment);
+            $('#addDocumentBtn').on('click', addDocument);
+
+            // Gallery - 2 images handling
+            $('#image1Input').on('change', function() {
+                handleImageUpload(this, '#image1Preview', '#image1Wrapper', '#removeImage1', 0);
+            });
+
+            $('#image2Input').on('change', function() {
+                handleImageUpload(this, '#image2Preview', '#image2Wrapper', '#removeImage2', 1);
+            });
+
+            $('#removeImage1').on('click', function() {
+                removeImage(0);
+            });
+
+            $('#removeImage2').on('click', function() {
+                removeImage(1);
+            });
+        });
+
+        function initMap() {
+            const lat = parseFloat($('#latitude').val()) || 23.8103;
+            const lng = parseFloat($('#longitude').val()) || 90.4125;
+            const position = {
+                lat,
+                lng
+            };
+
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: position,
+                zoom: 13,
+                mapTypeControl: true,
+                streetViewControl: true,
+                fullscreenControl: true
+            });
+
+            marker = new google.maps.Marker({
+                map: map,
+                position: position,
+                draggable: true,
+                animation: google.maps.Animation.DROP
+            });
+
+            geocoder = new google.maps.Geocoder();
+            const input = document.getElementById('searchBox');
+            searchBox = new google.maps.places.SearchBox(input);
+
+            map.addListener('bounds_changed', () => {
+                searchBox.setBounds(map.getBounds());
+            });
+
+            searchBox.addListener('places_changed', () => {
+                const places = searchBox.getPlaces();
+                if (places.length == 0) return;
+
+                const place = places[0];
+                if (!place.geometry || !place.geometry.location) return;
+
+                marker.setPosition(place.geometry.location);
+                map.setCenter(place.geometry.location);
+                map.setZoom(15);
+
+                updateLocationFields(place);
+            });
+
+            marker.addListener('dragend', function() {
+                reverseGeocode(marker.getPosition());
+            });
+
+            map.addListener('click', function(e) {
+                marker.setPosition(e.latLng);
+                reverseGeocode(e.latLng);
+            });
+
+            console.log('Map initialized for edit page');
+        }
+
+        function reverseGeocode(location) {
+            geocoder.geocode({
+                location: location
+            }, (results, status) => {
+                if (status === 'OK' && results[0]) {
+                    updateLocationFields({
+                        geometry: {
+                            location: location
+                        },
+                        formatted_address: results[0].formatted_address,
+                        address_components: results[0].address_components
+                    });
+                }
+            });
+        }
+
+        function updateLocationFields(place) {
+            $('#latitude').val(place.geometry.location.lat());
+            $('#longitude').val(place.geometry.location.lng());
+            $('#address').val(place.formatted_address || '');
+
+            if (place.address_components) {
+                $('#country, #state, #city').val('');
+
+                place.address_components.forEach(component => {
+                    const types = component.types;
+
+                    if (types.includes('country')) {
+                        $('#country').val(component.long_name);
+                    }
+                    if (types.includes('administrative_area_level_1')) {
+                        $('#state').val(component.long_name);
+                    }
+                    if (types.includes('locality')) {
+                        $('#city').val(component.long_name);
+                    } else if (types.includes('administrative_area_level_2') && !$('#city').val()) {
+                        $('#city').val(component.long_name);
+                    }
+                });
+
+                toastr.success('Location updated successfully');
+            }
+        }
+
+        function updateBasicInfo() {
+            const formData = new FormData($('#investmentForm')[0]);
+
+            formData.set('country', $('#country').val() || '');
+            formData.set('state', $('#state').val() || '');
+            formData.set('city', $('#city').val() || '');
+            formData.set('address', $('#address').val() || '');
+            formData.set('latitude', $('#latitude').val() || '');
+            formData.set('longitude', $('#longitude').val() || '');
+
+            NProgress.start();
+            $.ajax({
+                url: window.routes.updateBasic,
+                type: "POST",
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function(res) {
+                    NProgress.done();
+                    if (res.success) {
+                        toastr.success(res.message || 'Basic info updated');
+                        navigateStep(1);
+                    }
+                },
+                error: function(xhr) {
+                    NProgress.done();
+                    handleAjaxError(xhr, 'Failed to update basic info');
+                }
+            });
+        }
+
+        function updateLocation() {
+            const locationData = new FormData();
+            locationData.append('_token', $('input[name="_token"]').val());
+            locationData.append('_method', 'POST');
+            locationData.append('country', $('#country').val() || '');
+            locationData.append('state', $('#state').val() || '');
+            locationData.append('city', $('#city').val() || '');
+            locationData.append('address', $('#address').val() || '');
+            locationData.append('latitude', $('#latitude').val() || '');
+            locationData.append('longitude', $('#longitude').val() || '');
+
+            NProgress.start();
+            $.ajax({
+                url: window.routes.updateBasic,
+                type: "POST",
+                data: locationData,
+                processData: false,
+                contentType: false,
+                success: function(res) {
+                    NProgress.done();
+                    if (res.success) {
+                        toastr.success('Location updated successfully');
+                        navigateStep(1);
+                    }
+                },
+                error: function(xhr) {
+                    NProgress.done();
+                    handleAjaxError(xhr, 'Failed to update location');
+                }
+            });
+        }
+
+        function navigateStep(direction) {
+            goToStep(currentStep + direction);
+        }
+
+        function goToStep(step) {
+            if (step < 1 || step > totalSteps) return;
+
+            $(`.step-content[data-step="${currentStep}"]`).removeClass('active');
+            $(`.step-item[data-step="${currentStep}"]`).removeClass('active').addClass('completed');
+
+            $(`.step-content[data-step="${step}"]`).addClass('active');
+            $(`.step-item[data-step="${step}"]`).addClass('active');
+
+            currentStep = step;
+
+            $('#prevBtn').toggle(currentStep > 1);
+            $('#nextBtn').toggle(currentStep < totalSteps);
+            $('#submitBtn').toggle(currentStep === totalSteps);
+        }
+
+        function deleteExistingDocument(docId) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    NProgress.start();
+                    $.ajax({
+                        url: window.routes.deleteDoc + docId,
+                        type: "DELETE",
+                        headers: {
+                            'X-CSRF-TOKEN': $('input[name="_token"]').val()
+                        },
+                        success: function(res) {
+                            NProgress.done();
+                            if (res.success) {
+                                $(`#existingDocuments [data-doc-id="${docId}"]`).remove();
+                                Swal.fire('Deleted!', res.message || 'Document deleted', 'success');
+                            }
+                        },
+                        error: function(xhr) {
+                            NProgress.done();
+                            Swal.fire('Error!', 'Failed to delete document', 'error');
+                        }
+                    });
+                }
+            });
+        }
+
+        function deleteExistingImage(imgId) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "This image will be permanently deleted!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    NProgress.start();
+                    $.ajax({
+                        url: window.routes.deleteImage + imgId,
+                        type: "DELETE",
+                        headers: {
+                            'X-CSRF-TOKEN': $('input[name="_token"]').val()
+                        },
+                        success: function(res) {
+                            NProgress.done();
+                            if (res.success) {
+                                $(`#existingImages [data-img-id="${imgId}"]`).remove();
+                                Swal.fire('Deleted!', res.message || 'Image deleted', 'success');
+                            }
+                        },
+                        error: function(xhr) {
+                            NProgress.done();
+                            Swal.fire('Error!', 'Failed to delete image', 'error');
+                        }
+                    });
+                }
+            });
+        }
+
+        function addDocument() {
+            const name = $('#docName').val().trim();
+            const fileInput = $('#docFile')[0];
+            const file = fileInput.files[0];
+
+            if (!name || !file) {
+                toastr.error('Please provide document name and file');
+                return;
+            }
+
+            documents.push({
+                name,
+                file
+            });
+            renderDocuments();
+            $('#docName').val('');
+            $('#docFile').val('');
+            toastr.success('Document added');
+        }
+
+        function renderDocuments() {
+            let html = '<div class="list-group">';
+            documents.forEach((doc, index) => {
+                html += `
+            <div class="list-group-item d-flex justify-content-between align-items-center">
+                <span><i class="fa fa-file"></i> ${doc.name}</span>
+                <button type="button" class="btn btn-sm btn-danger" onclick="removeDocument(${index})">
+                    <i class="fa fa-trash"></i>
+                </button>
+            </div>
+        `;
+            });
+            html += '</div>';
+            $('#documentsList').html(html);
+        }
+
+        function removeDocument(index) {
+            documents.splice(index, 1);
+            renderDocuments();
+            toastr.info('Document removed');
+        }
+
+        // FIXED: Gallery image handling (2 images only)
+        function handleImageUpload(input, previewId, wrapperId, removeBtnId, index) {
+            const file = input.files[0];
+            if (!file) return;
+
+            if (!file.type.startsWith('image/')) {
+                toastr.error('Please select an image file');
+                input.value = '';
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                $(previewId).attr('src', e.target.result).show();
+                $(wrapperId).addClass('has-image');
+                $(removeBtnId).show();
+            };
+            reader.readAsDataURL(file);
+
+            galleryImages[index] = file;
+            console.log('New image added at index', index);
+        }
+
+        function removeImage(index) {
+            const imageNum = index + 1;
+            const inputId = `#image${imageNum}Input`;
+            const previewId = `#image${imageNum}Preview`;
+            const wrapperId = `#image${imageNum}Wrapper`;
+            const removeBtnId = `#removeImage${imageNum}`;
+
+            $(inputId).val('');
+            $(previewId).hide();
+            $(wrapperId).removeClass('has-image');
+            $(removeBtnId).hide();
+
+            galleryImages[index] = null;
+            console.log('Image removed at index', index);
+            toastr.info('Image removed');
+        }
+
+        function submitInvestment() {
+            NProgress.start();
+            console.log('Starting update for Investment ID:', investmentId);
+
+            const promises = [];
+
+            // Step 3: Highlights
+            const highlightData = {
+                overview: $('#overview').summernote('code'),
+                targeted_irr: $('[name="targeted_irr"]').val(),
+                tax_doc: $('[name="tax_doc"]').val(),
+                investor_waterfall: $('#investor_waterfall').summernote('code'),
+                promoted_interest: $('#promoted_interest').summernote('code'),
+                asset_management_fee: $('[name="asset_management_fee"]').val(),
+                organizational_and_offering_fee: $('[name="organizational_and_offering_fee"]').val(),
+                acquisition_fee: $('[name="acquisition_fee"]').val(),
+                disposition_fee: $('[name="disposition_fee"]').val(),
+                fund_administration_fee: $('[name="fund_administration_fee"]').val(),
+                _token: $('input[name="_token"]').val()
+            };
+
+            promises.push(
+                $.ajax({
+                    url: window.routes.highlightStore,
+                    type: "POST",
+                    data: highlightData
+                }).then(() => console.log('✓ Highlights updated'))
+            );
+
+            // Step 4: New Documents
+            if (documents.length > 0) {
+                console.log('Uploading', documents.length, 'new documents');
+                documents.forEach((doc, index) => {
+                    const formData = new FormData();
+                    formData.append('name', doc.name);
+                    formData.append('file', doc.file);
+                    formData.append('_token', $('input[name="_token"]').val());
+
+                    promises.push(
+                        $.ajax({
+                            url: window.routes.documentStore,
+                            type: "POST",
+                            data: formData,
+                            processData: false,
+                            contentType: false
+                        }).then(() => console.log(`✓ Document ${index + 1} uploaded`))
+                    );
+                });
+            }
+
+            // Step 5: New Gallery Images (FIXED - only non-null images)
+            const validImages = galleryImages.filter(img => img !== null);
+            console.log('Valid new gallery images:', validImages.length);
+
+            if (validImages.length > 0) {
+                const imageFormData = new FormData();
+
+                validImages.forEach(img => {
+                    imageFormData.append('images[]', img);
+                });
+
+                imageFormData.append('_token', $('input[name="_token"]').val());
+
+                promises.push(
+                    $.ajax({
+                        url: window.routes.imagesStore,
+                        type: "POST",
+                        data: imageFormData,
+                        processData: false,
+                        contentType: false
+                    }).then(() => console.log('✓ New gallery images uploaded'))
+                );
+            }
+
+            // Step 6: Disclaimer
+            const disclaimerContent = $('#disclaimerDescription').summernote('code');
+            if (disclaimerContent && disclaimerContent.trim() !== '') {
+                promises.push(
+                    $.ajax({
+                        url: window.routes.disclaimerStore,
+                        type: "POST",
+                        data: {
+                            description: disclaimerContent,
+                            _token: $('input[name="_token"]').val()
+                        }
+                    }).then(() => console.log('✓ Disclaimer updated'))
+                );
+            }
+
+            // Execute all promises
+            Promise.all(promises)
+                .then(() => {
+                    NProgress.done();
+                    console.log('✓ All data updated successfully');
+
+                    Swal.fire({
+                        title: 'Success!',
+                        text: 'Investment updated successfully',
+                        icon: 'success',
+                        confirmButtonText: 'View List',
+                        confirmButtonColor: '#172870'
+                    }).then(() => {
+                        window.location.href = window.routes.updateBasic.replace('/update/' + investmentId,
+                            '/list');
+                    });
+                })
+                .catch(err => {
+                    NProgress.done();
+                    console.error('Update error:', err);
+
+                    let message = 'Failed to complete investment update';
+                    if (err.responseJSON) {
+                        if (err.responseJSON.message) {
+                            message = err.responseJSON.message;
+                        } else if (err.responseJSON.errors) {
+                            message = Object.values(err.responseJSON.errors).flat().join('<br>');
+                        }
+                    }
+
+                    Swal.fire({
+                        title: 'Error',
+                        html: message,
+                        icon: 'error',
+                        confirmButtonText: 'OK',
+                        confirmButtonColor: '#dc3545'
+                    });
+                });
+        }
+
+        function handleAjaxError(xhr, defaultMsg) {
+            let message = defaultMsg;
+
+            if (xhr.responseJSON) {
+                if (xhr.responseJSON.message) {
+                    message = xhr.responseJSON.message;
+                } else if (xhr.responseJSON.errors) {
+                    message = Object.values(xhr.responseJSON.errors).flat().join('<br>');
+                }
+            }
+
+            toastr.error(message);
+            console.error(defaultMsg, xhr);
+        }
     </script>
 @endpush
 
@@ -1219,6 +1808,77 @@
             max-height: 200px;
             margin-top: 10px;
             border-radius: 8px;
+        }
+    </style>
+
+    {{-- gallery image box styling --}}
+    <style>
+        .gallery-upload-box {
+            margin-bottom: 1rem;
+        }
+
+        .image-upload-wrapper {
+            position: relative;
+            border: 2px dashed #dee2e6;
+            border-radius: 8px;
+            background: #f8f9fa;
+            height: 250px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .image-upload-wrapper:hover {
+            border-color: #0d6efd;
+        }
+
+        .image-input {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .upload-placeholder {
+            text-align: center;
+            color: #6c757d;
+        }
+
+        .image-preview {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+
+        .remove-image-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(220, 53, 69, 0.9);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0.9;
+            transition: opacity 0.3s;
+            z-index: 10;
+        }
+
+        .remove-image-btn:hover {
+            opacity: 1;
+        }
+
+        .has-image .upload-placeholder {
+            display: none;
         }
     </style>
 @endpush

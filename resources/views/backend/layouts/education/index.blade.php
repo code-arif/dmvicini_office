@@ -24,7 +24,7 @@
                     </div>
                     <div class="ms-auto pageheader-btn">
                         <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="javascript:void(0);">Education</a></li>
+                            <li class="breadcrumb-item"><a href="javascript:void(0);">Article</a></li>
                             <li class="breadcrumb-item active" aria-current="page">Index</li>
                         </ol>
                     </div>
@@ -35,11 +35,11 @@
                     <div class="col-12">
                         <div class="card">
                             <div class="card-header border-bottom">
-                                <h3 class="card-title mb-0">Education List</h3>
+                                <h3 class="card-title mb-0">Article List</h3>
                                 <div class="card-options ms-auto">
                                     <button class="btn btn-primary btn-sm" data-bs-toggle="modal"
                                         data-bs-target="#createEducationModal">
-                                        <i class="fa fa-plus"></i> Add Education
+                                        <i class="fa fa-plus"></i> Add Article
                                     </button>
                                 </div>
                             </div>
@@ -52,7 +52,7 @@
                                                 <th>Image</th>
                                                 <th>Title</th>
                                                 <th>Sub Title</th>
-                                                <th>Category</th>
+                                                <th>Asset Class</th>
                                                 <th>Created</th>
                                                 <th>Status – Active</th>
                                                 <th>Action</th>
@@ -96,14 +96,14 @@
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">Category <span class="text-danger">*</span></label>
-                            <select name="category_id" class="form-control" required>
-                                <option value="">-- Select Category --</option>
-                                @foreach ($categories as $category)
-                                    <option value="{{ $category->id }}">{{ $category->title }}</option>
+                            <label class="form-label">Asset Class <span class="text-danger">*</span></label>
+                            <select name="asset_class_id" class="form-control" required>
+                                <option value="">-- Select Asset Class --</option>
+                                @foreach ($asset_classes as $asset_class)
+                                    <option value="{{ $asset_class->id }}">{{ $asset_class->name }}</option>
                                 @endforeach
                             </select>
-                            <span class="text-danger error-text category_id_error"></span>
+                            <span class="text-danger error-text asset_class_id_error"></span>
                         </div>
 
                         <div class="mb-3">
@@ -164,14 +164,14 @@
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label">Category <span class="text-danger">*</span></label>
-                            <select name="category_id" id="editCategoryId" class="form-control" required>
-                                <option value="">-- Select Category --</option>
-                                @foreach ($categories as $category)
-                                    <option value="{{ $category->id }}">{{ $category->title }}</option>
+                            <label class="form-label">Asset Class <span class="text-danger">*</span></label>
+                            <select name="asset_class_id" id="editAssetClassId" class="form-control" required>
+                                <option value="">-- Select Asset Class --</option>
+                                @foreach ($asset_classes as $asset_class)
+                                    <option value="{{ $asset_class->id }}">{{ $asset_class->name }}</option>
                                 @endforeach
                             </select>
-                            <span class="text-danger error-text category_id_error"></span>
+                            <span class="text-danger error-text asset_class_id_error"></span>
                         </div>
 
                         <div class="mb-3">
@@ -292,8 +292,8 @@
                         name: 'sub_title'
                     },
                     {
-                        data: 'category',
-                        name: 'category',
+                        data: 'asset_class',
+                        name: 'asset_class',
                         orderable: false,
                         searchable: false
                     },

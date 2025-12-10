@@ -8,9 +8,13 @@ use Illuminate\Http\Request;
 use Yajra\DataTables\DataTables;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Storage;
 
 class FaqController extends Controller
 {
+    /**
+     * Display a listing of the resource.
+     */
     public function index(Request $request)
     {
         if ($request->ajax()) {
@@ -38,12 +42,9 @@ class FaqController extends Controller
                 })
                 ->addColumn('action', function ($data) {
                     return '<div class="d-flex justify-content-start gap-2">
-                        <button type="button" class="btn btn-sm btn-primary editBtn"
-                            data-id="' . $data->id . '"
-                            data-question="' . e($data->question) . '"
-                            data-answer="' . e($data->answer) . '">
+                        <a href="' . route('admin.faq.edit', $data->id) . '" class="btn btn-sm btn-primary">
                             <i class="fa fa-edit"></i>
-                        </button>
+                        </a>
                         <button type="button" class="btn btn-sm btn-danger" onclick="showDeleteConfirm(' . $data->id . ')">
                             <i class="fa fa-trash"></i>
                         </button>
@@ -55,6 +56,17 @@ class FaqController extends Controller
         return view('backend.layouts.faq.index');
     }
 
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        return view('backend.layouts.faq.create');
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
     public function store(Request $request)
     {
         try {
@@ -80,6 +92,18 @@ class FaqController extends Controller
         }
     }
 
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(int $id)
+    {
+        $faq = Faq::findOrFail($id);
+        return view('backend.layouts.faq.edit', compact('faq'));
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
     public function update(Request $request, int $id)
     {
         try {
@@ -104,6 +128,9 @@ class FaqController extends Controller
         }
     }
 
+    /**
+     * Change the status of the specified resource.
+     */
     public function status(int $id): JsonResponse
     {
         $data = Faq::findOrFail($id);
@@ -124,6 +151,9 @@ class FaqController extends Controller
         ]);
     }
 
+    /**
+     * Remove the specified resource from storage.
+     */
     public function destroy(int $id): JsonResponse
     {
         $data = Faq::findOrFail($id);
@@ -141,5 +171,40 @@ class FaqController extends Controller
             'success' => true,
             'message' => 'FAQ deleted successfully!',
         ], 200);
+    }
+
+    /**
+     * Upload image for Summernote editor
+     */
+    public function uploadImage(Request $request): JsonResponse
+    {
+        try {
+            $request->validate([
+                'file' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048'
+            ]);
+
+            if ($request->hasFile('file')) {
+                $file = $request->file('file');
+                $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+
+                // Store in public disk
+                $path = $file->storeAs('faq-images', $filename, 'public');
+
+                return response()->json([
+                    'success' => true,
+                    'url' => asset('storage/' . $path)
+                ]);
+            }
+
+            return response()->json([
+                'success' => false,
+                'message' => 'No file uploaded'
+            ], 400);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Image upload failed: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

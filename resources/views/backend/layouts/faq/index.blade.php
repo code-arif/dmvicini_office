@@ -29,10 +29,9 @@
                             <div class="card-header border-bottom">
                                 <h3 class="card-title mb-0">FAQs List</h3>
                                 <div class="card-options ms-auto">
-                                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal"
-                                        data-bs-target="#createFaqModal">
+                                    <a href="{{ route('admin.faq.create') }}" class="btn btn-primary btn-sm">
                                         <i class="fa fa-plus"></i> Add FAQ
-                                    </button>
+                                    </a>
                                 </div>
                             </div>
                             <div class="card-body">
@@ -58,92 +57,11 @@
             </div>
         </div>
     </div>
-
-    <!-- CREATE FAQ MODAL -->
-    <div class="modal fade" id="createFaqModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-xl">
-            <div class="modal-content">
-                <form id="createFaqForm">
-                    @csrf
-                    <div class="modal-header">
-                        <h5 class="modal-title">Create FAQ</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label class="form-label">Question <span class="text-danger">*</span></label>
-                            <input type="text" name="question" class="form-control" placeholder="Enter your question"
-                                required>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Answer <span class="text-danger">*</span></label>
-                            <textarea name="answer" id="createAnswer" class="form-control summernote" rows="4"></textarea>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fa fa-save"></i> Save
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- EDIT FAQ MODAL -->
-    <div class="modal fade" id="editFaqModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-xl">
-            <div class="modal-content">
-                <form id="editFaqForm">
-                    @csrf
-                    <input type="hidden" name="id" id="editID">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Edit FAQ</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label class="form-label">Question <span class="text-danger">*</span></label>
-                            <input type="text" name="question" id="editQuestion" class="form-control"
-                                placeholder="Enter your question" required>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Answer <span class="text-danger">*</span></label>
-                            <textarea name="answer" id="editAnswer" class="form-control summernote" rows="4"></textarea>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fa fa-save"></i> Update
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
 @endsection
 
 @push('scripts')
     <script>
         $(document).ready(function() {
-            // Initialize Summernote
-            $('.summernote').summernote({
-                height: 250,
-                toolbar: [
-                    ['style', ['bold', 'italic', 'underline', 'clear']],
-                    ['font', ['strikethrough', 'superscript', 'subscript']],
-                    ['fontsize', ['fontsize']],
-                    ['color', ['color']],
-                    ['para', ['ul', 'ol', 'paragraph']],
-                    ['insert', ['link', 'picture']],
-                    ['view', ['fullscreen', 'codeview']]
-                ]
-            });
-
             $.ajaxSetup({
                 headers: {
                     "X-CSRF-TOKEN": $('meta[name="csrf-token"]').attr("content")
@@ -182,88 +100,6 @@
                         searchable: false
                     }
                 ]
-            });
-
-            // CREATE
-            $('#createFaqForm').on('submit', function(e) {
-                e.preventDefault();
-                NProgress.start();
-                $.ajax({
-                    url: "{{ route('admin.faq.store') }}",
-                    method: "POST",
-                    data: $(this).serialize(),
-                    success: function(res) {
-                        NProgress.done();
-                        if (res.success) {
-                            $('#createFaqModal').modal('hide');
-                            $('#createFaqForm')[0].reset();
-                            $('#createAnswer').summernote('reset');
-                            dTable.ajax.reload();
-                            toastr.success(res.message);
-                        } else {
-                            toastr.error(res.message);
-                        }
-                    },
-                    error: function(xhr) {
-                        NProgress.done();
-                        if (xhr.status === 422) {
-                            let errors = xhr.responseJSON.errors;
-                            Object.keys(errors).forEach(key => {
-                                toastr.error(errors[key][0]);
-                            });
-                        } else {
-                            toastr.error('Something went wrong!');
-                        }
-                    }
-                });
-            });
-
-            // EDIT BUTTON
-            $(document).on('click', '.editBtn', function() {
-                let e = $(this);
-                $('#editID').val(e.data('id'));
-                $('#editQuestion').val(e.data('question'));
-                $('#editAnswer').summernote('code', e.data('answer'));
-                $('#editFaqModal').modal('show');
-            });
-
-            // UPDATE
-            $('#editFaqForm').on('submit', function(e) {
-                e.preventDefault();
-                let id = $('#editID').val();
-                NProgress.start();
-                $.ajax({
-                    url: "{{ route('admin.faq.update', ':id') }}".replace(':id', id),
-                    method: "PUT",
-                    data: $(this).serialize(),
-                    success: function(res) {
-                        NProgress.done();
-                        if (res.success) {
-                            $('#editFaqModal').modal('hide');
-                            dTable.ajax.reload();
-                            toastr.success(res.message);
-                        } else {
-                            toastr.error(res.message);
-                        }
-                    },
-                    error: function(xhr) {
-                        NProgress.done();
-                        if (xhr.status === 422) {
-                            let errors = xhr.responseJSON.errors;
-                            Object.keys(errors).forEach(key => {
-                                toastr.error(errors[key][0]);
-                            });
-                        } else {
-                            toastr.error('Something went wrong!');
-                        }
-                    }
-                });
-            });
-
-            // Reset Summernote when modals close
-            $('#createFaqModal, #editFaqModal').on('hidden.bs.modal', function() {
-                $(this).find('form')[0].reset();
-                $(this).find('.summernote').summernote('reset');
             });
         });
 
