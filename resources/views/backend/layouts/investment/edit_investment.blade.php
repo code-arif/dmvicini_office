@@ -76,8 +76,8 @@
                                             </div>
                                         </div>
 
-                                        <div class="row">
-                                            <div class="col-md-3 mb-3">
+                                        <div class="d-flex justify-content-between mt-1 gap-2">
+                                            <div class="col-md-4 mb-3 bg-light p-3 rounded-1">
                                                 <label class="form-label">Asset Class</label>
                                                 <select name="asset_class_id" class="form-select">
                                                     <option value="">-- Select --</option>
@@ -89,7 +89,7 @@
                                                     @endforeach
                                                 </select>
                                             </div>
-                                            <div class="col-md-3 mb-3">
+                                            <div class="col-md-4 mb-3 bg-light p-3 rounded-1">
                                                 <label class="form-label">Investment Type</label>
                                                 <select name="investment_type_id" class="form-select">
                                                     <option value="">-- Select --</option>
@@ -101,25 +101,13 @@
                                                     @endforeach
                                                 </select>
                                             </div>
-                                            <div class="col-md-3 mb-3">
+                                            <div class="col-md-4 mb-3 bg-light p-3 rounded-1">
                                                 <label class="form-label">Investment Strategy</label>
                                                 <select name="investments_strategy_id" class="form-select">
                                                     <option value="">-- Select --</option>
                                                     @foreach ($strategies as $item)
                                                         <option value="{{ $item->id }}"
                                                             {{ $investment->investments_strategy_id == $item->id ? 'selected' : '' }}>
-                                                            {{ $item->name }}
-                                                        </option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                            <div class="col-md-3 mb-3">
-                                                <label class="form-label">Tax Strategy</label>
-                                                <select name="tax_strategie_id" class="form-select">
-                                                    <option value="">-- Select --</option>
-                                                    @foreach ($tax_strategies as $item)
-                                                        <option value="{{ $item->id }}"
-                                                            {{ $investment->tax_strategies_id == $item->id ? 'selected' : '' }}>
                                                             {{ $item->name }}
                                                         </option>
                                                     @endforeach
@@ -307,35 +295,6 @@
                                             </div>
                                         </div>
                                     </div>
-
-                                    <!-- Step 5: Gallery -->
-                                    {{-- <div class="step-content" data-step="5">
-                                        <h4 class="mb-4">Gallery Images</h4>
-
-                                        <!-- Existing Images -->
-                                        <div class="mb-4">
-                                            <h5>Existing Images</h5>
-                                            <div id="existingImages" class="image-preview-grid">
-                                                @foreach ($investment->images as $img)
-                                                    <div class="image-preview-item" data-img-id="{{ $img->id }}">
-                                                        <img src="{{ asset($img->image_url) }}" alt="Gallery Image">
-                                                        <button type="button" class="remove-btn"
-                                                            onclick="deleteExistingImage({{ $img->id }})">
-                                                            <i class="fa fa-times"></i>
-                                                        </button>
-                                                    </div>
-                                                @endforeach
-                                            </div>
-                                        </div>
-
-                                        <!-- New Images -->
-                                        <div class="mb-3">
-                                            <label class="form-label">Add New Images</label>
-                                            <input type="file" id="galleryImages" class="form-control"
-                                                accept="image/*" multiple>
-                                        </div>
-                                        <div id="imagePreviewGrid" class="image-preview-grid"></div>
-                                    </div> --}}
 
                                     <!-- Step 5: Gallery (REPLACE OLD SECTION) -->
                                     <div class="step-content" data-step="5">

@@ -41,15 +41,20 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin' => App\Http\Middleware\AdminMiddleware::class,
         ]);
         $middleware->validateCsrfTokens(except: [
-            'payment/stripe-webhook',
-            'api/*',
-            'https://dmvicini.softvencefsd.xyz/',
-            'https://dmvicini.softvencefsd.xyz/api/',
-            'https://dmvicini.softvencefsd.xyz/api/*',
-            'http://localhost:5173/investment',
-            'http://localhost:5173/*',
-            'https://pinnacle-capital.netlify.app/'
-        ]);
+          'payment/stripe-webhook',
+          'api/*',
+          'https://dmvicini.softvencefsd.xyz/',
+          'https://dmvicini.softvencefsd.xyz/api/',
+          'https://dmvicini.softvencefsd.xyz/api/*',
+          'http://localhost:5173/investment',
+          'http://localhost:5173/*',
+          'https://pinnacle-capital.netlify.app/',
+          'https://pinnaclealts.com/',
+          'https://pinnaclealts.com',
+          'https://admin.pinnaclealts.com/',
+          'https://admin.pinnaclealts.com/api/',
+          'https://admin.pinnaclealts.com/api/*'
+		]);
 
     })
     ->withExceptions(function (Exceptions $exceptions) {

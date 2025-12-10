@@ -2,43 +2,24 @@
 
 return [
 
-    /*
-    |--------------------------------------------------------------------------
-    | Cross-Origin Resource Sharing (CORS) Configuration
-    |--------------------------------------------------------------------------
-    |
-    | Here you may configure your settings for cross-origin resource sharing
-    | or "CORS". This determines what cross-origin operations may execute
-    | in web browsers. You are free to adjust these settings as needed.
-    |
-    | To learn more: https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
-    |
-    */
+    'paths'                    => ['api/*', 'sanctum/csrf-cookie'],
 
-    // 'paths' => ['api/*', 'sanctum/csrf-cookie'],
+    'allowed_methods'          => ['*'],
 
-    // 'allowed_methods' => ['*'],
-
-    // 'allowed_origins' => ['*'],
-
-    // 'allowed_origins_patterns' => [],
-
-    // 'allowed_headers' => ['*'],
-
-    // 'exposed_headers' => [],
-
-    // 'max_age' => 0,
-
-    // 'supports_credentials' => false,
-
-
-    'supports_credentials' => true,
-    'allowed_origins' => [
-        'https://pinnacle-capital-group.netlify.app',
+    // Replace or add your actual frontend domain here
+    'allowed_origins'          => [
+        'https://brixl.netlify.app',
         'http://localhost:5173',
-        'https://dmvicini.softvencefsd.xyz/',
-        'https://dmvicini.softvencefsd.xyz/api/',
-        'https://dmvicini.softvencefsd.xyz/api/*',
-        'https://pinnacle-capital.netlify.app/'
+      	'https://pinnaclealts.com'
     ],
+
+    'allowed_origins_patterns' => [],
+
+    'allowed_headers'          => ['*'],
+
+    'exposed_headers'          => [],
+
+    'max_age'                  => 0,
+
+    'supports_credentials'     => true,
 ];

@@ -13,7 +13,6 @@ class Investment extends Model
         'asset_class_id',
         'investment_type_id',
         'investments_strategy_id',
-        'tax_strategie_id',
 
         'term',
         'min_investment',
