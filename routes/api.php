@@ -1,8 +1,6 @@
 <?php
 
-use Illuminate\Auth\Events\Login;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Contracts\Auth\UserProvider;
 use App\Http\Controllers\Api\FooterController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\Auth\LoginController;
