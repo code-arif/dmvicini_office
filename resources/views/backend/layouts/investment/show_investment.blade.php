@@ -13,7 +13,7 @@
                     </a>
                     <div class="d-flex gap-2">
                         <a href="{{ route('investment.edit', $investment->id) }}" class="btn btn-primary">
-                            <i class="fa fa-edit me-2"></i> Edit Investment
+                            <i class="fa fa-edit me-2"></i> Edit Deal
                         </a>
                         <button class="btn btn-danger" onclick="confirmDelete({{ $investment->id }})">
                             <i class="fa fa-trash me-2"></i> Delete
@@ -309,19 +309,23 @@
                     <div id="gallery" class="tab-pane fade">
                         <div class="section-card">
                             <h3 class="section-title">Investment Gallery</h3>
-                            @forelse($investment->images as $img)
+
+                            @if ($investment->images->isNotEmpty())
                                 <div class="gallery-grid">
-                                    <div class="gallery-item">
-                                        <img src="{{ asset($img->image_url) }}" alt="Investment Image"
-                                            onclick="viewImage('{{ asset($img->image_url) }}')">
-                                    </div>
+                                    @foreach ($investment->images as $img)
+                                        <div class="gallery-item">
+                                            <img src="{{ asset($img->image_url) }}" alt="Investment Image"
+                                                onclick="viewImage('{{ asset($img->image_url) }}')">
+                                        </div>
+                                    @endforeach
                                 </div>
-                            @empty
+                            @else
                                 <div class="empty-state">
                                     <i class="fa fa-images"></i>
                                     <p>No images uploaded</p>
                                 </div>
-                            @endforelse
+                            @endif
+
                         </div>
                     </div>
 
@@ -329,17 +333,45 @@
                     <div id="disclaimer" class="tab-pane fade">
                         <div class="section-card">
                             <h3 class="section-title">Investment Disclaimer</h3>
-                            @if ($investment->disclaimer && $investment->disclaimer->description)
+                            @if ($investment->disclaimers && $investment->disclaimers->description)
                                 <div class="disclaimer-box">
                                     <div class="disclaimer-icon">
                                         <i class="fa fa-exclamation-triangle"></i>
                                     </div>
-                                    {!! $investment->disclaimer->description !!}
+                                    {!! $investment->disclaimers->description !!}
                                 </div>
                             @else
-                                <div class="empty-state">
-                                    <i class="fa fa-exclamation-triangle"></i>
-                                    <p>No disclaimer available</p>
+                                <div class="disclaimer-box">
+                                    <div class="disclaimer-icon">
+                                        <i class="fa fa-exclamation-triangle"></i>
+                                    </div>
+                                    This offering summary has been prepared solely by the sponsor and is provided for
+                                    informational purposes only. It is not a complete description of the securities being
+                                    offered and does not constitute part of the sponsor’s private placement memorandum or
+                                    other definitive offering documents (collectively, the “Offering Materials”), nor does
+                                    it constitute an offer to sell or a solicitation of an offer to buy any securities. The
+                                    securities described herein are offered exclusively pursuant to the Offering Materials,
+                                    which must be reviewed carefully and in their entirety prior to making any investment
+                                    decision.
+                                    No person has been authorized to provide information or make representations regarding
+                                    this offering other than those contained in the Offering Materials. Any such
+                                    unauthorized information or representations may not be relied upon.
+                                    Pinnacle Capital Group, LLC (“Pinnacle”) may act solely as a placement agent for certain
+                                    offerings or, in some cases, may provide limited, non-solicited marketing or
+                                    administrative services to the sponsor. Pinnacle is not the issuer, sponsor, or manager
+                                    of any investment. Pinnacle does not provide investment, tax, or legal advice, does not
+                                    recommend or endorse any offering on this platform, and makes no representation
+                                    regarding the merits, suitability, risks, or expected performance of any offering.
+                                    Investing in private placements involves significant risks, including, but not limited
+                                    to, total loss of principal, illiquidity, long holding periods, lack of a secondary
+                                    market, and limited transparency. These investments are suitable only for accredited
+                                    investors who fully understand and are willing to accept these risks. All investors must
+                                    be verified as accredited investors in accordance with applicable securities laws and
+                                    regulations prior to investing.
+                                    Any references to “target returns,” “annualized yields,” projections, or other
+                                    forward-looking statements are hypothetical, are based solely on sponsor assumptions,
+                                    should not be relied upon, are not guarantees of future performance, and actual results
+                                    may differ materially. Past performance is not indicative of future results.
                                 </div>
                             @endif
                         </div>
@@ -621,11 +653,11 @@
         }
 
         .nav-tabs .nav-link:hover {
-            color: var(--primary);
+            color: var(--primary) !important;
         }
 
         .nav-tabs .nav-link.active {
-            color: var(--primary);
+            color: var(--primary) !important;
             background: transparent;
         }
 

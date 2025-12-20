@@ -15,7 +15,7 @@ class Education extends Model
         'image'
     ];
 
-    //reation with category table
+    //reation with asset_class table
     public function asset_class()
     {
         return $this->BelongsTo(AssetClass::class);

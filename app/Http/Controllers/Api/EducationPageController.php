@@ -10,6 +10,7 @@ use App\Models\PinnedEducation;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\CategoryResource;
 use App\Http\Resources\EducationResource;
+use App\Models\AssetClass;
 
 class EducationPageController extends Controller
 {
@@ -20,7 +21,7 @@ class EducationPageController extends Controller
     {
         $perPage = $request->input('per_page', 10);
 
-        $query = Education::with('category:id,title')->latest();
+        $query = Education::with('asset_class:id,name')->latest();
 
         // Title search
         if ($request->filled('title')) {
@@ -32,15 +33,9 @@ class EducationPageController extends Controller
             $query->where('description', 'like', '%' . $request->description . '%');
         }
 
-        // Single category
-        if ($request->filled('category_id')) {
-            $query->where('category_id', $request->category_id);
-        }
-
-        // Multiple categories
-        if ($request->filled('category_ids')) {
-            $ids = array_filter(explode(',', $request->category_ids));
-            $query->whereIn('category_id', $ids);
+        // Single asset_class
+        if ($request->filled('asset_class_id')) {
+            $query->where('asset_class_id', $request->asset_class_id);
         }
 
         // Date filtering
@@ -73,7 +68,7 @@ class EducationPageController extends Controller
     //eudcation details
     public function show($id)
     {
-        $education = Education::with('category:id,title')->find($id);
+        $education = Education::with('asset_class:id,name')->find($id);
 
         if (!$education) {
             return $this->error([], 'Education not found.', 404);
@@ -88,7 +83,7 @@ class EducationPageController extends Controller
             'created_at'  => $education->created_at,
             'updated_at'  => $education->updated_at,
 
-            'category'    => $education->category,
+            'asset_class'    => $education->asset_class,
         ];
 
         return $this->success(
@@ -108,13 +103,13 @@ class EducationPageController extends Controller
     // get categories
     public function getCategories(Request $request)
     {
-        $categories = Category::select('id', 'title')
-            ->orderBy('title')
+        $categories = AssetClass::select('id', 'name')
+            ->orderBy('name')
             ->get();
 
         return $this->success(
             CategoryResource::collection($categories),
-            'Categories retrieved successfully.',
+            'Asset class retrieved successfully.',
             200
         );
     }

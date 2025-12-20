@@ -100,8 +100,9 @@
                         <td bgcolor="#f7fafc" align="center"
                             style="padding: 30px; text-align: center; font-family: Arial, sans-serif; font-size: 13px; color: #718096; border-top: 1px solid #e2e8f0;">
 
-                            <p style="margin: 0 0 10px; font-family: Arial, sans-serif;">&copy; 2026
-                                Pinnacle Alt's Platform. All rights reserved.</p>
+                            <p style="margin: 0 0 10px; font-family: Arial, sans-serif;">
+                                &copy; 2026 Pinnacle Alt's Platform. All rights reserved.
+                            </p>
 
                             <p style="margin: 0; font-size: 12px; color: #a0aec0; font-family: Arial, sans-serif;">
                                 This is an automated message. Please do not reply.

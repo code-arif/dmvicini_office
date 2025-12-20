@@ -7,11 +7,11 @@
             <div class="main-container container-fluid">
                 <div class="page-header">
                     <div>
-                        <h1 class="page-title">Edit Investment</h1>
+                        <h1 class="page-title">Edit Deal</h1>
                     </div>
                     <div class="ms-auto pageheader-btn">
                         <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="{{ route('investment.list') }}">Investments</a></li>
+                            <li class="breadcrumb-item"><a href="{{ route('investment.list') }}">Deals</a></li>
                             <li class="breadcrumb-item active">Edit</li>
                         </ol>
                     </div>
@@ -63,7 +63,7 @@
                                                     value="{{ $investment->title }}" required>
                                             </div>
                                             <div class="col-md-6 mb-3">
-                                                <label class="form-label">Mountain Image</label>
+                                                <label class="form-label">Main Image</label>
                                                 <input type="file" name="mountain_image" class="form-control"
                                                     accept="image/*">
                                                 @if ($investment->mountain_image)
@@ -127,8 +127,7 @@
                                                     value="{{ $investment->min_investment }}">
                                             </div>
                                             <div class="col-md-4 mb-3">
-                                                <label class="form-label">Status <span
-                                                        class="text-danger">*</span></label>
+                                                <label class="form-label">Status <span class="text-danger">*</span></label>
                                                 <select name="status" class="form-select" required>
                                                     <option value="draft"
                                                         {{ $investment->status == 'draft' ? 'selected' : '' }}>Draft
@@ -392,7 +391,13 @@
 
                                         <div class="mb-3">
                                             <label class="form-label">Disclaimer Content</label>
-                                            <textarea name="disclaimer_description" id="disclaimerDescription" class="form-control">{{ $investment->disclaimer->description ?? '' }}</textarea>
+                                            <textarea name="disclaimer_description" id="disclaimerDescription" class="form-control">{{ $investment->disclaimer->description ??
+                                                'This offering summary has been prepared solely by the sponsor and is provided for informational purposes only. It is not a complete description of the securities being offered and does not constitute part of the sponsor’s private placement memorandum or other definitive offering documents (collectively, the “Offering Materials”), nor does it constitute an offer to sell or a solicitation of an offer to buy any securities. The securities described herein are offered exclusively pursuant to the Offering Materials, which must be reviewed carefully and in their entirety prior to making any investment decision.
+                                            No person has been authorized to provide information or make representations regarding this offering other than those contained in the Offering Materials. Any such unauthorized information or representations may not be relied upon.
+                                            Pinnacle Capital Group, LLC (“Pinnacle”) may act solely as a placement agent for certain offerings or, in some cases, may provide limited, non-solicited marketing or administrative services to the sponsor. Pinnacle is not the issuer, sponsor, or manager of any investment. Pinnacle does not provide investment, tax, or legal advice, does not recommend or endorse any offering on this platform, and makes no representation regarding the merits, suitability, risks, or expected performance of any offering.
+                                            Investing in private placements involves significant risks, including, but not limited to, total loss of principal, illiquidity, long holding periods, lack of a secondary market, and limited transparency. These investments are suitable only for accredited investors who fully understand and are willing to accept these risks. All investors must be verified as accredited investors in accordance with applicable securities laws and regulations prior to investing.
+                                            Any references to “target returns,” “annualized yields,” projections, or other forward-looking statements are hypothetical, are based solely on sponsor assumptions, should not be relied upon, are not guarantees of future performance, and actual results may differ materially. Past performance is not indicative of future results.
+                                            ' }}</textarea>
                                             <small class="text-muted">Add any legal disclaimers, risk warnings, or
                                                 important notices here.</small>
                                         </div>

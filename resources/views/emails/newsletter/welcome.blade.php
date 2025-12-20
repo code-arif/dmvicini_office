@@ -91,7 +91,7 @@
                             </p>
 
                             <p style="margin: 0; color: #999999; font-size: 12px; text-align: center;">
-                                © {{ date('Y') }} Pinnacle Capital Group. All rights reserved.
+                                © 2026 Pinnacle Capital Group. All rights reserved.
                             </p>
 
                             <!-- Unsubscribe Link -->
