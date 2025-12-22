@@ -92,7 +92,12 @@ class InvestmentResource extends JsonResource
                     ];
                 });
             }),
-
+            'disclaimers' => $this->whenLoaded('disclaimers', function () {
+                return [
+                    'id' => $this->disclaimers->id,
+                    'description' => $this->disclaimers->description,
+                ];
+            }),
         ];
     }
 }
