@@ -377,12 +377,32 @@ Any references to “target returns,” “annualized yields,” projections, or
                     toolbar: [
                         ['style', ['style']],
                         ['font', ['bold', 'italic', 'underline', 'clear']],
-                        ['color', ['color']],
                         ['para', ['ul', 'ol', 'paragraph']],
                         ['table', ['table']],
                         ['insert', ['link', 'picture']],
                         ['view', ['fullscreen', 'codeview']]
-                    ]
+                    ],
+                    // Dark theme options
+                    callbacks: {
+                        onInit: function() {
+                            $('.note-editable').css({
+                                'background-color': '#000000',
+                                'color': '#ffffff',
+                                'min-height': '400px'
+                            });
+                            $('.note-toolbar').css({
+                                'background-color': '#1a1a1a',
+                                'border-top': '1px solid #333'
+                            });
+                        },
+                        onChange: function(contents, $editable) {}
+                    },
+
+                    // Default text color white
+                    color: {
+                        foreColor: '#ffffff',
+                        backColor: '#000000'
+                    }
                 });
 
             initMap();
@@ -1066,6 +1086,38 @@ Any references to “target returns,” “annualized yields,” projections, or
 
         .remove-image-btn:hover {
             opacity: 1;
+        }
+
+        /* Summernote Dark Theme Fix */
+        .note-editor .note-editable {
+            background-color: #000000 !important;
+            color: #ffffff !important;
+        }
+
+        .note-editor .note-toolbar {
+            background-color: #1a1a1a !important;
+            border-bottom: 1px solid #333 !important;
+        }
+
+        .note-editor .note-toolbar .note-btn {
+            background-color: #2d2d2d !important;
+            color: #ffffff !important;
+            border: 1px solid #444 !important;
+        }
+
+        .note-editor .note-toolbar .note-btn:hover {
+            background-color: #3d3d3d !important;
+        }
+
+        .note-editor .note-statusbar {
+            background-color: #1a1a1a !important;
+            color: #aaa !important;
+        }
+
+        .note-editor .note-editable:empty:before {
+            content: "Type here...";
+            color: #888 !important;
+            pointer-events: none;
         }
     </style>
 @endpush

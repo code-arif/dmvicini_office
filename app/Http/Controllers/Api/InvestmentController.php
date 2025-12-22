@@ -142,13 +142,16 @@ class InvestmentController extends Controller
                 'p_strategy'      => optional($item->strategy)->name,
                 'asset_class'     => optional($item->assetClass)->name,
                 'investment_type' => optional($item->investmentType)->name,
-                'location'        => trim("{$item->city}, {$item->country}", ', '),
+                'country'         => $item->country ?? null,
+                'city'            => $item->city ?? null,
+                'state'           => $item->state ?? null,
+                'address'          => $item->address ?? null,
                 'thumbnail'       => $item->mountain_image ? url($item->mountain_image) : null,
                 'property_type'   => $item->property_type,
                 'launch_date'     => $item->launch_date,
                 'close_date'      => $item->close_date,
                 'created_at'      => $item->created_at->format('Y-m-d'),
-                'years_old'       => $item->created_at->diffInYears(now()), // How old is this investment
+                'years_old'       => $item->created_at->diffInYears(now()),
             ];
         });
 
