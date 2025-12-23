@@ -362,12 +362,16 @@ Any references to “target returns,” “annualized yields,” projections, or
     </script>
 
     <script>
+        // Global variables
         let currentStep = 1;
         let totalSteps = 6;
         let investmentId = null;
         let map, marker, geocoder, searchBox;
         let documents = [];
-        let galleryImages = [null, null]; // Fixed: Initialize with nulls for 2 images
+        let galleryImages = [null, null];
+
+        // LocalStorage key
+        const FORM_STORAGE_KEY = 'investment_form_progress';
 
         $(document).ready(function() {
             // Initialize Summernote
@@ -382,7 +386,6 @@ Any references to “target returns,” “annualized yields,” projections, or
                         ['insert', ['link', 'picture']],
                         ['view', ['fullscreen', 'codeview']]
                     ],
-                    // Dark theme options
                     callbacks: {
                         onInit: function() {
                             $('.note-editable').css({
@@ -395,10 +398,10 @@ Any references to “target returns,” “annualized yields,” projections, or
                                 'border-top': '1px solid #333'
                             });
                         },
-                        onChange: function(contents, $editable) {}
+                        onChange: function(contents, $editable) {
+                            saveFormProgress();
+                        }
                     },
-
-                    // Default text color white
                     color: {
                         foreColor: '#ffffff',
                         backColor: '#000000'
@@ -406,6 +409,15 @@ Any references to “target returns,” “annualized yields,” projections, or
                 });
 
             initMap();
+
+            // Load saved progress
+            loadFormProgress();
+
+            // Auto-save on input change
+            $('#investmentForm input, #investmentForm select, #investmentForm textarea').on('change input',
+                function() {
+                    saveFormProgress();
+                });
 
             // Mountain image preview
             $('input[name="mountain_image"]').on('change', function() {
@@ -416,6 +428,7 @@ Any references to “target returns,” “annualized yields,” projections, or
                     };
                     reader.readAsDataURL(this.files[0]);
                 }
+                saveFormProgress();
             });
 
             // Navigation buttons
@@ -433,7 +446,7 @@ Any references to “target returns,” “annualized yields,” projections, or
             $('#submitBtn').on('click', submitInvestment);
             $('#addDocumentBtn').on('click', addDocument);
 
-            // Gallery - 2 images handling (FIXED)
+            // Gallery - 2 images handling
             $('#image1Input').on('change', function() {
                 handleImageUpload(this, '#image1Preview', '#image1Wrapper', '#removeImage1', 0);
             });
@@ -450,6 +463,8 @@ Any references to “target returns,” “annualized yields,” projections, or
                 removeImage(1);
             });
         });
+
+        // ============= MAP FUNCTIONS =============
 
         function initMap() {
             const dhaka = {
@@ -559,6 +574,8 @@ Any references to “target returns,” “annualized yields,” projections, or
             }
         }
 
+        // ============= SAVE & UPDATE FUNCTIONS =============
+
         function saveBasicInfo() {
             const formData = new FormData($('#investmentForm')[0]);
 
@@ -584,6 +601,7 @@ Any references to “target returns,” “annualized yields,” projections, or
                         console.log('Investment ID saved:', investmentId);
                         toastr.success(res.message || 'Basic info saved successfully');
                         $(`.step-item[data-step="1"]`).addClass('completed');
+                        saveFormProgress(); // Save investment ID
                         navigateStep(1);
                     }
                 },
@@ -631,7 +649,10 @@ Any references to “target returns,” “annualized yields,” projections, or
             });
         }
 
+        // ============= NAVIGATION FUNCTIONS =============
+
         function navigateStep(direction) {
+            saveFormProgress(); // Save before navigation
             goToStep(currentStep + direction);
         }
 
@@ -654,10 +675,15 @@ Any references to “target returns,” “annualized yields,” projections, or
 
             currentStep = step;
 
+            // Save current step
+            saveFormProgress();
+
             $('#prevBtn').toggle(currentStep > 1);
             $('#nextBtn').toggle(currentStep < totalSteps);
             $('#submitBtn').toggle(currentStep === totalSteps);
         }
+
+        // ============= DOCUMENT FUNCTIONS =============
 
         function addDocument() {
             const name = $('#docName').val().trim();
@@ -677,19 +703,21 @@ Any references to “target returns,” “annualized yields,” projections, or
             $('#docName').val('');
             $('#docFile').val('');
             toastr.success('Document added');
+
+            saveFormProgress(); // Save after adding document
         }
 
         function renderDocuments() {
             let html = '<div class="list-group">';
             documents.forEach((doc, index) => {
                 html += `
-            <div class="list-group-item d-flex justify-content-between align-items-center">
-                <span><i class="fa fa-file"></i> ${doc.name}</span>
-                <button type="button" class="btn btn-sm btn-danger" onclick="removeDocument(${index})">
-                    <i class="fa fa-trash"></i>
-                </button>
-            </div>
-        `;
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <span><i class="fa fa-file"></i> ${doc.name}</span>
+                        <button type="button" class="btn btn-sm btn-danger" onclick="removeDocument(${index})">
+                            <i class="fa fa-trash"></i>
+                        </button>
+                    </div>
+                `;
             });
             html += '</div>';
             $('#documentsList').html(html);
@@ -699,9 +727,12 @@ Any references to “target returns,” “annualized yields,” projections, or
             documents.splice(index, 1);
             renderDocuments();
             toastr.info('Document removed');
+
+            saveFormProgress(); // Save after removing document
         }
 
-        // FIXED: Gallery image handling
+        // ============= GALLERY FUNCTIONS =============
+
         function handleImageUpload(input, previewId, wrapperId, removeBtnId, index) {
             const file = input.files[0];
             if (!file) return;
@@ -720,13 +751,12 @@ Any references to “target returns,” “annualized yields,” projections, or
             };
             reader.readAsDataURL(file);
 
-            // Store the actual File object
             galleryImages[index] = file;
             console.log('Image added at index', index, galleryImages);
         }
 
         function removeImage(index) {
-            const imageNum = index + 1; // Convert to 1-based for IDs
+            const imageNum = index + 1;
             const inputId = `#image${imageNum}Input`;
             const previewId = `#image${imageNum}Preview`;
             const wrapperId = `#image${imageNum}Wrapper`;
@@ -742,7 +772,193 @@ Any references to “target returns,” “annualized yields,” projections, or
             toastr.info('Image removed');
         }
 
-        // FIXED: Submit function - keep your existing API structure
+        // ============= LOCALSTORAGE FUNCTIONS =============
+
+        function saveFormProgress() {
+            try {
+                const progressData = {
+                    currentStep: currentStep,
+                    investmentId: investmentId,
+                    formData: {
+                        // Step 1 - Basic Info
+                        title: $('[name="title"]').val(),
+                        asset_class_id: $('[name="asset_class_id"]').val(),
+                        investment_type_id: $('[name="investment_type_id"]').val(),
+                        investments_strategy_id: $('[name="investments_strategy_id"]').val(),
+                        term: $('[name="term"]').val(),
+                        min_investment: $('[name="min_investment"]').val(),
+                        status: $('[name="status"]').val(),
+                        investment_details: $('#investmentDetails').summernote('code'),
+
+                        // Step 2 - Location
+                        country: $('#country').val(),
+                        state: $('#state').val(),
+                        city: $('#city').val(),
+                        address: $('#address').val(),
+                        latitude: $('#latitude').val(),
+                        longitude: $('#longitude').val(),
+
+                        // Step 3 - Highlights
+                        overview: $('#overview').summernote('code'),
+                        targeted_irr: $('[name="targeted_irr"]').val(),
+                        tax_doc: $('[name="tax_doc"]').val(),
+                        investor_waterfall: $('#investor_waterfall').summernote('code'),
+                        promoted_interest: $('#promoted_interest').summernote('code'),
+                        asset_management_fee: $('[name="asset_management_fee"]').val(),
+                        organizational_and_offering_fee: $('[name="organizational_and_offering_fee"]').val(),
+                        acquisition_fee: $('[name="acquisition_fee"]').val(),
+                        disposition_fee: $('[name="disposition_fee"]').val(),
+                        fund_administration_fee: $('[name="fund_administration_fee"]').val(),
+
+                        // Step 6 - Disclaimer
+                        disclaimer_description: $('#disclaimerDescription').summernote('code')
+                    },
+                    documents: documents.map(doc => ({
+                        name: doc.name,
+                        fileName: doc.file.name,
+                        fileSize: doc.file.size,
+                        fileType: doc.file.type
+                    })),
+                    timestamp: new Date().toISOString()
+                };
+
+                localStorage.setItem(FORM_STORAGE_KEY, JSON.stringify(progressData));
+                console.log('✓ Form progress saved');
+            } catch (error) {
+                console.error('Error saving form progress:', error);
+            }
+        }
+
+        function loadFormProgress() {
+            try {
+                const savedData = localStorage.getItem(FORM_STORAGE_KEY);
+
+                if (!savedData) {
+                    console.log('No saved progress found');
+                    return;
+                }
+
+                const progressData = JSON.parse(savedData);
+
+                // Show restore prompt
+                Swal.fire({
+                    title: 'Previous Progress found',
+                    text: 'Do you want to start over?',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, Continue',
+                    cancelButtonText: 'No, start fresh.',
+                    confirmButtonColor: '#0d6efd',
+                    cancelButtonColor: '#6c757d'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        restoreFormData(progressData);
+                        toastr.success('Previous progress restored successfully');
+                    } else {
+                        localStorage.removeItem(FORM_STORAGE_KEY);
+                        toastr.info('Starting fresh');
+                    }
+                });
+
+            } catch (error) {
+                console.error('Error loading form progress:', error);
+                localStorage.removeItem(FORM_STORAGE_KEY);
+            }
+        }
+
+        function restoreFormData(progressData) {
+            try {
+                // Restore basic variables
+                investmentId = progressData.investmentId;
+                currentStep = progressData.currentStep || 1;
+
+                const data = progressData.formData;
+
+                // Step 1 - Basic Info
+                $('[name="title"]').val(data.title || '');
+                $('[name="asset_class_id"]').val(data.asset_class_id || '');
+                $('[name="investment_type_id"]').val(data.investment_type_id || '');
+                $('[name="investments_strategy_id"]').val(data.investments_strategy_id || '');
+                $('[name="term"]').val(data.term || '');
+                $('[name="min_investment"]').val(data.min_investment || '');
+                $('[name="status"]').val(data.status || 'draft');
+
+                if (data.investment_details) {
+                    $('#investmentDetails').summernote('code', data.investment_details);
+                }
+
+                // Step 2 - Location
+                $('#country').val(data.country || '');
+                $('#state').val(data.state || '');
+                $('#city').val(data.city || '');
+                $('#address').val(data.address || '');
+                $('#latitude').val(data.latitude || '');
+                $('#longitude').val(data.longitude || '');
+
+                // Update map if coordinates exist
+                if (data.latitude && data.longitude) {
+                    const position = {
+                        lat: parseFloat(data.latitude),
+                        lng: parseFloat(data.longitude)
+                    };
+                    marker.setPosition(position);
+                    map.setCenter(position);
+                }
+
+                // Step 3 - Highlights
+                if (data.overview) {
+                    $('#overview').summernote('code', data.overview);
+                }
+                $('[name="targeted_irr"]').val(data.targeted_irr || '');
+                $('[name="tax_doc"]').val(data.tax_doc || '');
+
+                if (data.investor_waterfall) {
+                    $('#investor_waterfall').summernote('code', data.investor_waterfall);
+                }
+                if (data.promoted_interest) {
+                    $('#promoted_interest').summernote('code', data.promoted_interest);
+                }
+
+                $('[name="asset_management_fee"]').val(data.asset_management_fee || '');
+                $('[name="organizational_and_offering_fee"]').val(data.organizational_and_offering_fee || '');
+                $('[name="acquisition_fee"]').val(data.acquisition_fee || '');
+                $('[name="disposition_fee"]').val(data.disposition_fee || '');
+                $('[name="fund_administration_fee"]').val(data.fund_administration_fee || '');
+
+                // Step 6 - Disclaimer
+                if (data.disclaimer_description) {
+                    $('#disclaimerDescription').summernote('code', data.disclaimer_description);
+                }
+
+                // Restore documents info (files can't be restored, but show list)
+                if (progressData.documents && progressData.documents.length > 0) {
+                    toastr.info(
+                        `${progressData.documents.length} documents were previously added. Please re-upload them in Step 4.`
+                        );
+                }
+
+                // Mark completed steps
+                for (let i = 1; i < currentStep; i++) {
+                    $(`.step-item[data-step="${i}"]`).addClass('completed');
+                }
+
+                // Navigate to saved step
+                goToStep(currentStep);
+
+                console.log('✓ Form data restored successfully');
+
+            } catch (error) {
+                console.error('Error restoring form data:', error);
+                toastr.error('Error restoring previous progress');
+            }
+        }
+
+        function clearFormProgress() {
+            localStorage.removeItem(FORM_STORAGE_KEY);
+        }
+
+        // ============= SUBMIT FUNCTION =============
+
         function submitInvestment() {
             if (!investmentId) {
                 toastr.error('Please complete step 1 first');
@@ -777,7 +993,7 @@ Any references to “target returns,” “annualized yields,” projections, or
                 }).then(() => console.log('✓ Highlights saved'))
             );
 
-            // Step 4: Documents (keep existing one-by-one upload)
+            // Step 4: Documents
             if (documents.length > 0) {
                 console.log('Uploading', documents.length, 'documents');
                 documents.forEach((doc, index) => {
@@ -798,7 +1014,7 @@ Any references to “target returns,” “annualized yields,” projections, or
                 });
             }
 
-            // Step 5: Gallery (FIXED - upload only non-null images)
+            // Step 5: Gallery
             const validImages = galleryImages.filter(img => img !== null);
             console.log('Valid gallery images:', validImages.length);
 
@@ -843,6 +1059,9 @@ Any references to “target returns,” “annualized yields,” projections, or
                     NProgress.done();
                     console.log('✓ All data saved successfully');
 
+                    // Clear saved progress
+                    clearFormProgress();
+
                     Swal.fire({
                         title: 'Success!',
                         text: 'Investment created successfully',
@@ -875,6 +1094,8 @@ Any references to “target returns,” “annualized yields,” projections, or
                     });
                 });
         }
+
+        // ============= ERROR HANDLER =============
 
         function handleAjaxError(xhr, defaultMsg) {
             let message = defaultMsg;
