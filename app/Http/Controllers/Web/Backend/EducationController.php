@@ -5,10 +5,11 @@ namespace App\Http\Controllers\Web\Backend;
 use Exception;
 use App\Helper\Helper;
 use App\Models\Education;
-use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use App\Models\AssetClass;
+use Illuminate\Http\Request;
 use App\Models\PinnedEducation;
+use Illuminate\Http\JsonResponse;
+use App\Http\Controllers\Controller;
 use Yajra\DataTables\Facades\DataTables;
 
 class EducationController extends Controller
@@ -54,20 +55,15 @@ class EducationController extends Controller
 
                 // status (Pin/Unpin toggle) - Only one can be pinned at a time
                 ->addColumn('status', function ($item) {
-                    $isPinned = PinnedEducation::where('education_id', $item->id)
-                        ->where('user_id', auth()->id())
-                        ->exists();
-
-                    $checked = $isPinned ? 'checked' : '';
-
-                    return '<div class="form-check form-switch d-flex justify-content-center align-items-center">
-                        <input onclick="togglePin(' . $item->id . ')"
+                    $checked = $item->status == 'active' ? 'checked' : '';
+                    return '<div class="form-check form-switch d-flex justify-content-center">
+                        <input onclick="showStatusChangeAlert(' . $item->id . ')"
                         type="checkbox"
-                        class="form-check-input pin-toggle"
+                        class="form-check-input"
                         role="switch"
                         style="cursor: pointer; width: 50px; height: 24px;"
                         ' . $checked . '>
-                        </div>';
+                    </div>';
                 })
 
                 // Action buttons
@@ -188,43 +184,23 @@ class EducationController extends Controller
     }
 
     //education pinned/unpinned - Only one can be pinned at a time
-    public function togglePinned($id)
+    public function status(int $id): JsonResponse
     {
-        $user = auth()->user();
+        $data = Education::findOrFail($id);
 
-        // Check if the education exists
-        $education = Education::find($id);
-        if (!$education) {
-            return response()->json(['success' => false, 'message' => 'Item not found'], 404);
-        }
-
-        // Check if the user already pinned this education
-        $alreadyPinned = PinnedEducation::where('education_id', $education->id)
-            ->where('user_id', $user->id)
-            ->first();
-
-        if ($alreadyPinned) {
-            // Unpin the education
-            $alreadyPinned->delete();
-
+        if (!$data) {
             return response()->json([
-                'success' => false,
-                'message' => '📍 Education Unpinned!',
-            ], 200);
-        } else {
-            // First, unpin all other educations for this user
-            PinnedEducation::where('user_id', $user->id)->delete();
-
-            // Then pin this education
-            PinnedEducation::create([
-                'education_id' => $education->id,
-                'user_id'      => $user->id,
+                'status' => 'error',
+                'message' => 'Article not found.',
             ]);
-
-            return response()->json([
-                'success' => true,
-                'message' => '📍 Education Pinned! (Previous pin removed)',
-            ], 200);
         }
+
+        $data->status = $data->status === 'active' ? 'inactive' : 'active';
+        $data->save();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Article status changed successfully!',
+        ]);
     }
 }

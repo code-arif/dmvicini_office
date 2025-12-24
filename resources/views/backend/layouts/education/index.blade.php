@@ -468,32 +468,38 @@
             });
         }
 
-        // Toggle Pin (Only one can be pinned at a time)
-        function togglePin(id) {
+        // Status Change
+        function showStatusChangeAlert(id) {
             event.preventDefault();
 
+            Swal.fire({
+                title: 'Are you sure?',
+                text: 'You want to update the status?',
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonText: 'Yes',
+                cancelButtonText: 'No',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    statusChange(id);
+                }
+            });
+        }
+
+        function statusChange(id) {
             NProgress.start();
-            let url = "{{ route('pinned.education', ':id') }}";
-            let csrfToken = '{{ csrf_token() }}';
+            let url = "{{ route('education.status', ':id') }}";
             $.ajax({
                 type: "POST",
                 url: url.replace(':id', id),
-                headers: {
-                    'X-CSRF-TOKEN': csrfToken
-                },
                 success: function(resp) {
                     NProgress.done();
-                    if (resp.success) {
-                        toastr.success(resp.message);
-                    } else {
-                        toastr.info(resp.message);
-                    }
+                    toastr.success(resp.message);
                     $('#datatable').DataTable().ajax.reload();
                 },
                 error: function(error) {
                     NProgress.done();
-                    toastr.error('Failed to update pin status');
-                    $('#datatable').DataTable().ajax.reload();
+                    toastr.error('Failed to change status');
                 }
             });
         }

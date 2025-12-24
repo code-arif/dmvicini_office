@@ -12,19 +12,13 @@ class Education extends Model
         'title',
         'sub_title',
         'description',
-        'image'
+        'image',
+        'status'
     ];
 
     //reation with asset_class table
     public function asset_class()
     {
         return $this->BelongsTo(AssetClass::class);
-    }
-
-    //relation with pin table
-    public function pinnedByUser()
-    {
-        return $this->hasOne(PinnedEducation::class, 'education_id')
-            ->where('user_id', auth()->id());
     }
 }

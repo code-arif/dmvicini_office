@@ -945,11 +945,25 @@ Any references to “target returns,” “annualized yields,” projections, or
                 // Navigate to saved step
                 goToStep(currentStep);
 
+                // Scroll to the card after a short delay to ensure DOM is ready
+                setTimeout(() => {
+                    scrollToCard();
+                }, 300);
+
                 console.log('✓ Form data restored successfully');
 
             } catch (error) {
                 console.error('Error restoring form data:', error);
                 toastr.error('Error restoring previous progress');
+            }
+        }
+
+        function scrollToCard() {
+            const card = $('.card').first();
+            if (card.length) {
+                $('html, body').animate({
+                    scrollTop: card.offset().top - 20
+                }, 400);
             }
         }
 
@@ -1113,7 +1127,6 @@ Any references to “target returns,” “annualized yields,” projections, or
         }
     </script>
 @endpush
-
 
 @push('styles')
     <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.css" rel="stylesheet">

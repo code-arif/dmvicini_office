@@ -393,11 +393,11 @@
                                             <label class="form-label">Disclaimer Content</label>
                                             <textarea name="disclaimer_description" id="disclaimerDescription" class="form-control">{{ $investment->disclaimer->description ??
                                                 'This offering summary has been prepared solely by the sponsor and is provided for informational purposes only. It is not a complete description of the securities being offered and does not constitute part of the sponsor’s private placement memorandum or other definitive offering documents (collectively, the “Offering Materials”), nor does it constitute an offer to sell or a solicitation of an offer to buy any securities. The securities described herein are offered exclusively pursuant to the Offering Materials, which must be reviewed carefully and in their entirety prior to making any investment decision.
-                                                                                                                                                                                                                            No person has been authorized to provide information or make representations regarding this offering other than those contained in the Offering Materials. Any such unauthorized information or representations may not be relied upon.
-                                                                                                                                                                                                                            Pinnacle Capital Group, LLC (“Pinnacle”) may act solely as a placement agent for certain offerings or, in some cases, may provide limited, non-solicited marketing or administrative services to the sponsor. Pinnacle is not the issuer, sponsor, or manager of any investment. Pinnacle does not provide investment, tax, or legal advice, does not recommend or endorse any offering on this platform, and makes no representation regarding the merits, suitability, risks, or expected performance of any offering.
-                                                                                                                                                                                                                            Investing in private placements involves significant risks, including, but not limited to, total loss of principal, illiquidity, long holding periods, lack of a secondary market, and limited transparency. These investments are suitable only for accredited investors who fully understand and are willing to accept these risks. All investors must be verified as accredited investors in accordance with applicable securities laws and regulations prior to investing.
-                                                                                                                                                                                                                            Any references to “target returns,” “annualized yields,” projections, or other forward-looking statements are hypothetical, are based solely on sponsor assumptions, should not be relied upon, are not guarantees of future performance, and actual results may differ materially. Past performance is not indicative of future results.
-                                                                                                                                                                                                                            ' }}</textarea>
+                                                                                                                                                                                                                                                                                                                                                                No person has been authorized to provide information or make representations regarding this offering other than those contained in the Offering Materials. Any such unauthorized information or representations may not be relied upon.
+                                                                                                                                                                                                                                                                                                                                                                Pinnacle Capital Group, LLC (“Pinnacle”) may act solely as a placement agent for certain offerings or, in some cases, may provide limited, non-solicited marketing or administrative services to the sponsor. Pinnacle is not the issuer, sponsor, or manager of any investment. Pinnacle does not provide investment, tax, or legal advice, does not recommend or endorse any offering on this platform, and makes no representation regarding the merits, suitability, risks, or expected performance of any offering.
+                                                                                                                                                                                                                                                                                                                                                                Investing in private placements involves significant risks, including, but not limited to, total loss of principal, illiquidity, long holding periods, lack of a secondary market, and limited transparency. These investments are suitable only for accredited investors who fully understand and are willing to accept these risks. All investors must be verified as accredited investors in accordance with applicable securities laws and regulations prior to investing.
+                                                                                                                                                                                                                                                                                                                                                                Any references to “target returns,” “annualized yields,” projections, or other forward-looking statements are hypothetical, are based solely on sponsor assumptions, should not be relied upon, are not guarantees of future performance, and actual results may differ materially. Past performance is not indicative of future results.
+                                                                                                                                                                                                                                                                                                                                                                ' }}</textarea>
                                             <small class="text-muted">Add any legal disclaimers, risk warnings, or
                                                 important notices here.</small>
                                         </div>
@@ -445,13 +445,17 @@
 
         const investmentId = {{ $investment->id }};
     </script>
-
+    
     <script>
+        // Global variables
         let currentStep = 1;
         let totalSteps = 6;
         let map, marker, geocoder, searchBox;
         let documents = [];
-        let galleryImages = [null, null]; // Fixed: 2 images only
+        let galleryImages = [null, null];
+
+        // LocalStorage key - unique per investment
+        const FORM_STORAGE_KEY = `investment_edit_form_${investmentId}`;
 
         $(document).ready(function() {
             // Initialize Summernote
@@ -466,8 +470,6 @@
                         ['insert', ['link', 'picture']],
                         ['view', ['fullscreen', 'codeview']]
                     ],
-
-                    // Dark theme options
                     callbacks: {
                         onInit: function() {
                             $('.note-editable').css({
@@ -480,9 +482,10 @@
                                 'border-top': '1px solid #333'
                             });
                         },
-                        onChange: function(contents, $editable) {}
+                        onChange: function(contents, $editable) {
+                            saveFormProgress();
+                        }
                     },
-
                     color: {
                         foreColor: '#ffffff',
                         backColor: '#000000'
@@ -490,6 +493,15 @@
                 });
 
             initMap();
+
+            // Load saved progress
+            loadFormProgress();
+
+            // Auto-save on input change
+            $('#investmentForm input, #investmentForm select, #investmentForm textarea').on('change input',
+                function() {
+                    saveFormProgress();
+                });
 
             // Mountain image preview
             $('input[name="mountain_image"]').on('change', function() {
@@ -500,6 +512,7 @@
                     };
                     reader.readAsDataURL(this.files[0]);
                 }
+                saveFormProgress();
             });
 
             // Navigation
@@ -534,6 +547,8 @@
                 removeImage(1);
             });
         });
+
+        // ============= MAP FUNCTIONS =============
 
         function initMap() {
             const lat = parseFloat($('#latitude').val()) || 23.8103;
@@ -633,8 +648,11 @@
                 });
 
                 toastr.success('Location updated successfully');
+                saveFormProgress();
             }
         }
+
+        // ============= UPDATE FUNCTIONS =============
 
         function updateBasicInfo() {
             const formData = new FormData($('#investmentForm')[0]);
@@ -657,6 +675,7 @@
                     NProgress.done();
                     if (res.success) {
                         toastr.success(res.message || 'Basic info updated');
+                        saveFormProgress();
                         navigateStep(1);
                     }
                 },
@@ -689,6 +708,7 @@
                     NProgress.done();
                     if (res.success) {
                         toastr.success('Location updated successfully');
+                        saveFormProgress();
                         navigateStep(1);
                     }
                 },
@@ -699,25 +719,45 @@
             });
         }
 
+        // ============= NAVIGATION FUNCTIONS =============
+
         function navigateStep(direction) {
+            saveFormProgress();
             goToStep(currentStep + direction);
         }
 
         function goToStep(step) {
             if (step < 1 || step > totalSteps) return;
 
-            $(`.step-content[data-step="${currentStep}"]`).removeClass('active');
-            $(`.step-item[data-step="${currentStep}"]`).removeClass('active').addClass('completed');
+            // Hide ALL step contents first
+            $('.step-content').removeClass('active');
 
+            // Remove active from all step items
+            $('.step-item').removeClass('active');
+
+            // Mark all previous steps as completed
+            for (let i = 1; i < step; i++) {
+                $(`.step-item[data-step="${i}"]`).addClass('completed');
+            }
+
+            // Show only the current step content
             $(`.step-content[data-step="${step}"]`).addClass('active');
-            $(`.step-item[data-step="${step}"]`).addClass('active');
+
+            // Mark current step as active
+            $(`.step-item[data-step="${step}"]`).addClass('active').removeClass('completed');
 
             currentStep = step;
 
+            // Save current step
+            saveFormProgress();
+
+            // Update navigation buttons
             $('#prevBtn').toggle(currentStep > 1);
             $('#nextBtn').toggle(currentStep < totalSteps);
             $('#submitBtn').toggle(currentStep === totalSteps);
         }
+
+        // ============= DOCUMENT FUNCTIONS =============
 
         function deleteExistingDocument(docId) {
             Swal.fire({
@@ -753,6 +793,52 @@
             });
         }
 
+        function addDocument() {
+            const name = $('#docName').val().trim();
+            const fileInput = $('#docFile')[0];
+            const file = fileInput.files[0];
+
+            if (!name || !file) {
+                toastr.error('Please provide document name and file');
+                return;
+            }
+
+            documents.push({
+                name,
+                file
+            });
+            renderDocuments();
+            $('#docName').val('');
+            $('#docFile').val('');
+            toastr.success('Document added');
+            saveFormProgress();
+        }
+
+        function renderDocuments() {
+            let html = '<div class="list-group">';
+            documents.forEach((doc, index) => {
+                html += `
+            <div class="list-group-item d-flex justify-content-between align-items-center">
+                <span><i class="fa fa-file"></i> ${doc.name}</span>
+                <button type="button" class="btn btn-sm btn-danger" onclick="removeDocument(${index})">
+                    <i class="fa fa-trash"></i>
+                </button>
+            </div>
+        `;
+            });
+            html += '</div>';
+            $('#documentsList').html(html);
+        }
+
+        function removeDocument(index) {
+            documents.splice(index, 1);
+            renderDocuments();
+            toastr.info('Document removed');
+            saveFormProgress();
+        }
+
+        // ============= GALLERY FUNCTIONS =============
+
         function deleteExistingImage(imgId) {
             Swal.fire({
                 title: 'Are you sure?',
@@ -786,49 +872,6 @@
             });
         }
 
-        function addDocument() {
-            const name = $('#docName').val().trim();
-            const fileInput = $('#docFile')[0];
-            const file = fileInput.files[0];
-
-            if (!name || !file) {
-                toastr.error('Please provide document name and file');
-                return;
-            }
-
-            documents.push({
-                name,
-                file
-            });
-            renderDocuments();
-            $('#docName').val('');
-            $('#docFile').val('');
-            toastr.success('Document added');
-        }
-
-        function renderDocuments() {
-            let html = '<div class="list-group">';
-            documents.forEach((doc, index) => {
-                html += `
-            <div class="list-group-item d-flex justify-content-between align-items-center">
-                <span><i class="fa fa-file"></i> ${doc.name}</span>
-                <button type="button" class="btn btn-sm btn-danger" onclick="removeDocument(${index})">
-                    <i class="fa fa-trash"></i>
-                </button>
-            </div>
-        `;
-            });
-            html += '</div>';
-            $('#documentsList').html(html);
-        }
-
-        function removeDocument(index) {
-            documents.splice(index, 1);
-            renderDocuments();
-            toastr.info('Document removed');
-        }
-
-        // FIXED: Gallery image handling (2 images only)
         function handleImageUpload(input, previewId, wrapperId, removeBtnId, index) {
             const file = input.files[0];
             if (!file) return;
@@ -867,6 +910,203 @@
             console.log('Image removed at index', index);
             toastr.info('Image removed');
         }
+
+        // ============= LOCALSTORAGE FUNCTIONS =============
+
+        function saveFormProgress() {
+            try {
+                const progressData = {
+                    currentStep: currentStep,
+                    formData: {
+                        // Step 1 - Basic Info
+                        title: $('[name="title"]').val(),
+                        asset_class_id: $('[name="asset_class_id"]').val(),
+                        investment_type_id: $('[name="investment_type_id"]').val(),
+                        investments_strategy_id: $('[name="investments_strategy_id"]').val(),
+                        term: $('[name="term"]').val(),
+                        min_investment: $('[name="min_investment"]').val(),
+                        status: $('[name="status"]').val(),
+                        investment_details: $('#investmentDetails').summernote('code'),
+
+                        // Step 2 - Location
+                        country: $('#country').val(),
+                        state: $('#state').val(),
+                        city: $('#city').val(),
+                        address: $('#address').val(),
+                        latitude: $('#latitude').val(),
+                        longitude: $('#longitude').val(),
+
+                        // Step 3 - Highlights
+                        overview: $('#overview').summernote('code'),
+                        targeted_irr: $('[name="targeted_irr"]').val(),
+                        tax_doc: $('[name="tax_doc"]').val(),
+                        investor_waterfall: $('#investor_waterfall').summernote('code'),
+                        promoted_interest: $('#promoted_interest').summernote('code'),
+                        asset_management_fee: $('[name="asset_management_fee"]').val(),
+                        organizational_and_offering_fee: $('[name="organizational_and_offering_fee"]').val(),
+                        acquisition_fee: $('[name="acquisition_fee"]').val(),
+                        disposition_fee: $('[name="disposition_fee"]').val(),
+                        fund_administration_fee: $('[name="fund_administration_fee"]').val(),
+
+                        // Step 6 - Disclaimer
+                        disclaimer_description: $('#disclaimerDescription').summernote('code')
+                    },
+                    documents: documents.map(doc => ({
+                        name: doc.name,
+                        fileName: doc.file.name,
+                        fileSize: doc.file.size,
+                        fileType: doc.file.type
+                    })),
+                    timestamp: new Date().toISOString()
+                };
+
+                localStorage.setItem(FORM_STORAGE_KEY, JSON.stringify(progressData));
+                console.log('✓ Form progress saved');
+            } catch (error) {
+                console.error('Error saving form progress:', error);
+            }
+        }
+
+        function loadFormProgress() {
+            try {
+                const savedData = localStorage.getItem(FORM_STORAGE_KEY);
+
+                if (!savedData) {
+                    console.log('No saved progress found');
+                    return;
+                }
+
+                const progressData = JSON.parse(savedData);
+
+                // Show restore prompt
+                Swal.fire({
+                    title: 'Previous Progress Found',
+                    text: 'Do you want to continue from where you left off?',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, Continue',
+                    cancelButtonText: 'No, Start Fresh',
+                    confirmButtonColor: '#0d6efd',
+                    cancelButtonColor: '#6c757d'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        restoreFormData(progressData);
+                        toastr.success('Previous progress restored successfully');
+                    } else {
+                        localStorage.removeItem(FORM_STORAGE_KEY);
+                        toastr.info('Starting fresh');
+                    }
+                });
+
+            } catch (error) {
+                console.error('Error loading form progress:', error);
+                localStorage.removeItem(FORM_STORAGE_KEY);
+            }
+        }
+
+        function restoreFormData(progressData) {
+            try {
+                currentStep = progressData.currentStep || 1;
+                const data = progressData.formData;
+
+                // Step 1 - Basic Info
+                $('[name="title"]').val(data.title || '');
+                $('[name="asset_class_id"]').val(data.asset_class_id || '');
+                $('[name="investment_type_id"]').val(data.investment_type_id || '');
+                $('[name="investments_strategy_id"]').val(data.investments_strategy_id || '');
+                $('[name="term"]').val(data.term || '');
+                $('[name="min_investment"]').val(data.min_investment || '');
+                $('[name="status"]').val(data.status || 'draft');
+
+                if (data.investment_details) {
+                    $('#investmentDetails').summernote('code', data.investment_details);
+                }
+
+                // Step 2 - Location
+                $('#country').val(data.country || '');
+                $('#state').val(data.state || '');
+                $('#city').val(data.city || '');
+                $('#address').val(data.address || '');
+                $('#latitude').val(data.latitude || '');
+                $('#longitude').val(data.longitude || '');
+
+                // Update map if coordinates exist
+                if (data.latitude && data.longitude) {
+                    const position = {
+                        lat: parseFloat(data.latitude),
+                        lng: parseFloat(data.longitude)
+                    };
+                    marker.setPosition(position);
+                    map.setCenter(position);
+                }
+
+                // Step 3 - Highlights
+                if (data.overview) {
+                    $('#overview').summernote('code', data.overview);
+                }
+                $('[name="targeted_irr"]').val(data.targeted_irr || '');
+                $('[name="tax_doc"]').val(data.tax_doc || '');
+
+                if (data.investor_waterfall) {
+                    $('#investor_waterfall').summernote('code', data.investor_waterfall);
+                }
+                if (data.promoted_interest) {
+                    $('#promoted_interest').summernote('code', data.promoted_interest);
+                }
+
+                $('[name="asset_management_fee"]').val(data.asset_management_fee || '');
+                $('[name="organizational_and_offering_fee"]').val(data.organizational_and_offering_fee || '');
+                $('[name="acquisition_fee"]').val(data.acquisition_fee || '');
+                $('[name="disposition_fee"]').val(data.disposition_fee || '');
+                $('[name="fund_administration_fee"]').val(data.fund_administration_fee || '');
+
+                // Step 6 - Disclaimer
+                if (data.disclaimer_description) {
+                    $('#disclaimerDescription').summernote('code', data.disclaimer_description);
+                }
+
+                // Restore documents info
+                if (progressData.documents && progressData.documents.length > 0) {
+                    toastr.info(
+                        `${progressData.documents.length} documents were previously added. Please re-upload them in Step 4.`
+                    );
+                }
+
+                // Mark completed steps
+                for (let i = 1; i < currentStep; i++) {
+                    $(`.step-item[data-step="${i}"]`).addClass('completed');
+                }
+
+                // Navigate to saved step
+                goToStep(currentStep);
+
+                // Scroll to the card after a short delay
+                setTimeout(() => {
+                    scrollToCard();
+                }, 300);
+
+                console.log('✓ Form data restored successfully');
+
+            } catch (error) {
+                console.error('Error restoring form data:', error);
+                toastr.error('Error restoring previous progress');
+            }
+        }
+
+        function scrollToCard() {
+            const card = $('.card').first();
+            if (card.length) {
+                $('html, body').animate({
+                    scrollTop: card.offset().top - 20
+                }, 400);
+            }
+        }
+
+        function clearFormProgress() {
+            localStorage.removeItem(FORM_STORAGE_KEY);
+        }
+
+        // ============= SUBMIT FUNCTION =============
 
         function submitInvestment() {
             NProgress.start();
@@ -918,7 +1158,7 @@
                 });
             }
 
-            // Step 5: New Gallery Images (FIXED - only non-null images)
+            // Step 5: New Gallery Images
             const validImages = galleryImages.filter(img => img !== null);
             console.log('Valid new gallery images:', validImages.length);
 
@@ -963,6 +1203,9 @@
                     NProgress.done();
                     console.log('✓ All data updated successfully');
 
+                    // Clear saved progress
+                    clearFormProgress();
+
                     Swal.fire({
                         title: 'Success!',
                         text: 'Investment updated successfully',
@@ -996,6 +1239,8 @@
                     });
                 });
         }
+
+        // ============= ERROR HANDLER =============
 
         function handleAjaxError(xhr, defaultMsg) {
             let message = defaultMsg;

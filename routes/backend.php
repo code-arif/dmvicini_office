@@ -81,8 +81,7 @@ Route::middleware(['auth', 'admin'])->group(function () {
         Route::post('/update/{id}', [EducationController::class, 'update'])->name('education.update');
         Route::delete('/delete/{id}', [EducationController::class, 'destroy'])->name('education.delete');
 
-        //pinned and unpinned education
-        Route::post('/pin/{edu_id}', [EducationController::class, 'togglePinned'])->name('pinned.education');
+        Route::post('/status/{id}', [EducationController::class, 'status'])->name('education.status');
     });
 
     //investment tags

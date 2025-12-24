@@ -21,7 +21,7 @@ class EducationPageController extends Controller
     {
         $perPage = $request->input('per_page', 10);
 
-        $query = Education::with('asset_class:id,name')->latest();
+        $query = Education::with('asset_class:id,name')->where('status', 'active')->latest();
 
         // Title search
         if ($request->filled('title')) {

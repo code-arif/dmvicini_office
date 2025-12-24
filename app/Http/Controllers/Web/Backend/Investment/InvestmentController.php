@@ -70,32 +70,15 @@ class InvestmentController extends Controller
                     return !empty($location) ? implode(', ', $location) : '<span class="text-muted">N/A</span>';
                 })
                 ->addColumn('status', function ($item) {
-                    $statuses = ['draft', 'active', 'closed'];
-                    $statusColors = [
-                        'draft' => 'secondary',
-                        'active' => 'success',
-                        'closed' => 'danger'
-                    ];
-
-                    $html = '<div class="dropdown">
-                            <button class="btn btn-sm btn-outline-' . $statusColors[$item->status] . ' dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">'
-                        . ucfirst($item->status) .
-                        '</button>
-                            <ul class="dropdown-menu">';
-
-                    foreach ($statuses as $status) {
-                        $activeClass = $item->status === $status ? 'active' : '';
-                        $html .= '<li>
-                                <a class="dropdown-item changeStatus ' . $activeClass . '"
-                                href="javascript:void(0)"
-                                data-id="' . $item->id . '"
-                                data-status="' . $status . '">'
-                            . ucfirst($status) . '</a>
-                            </li>';
-                    }
-
-                    $html .= '</ul></div>';
-                    return $html;
+                    $checked = $item->status == 'active' ? 'checked' : '';
+                    return '<div class="form-check form-switch d-flex justify-content-center">
+                        <input onclick="showStatusChangeAlert(' . $item->id . ')"
+                        type="checkbox"
+                        class="form-check-input"
+                        role="switch"
+                        style="cursor: pointer; width: 50px; height: 24px;"
+                        ' . $checked . '>
+                    </div>';
                 })
                 ->addColumn('created_at', fn($item) => $item->created_at->format('Y-m-d h:i A'))
                 ->addColumn('action', function ($item) {
