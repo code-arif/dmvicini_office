@@ -130,15 +130,12 @@ class InvestmentController extends Controller
         $investments = $query->paginate($perPage);
 
         $data = $investments->map(function ($item) {
-            // Clean min_investment for display
-            $minInvestmentClean = preg_replace('/[^0-9.]/', '', $item->min_investment ?? '0');
-
             return [
                 'id'              => $item->id,
                 'title'           => $item->title,
                 'term'            => $item->term,
                 'min_investment'  => $item->min_investment,
-                'targeted_irr'    => $item->highlight->targeted_irr,
+                'targeted_irr'    => $item->highlight?->targeted_irr,
                 'p_strategy'      => optional($item->strategy)->name,
                 'asset_class'     => optional($item->assetClass)->name,
                 'investment_type' => optional($item->investmentType)->name,

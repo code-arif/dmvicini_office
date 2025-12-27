@@ -122,7 +122,8 @@
                             <div class="card-header border-bottom">
                                 <h3 class="card-title mb-0">Deals List</h3>
                                 <div class="card-options ms-auto">
-                                    <a href="{{ route('investment.create') }}" class="btn btn-primary btn-sm" style="margin-right: 10px">
+                                    <a href="{{ route('investment.create') }}" class="btn btn-primary btn-sm"
+                                        style="margin-right: 10px">
                                         <i class="fa fa-plus"></i> Add Deal
                                     </a>
                                     <a href="{{ route('investment.create') }}" class="btn btn-outline-secondary btn-sm">
@@ -158,6 +159,24 @@
         </div>
     </div>
 @endsection
+
+@push('styles')
+    <style>
+        /* Dropdown status styling */
+        .dropdown-item.active {
+            background-color: #f8f9fa;
+            font-weight: 600;
+        }
+
+        .dropdown-item:hover {
+            background-color: #e9ecef;
+        }
+
+        .dropdown-menu {
+            min-width: 140px;
+        }
+    </style>
+@endpush
 
 @push('scripts')
     <script>
@@ -209,7 +228,8 @@
                     },
                     {
                         data: 'status',
-                        name: 'status'
+                        name: 'status',
+                        orderable: false
                     },
                     {
                         data: 'created_at',
@@ -239,30 +259,114 @@
         });
     </script>
 
-    {{-- Update status --}}
+    {{-- Update status with dropdown --}}
     <script>
-        $(document).on('click', '.changeStatus', function() {
-            let id = $(this).data('id');
-            let status = $(this).data('status');
+        $(document).on('click', '.changeStatus', function(e) {
+            e.preventDefault();
 
-            $.ajax({
-                url: "{{ route('investment.status.update') }}",
-                type: "POST",
-                data: {
-                    _token: "{{ csrf_token() }}",
-                    id: id,
-                    status: status
+            let element = $(this);
+            let id = element.data('id');
+            let newStatus = element.data('status');
+            let currentStatus = element.data('current');
+
+            // If clicking on current status, do nothing
+            if (newStatus === currentStatus) {
+                return;
+            }
+
+            // Status label mapping
+            const statusLabels = {
+                'draft': 'Draft',
+                'active': 'Active',
+                'closed': 'Closed'
+            };
+
+            // Sweet Alert confirmation
+            Swal.fire({
+                title: 'Change Status?',
+                html: `Change status from <strong class="text-primary">${statusLabels[currentStatus]}</strong> to <strong class="text-success">${statusLabels[newStatus]}</strong>?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: '<i class="fa fa-check me-1"></i> Yes, Change',
+                cancelButtonText: '<i class="fa fa-times me-1"></i> Cancel',
+                customClass: {
+                    confirmButton: 'btn btn-primary me-2',
+                    cancelButton: 'btn btn-secondary'
                 },
-                success: function(res) {
-                    if (res.success) {
-                        toastr.success(res.message);
-                        $('#datatable').DataTable().ajax.reload(null, false);
-                    } else {
-                        toastr.error("Failed to update status");
-                    }
-                },
-                error: function(xhr) {
-                    toastr.error("Something went wrong");
+                buttonsStyling: false
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Show loading
+                    Swal.fire({
+                        title: 'Updating Status...',
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                        didOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+
+                    // Update status via AJAX
+                    $.ajax({
+                        url: "{{ route('investment.status.update') }}",
+                        type: "POST",
+                        data: {
+                            _token: "{{ csrf_token() }}",
+                            id: id,
+                            status: newStatus
+                        },
+                        success: function(res) {
+                            if (res.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Success!',
+                                    text: res.message,
+                                    timer: 1500,
+                                    showConfirmButton: false
+                                }).then(() => {
+                                    // Reload table
+                                    $('#datatable').DataTable().ajax.reload(null,
+                                    false);
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Failed!',
+                                    text: res.message || 'Failed to update status',
+                                    confirmButtonText: 'OK',
+                                    customClass: {
+                                        confirmButton: 'btn btn-danger'
+                                    },
+                                    buttonsStyling: false
+                                });
+                            }
+                        },
+                        error: function(xhr) {
+                            let errorMsg = 'Something went wrong!';
+
+                            if (xhr.responseJSON) {
+                                if (xhr.responseJSON.message) {
+                                    errorMsg = xhr.responseJSON.message;
+                                } else if (xhr.responseJSON.errors) {
+                                    errorMsg = Object.values(xhr.responseJSON.errors).flat()
+                                        .join('<br>');
+                                }
+                            }
+
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error!',
+                                html: errorMsg,
+                                confirmButtonText: 'OK',
+                                customClass: {
+                                    confirmButton: 'btn btn-danger'
+                                },
+                                buttonsStyling: false
+                            });
+                        }
+                    });
                 }
             });
         });
@@ -272,14 +376,21 @@
     <script>
         function showDeleteConfirm(id) {
             event.preventDefault();
+
             Swal.fire({
-                title: 'Are you sure you want to delete this investment?',
-                text: 'If you delete this, it will be gone forever.',
+                title: 'Are you sure?',
+                text: 'Do you want to delete this investment? This action cannot be undone!',
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, delete it!',
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: '<i class="fa fa-trash me-1"></i> Yes, Delete',
+                cancelButtonText: '<i class="fa fa-times me-1"></i> Cancel',
+                customClass: {
+                    confirmButton: 'btn btn-danger me-2',
+                    cancelButton: 'btn btn-secondary'
+                },
+                buttonsStyling: false
             }).then((result) => {
                 if (result.isConfirmed) {
                     deleteItem(id);
@@ -288,9 +399,20 @@
         }
 
         function deleteItem(id) {
-            NProgress.start();
+            // Show loading
+            Swal.fire({
+                title: 'Deleting...',
+                text: 'Please wait',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
             let url = "{{ route('investment.destroy', ':id') }}";
             let csrfToken = '{{ csrf_token() }}';
+
             $.ajax({
                 type: "DELETE",
                 url: url.replace(':id', id),
@@ -298,13 +420,33 @@
                     'X-CSRF-TOKEN': csrfToken
                 },
                 success: function(resp) {
-                    NProgress.done();
-                    toastr.success(resp.message);
-                    $('#datatable').DataTable().ajax.reload();
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Deleted!',
+                        text: resp.message || 'Investment deleted successfully',
+                        timer: 1500,
+                        showConfirmButton: false
+                    }).then(() => {
+                        $('#datatable').DataTable().ajax.reload();
+                    });
                 },
                 error: function(error) {
-                    NProgress.done();
-                    toastr.error(error.responseJSON.message);
+                    let errorMsg = 'Failed to delete investment';
+
+                    if (error.responseJSON && error.responseJSON.message) {
+                        errorMsg = error.responseJSON.message;
+                    }
+
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: errorMsg,
+                        confirmButtonText: 'OK',
+                        customClass: {
+                            confirmButton: 'btn btn-danger'
+                        },
+                        buttonsStyling: false
+                    });
                 }
             });
         }

@@ -70,14 +70,50 @@ class InvestmentController extends Controller
                     return !empty($location) ? implode(', ', $location) : '<span class="text-muted">N/A</span>';
                 })
                 ->addColumn('status', function ($item) {
-                    $checked = $item->status == 'active' ? 'checked' : '';
-                    return '<div class="form-check form-switch d-flex justify-content-center">
-                        <input onclick="showStatusChangeAlert(' . $item->id . ')"
-                        type="checkbox"
-                        class="form-check-input"
-                        role="switch"
-                        style="cursor: pointer; width: 50px; height: 24px;"
-                        ' . $checked . '>
+                    // Badge color based on status
+                    $badgeClass = match ($item->status) {
+                        'active' => 'success',
+                        'closed' => 'danger',
+                        'draft' => 'warning',
+                        default => 'secondary'
+                    };
+
+                    $statusText = ucfirst($item->status);
+
+                    return '<div class="dropdown">
+                        <button class="btn btn-sm btn-' . $badgeClass . ' dropdown-toggle" type="button"
+                            data-bs-toggle="dropdown" aria-expanded="false" style="min-width: 100px;">
+                            ' . $statusText . '
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a class="dropdown-item changeStatus ' . ($item->status == 'draft' ? 'active' : '') . '"
+                                href="javascript:void(0)"
+                                data-id="' . $item->id . '"
+                                data-status="draft"
+                                data-current="' . $item->status . '">
+                                    <i class="fa fa-circle text-warning me-2"></i> Draft
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item changeStatus ' . ($item->status == 'active' ? 'active' : '') . '"
+                                href="javascript:void(0)"
+                                data-id="' . $item->id . '"
+                                data-status="active"
+                                data-current="' . $item->status . '">
+                                    <i class="fa fa-circle text-success me-2"></i> Active
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item changeStatus ' . ($item->status == 'closed' ? 'active' : '') . '"
+                                href="javascript:void(0)"
+                                data-id="' . $item->id . '"
+                                data-status="closed"
+                                data-current="' . $item->status . '">
+                                    <i class="fa fa-circle text-danger me-2"></i> Closed
+                                </a>
+                            </li>
+                        </ul>
                     </div>';
                 })
                 ->addColumn('created_at', fn($item) => $item->created_at->format('Y-m-d h:i A'))
