@@ -2,6 +2,7 @@
 @section('title', 'Investment Strategy')
 
 @push('styles')
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.css" rel="stylesheet">
     <link href="{{ asset('default/datatable.css') }}" rel="stylesheet" />
     <style>
         .sortable-row {
@@ -48,6 +49,38 @@
             padding: 12px;
             margin-bottom: 20px;
             border-radius: 4px;
+        }
+
+        /* Summernote Dark Theme Fix */
+        .note-editor .note-editable {
+            background-color: #000000 !important;
+            color: #ffffff !important;
+        }
+
+        .note-editor .note-toolbar {
+            background-color: #1a1a1a !important;
+            border-bottom: 1px solid #333 !important;
+        }
+
+        .note-editor .note-toolbar .note-btn {
+            background-color: #2d2d2d !important;
+            color: #ffffff !important;
+            border: 1px solid #444 !important;
+        }
+
+        .note-editor .note-toolbar .note-btn:hover {
+            background-color: #3d3d3d !important;
+        }
+
+        .note-editor .note-statusbar {
+            background-color: #1a1a1a !important;
+            color: #aaa !important;
+        }
+
+        .note-editor .note-editable:empty:before {
+            content: "Type here...";
+            color: #888 !important;
+            pointer-events: none;
         }
     </style>
 @endpush
@@ -182,18 +215,82 @@
 
 @push('scripts')
     <!-- SortableJS CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.20/summernote-lite.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 
     <script>
         $(document).ready(function() {
-            // Initialize Summernote
+            // Initialize Summernote - FULL DARK MODE
             $('.summernote').summernote({
-                height: 200,
+                height: 300,
                 toolbar: [
-                    ['style', ['bold', 'italic', 'underline', 'clear']],
+                    ['style', ['style']],
+                    ['font', ['bold', 'italic', 'underline', 'clear']],
+                    ['fontname', ['fontname']],
+                    ['color', ['color']],
                     ['para', ['ul', 'ol', 'paragraph']],
+                    ['table', ['table']],
                     ['insert', ['link', 'picture']],
-                ]
+                    ['view', ['fullscreen', 'codeview']]
+                ],
+                callbacks: {
+                    onInit: function() {
+                        // Editor area - black background, white text
+                        $('.note-editable').css({
+                            'background-color': '#000000',
+                            'color': '#ffffff',
+                            'min-height': '300px'
+                        });
+
+                        // Toolbar dark theme
+                        $('.note-toolbar').css({
+                            'background-color': '#1a1a1a',
+                            'border-bottom': '1px solid #333'
+                        });
+
+                        // Force default text color to white
+                        $('.note-editable').attr('style', $('.note-editable').attr('style') +
+                            '; color: #ffffff !important;');
+
+                        // Set default font color to white when typing starts
+                        $('.note-editable').on('focus', function() {
+                            document.execCommand('styleWithCSS', false, true);
+                            document.execCommand('foreColor', false, '#ffffff');
+                        });
+                    },
+                    onKeyup: function(e) {
+                        // Ensure new typed text is always white
+                        const selection = window.getSelection();
+                        if (selection.rangeCount > 0) {
+                            const range = selection.getRangeAt(0);
+                            if (range.startContainer.parentNode.closest !== null) {
+                                document.execCommand('foreColor', false, '#ffffff');
+                            }
+                        }
+                    },
+                    onChange: function(contents, $editable) {
+                        // Always force white text on content change
+                        $('.note-editable').find('*').not('img,hr,table').css('color', '#ffffff');
+                        $('.note-editable').css('color', '#ffffff');
+
+                        saveFormProgress();
+                    }
+                },
+                // Default text color white
+                color: {
+                    foreColor: '#ffffff',
+                    backColor: '#333333'
+                },
+                // Additional style to enforce white text
+                styleWithCSS: true
+            });
+
+            // Extra safety: Force white color on paste
+            $('.note-editable').on('paste', function(e) {
+                setTimeout(function() {
+                    $('.note-editable *').css('color', '#ffffff');
+                    $('.note-editable').css('color', '#ffffff');
+                }, 100);
             });
 
             $.ajaxSetup({
